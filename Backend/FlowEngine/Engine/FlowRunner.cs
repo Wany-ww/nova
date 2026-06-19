@@ -252,7 +252,8 @@ namespace FlowEngine.Engine
                 int stepVal = 1;
 
                 if (inputValues.TryGetValue("start", out var sVal)) startVal = ParseInt(sVal, 1);
-                if (inputValues.TryGetValue("end", out var eVal)) endVal = ParseInt(eVal, 5);
+                if (inputValues.TryGetValue("limit", out var eVal)) endVal = ParseInt(eVal, 5);
+                else if (inputValues.TryGetValue("end", out var eValOld)) endVal = ParseInt(eValOld, 5);
                 if (inputValues.TryGetValue("step", out var stVal)) stepVal = ParseInt(stVal, 1);
                 if (stepVal == 0) stepVal = 1;
 

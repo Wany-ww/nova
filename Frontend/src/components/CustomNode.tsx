@@ -286,37 +286,37 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
               </div>
             ))}
           </div>
-
-          {/* Render Case Inputs for Switch node below the columns */}
-          {name === 'Switch' && (
-            <div style={{ width: '100%', borderTop: '1px solid var(--border-color)', marginTop: '8px', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Case Values</div>
-              {(() => {
-                const numVal = inputValues?.number !== undefined ? Number(inputValues.number) : 0;
-                const typeVal = inputValues?.type !== undefined ? String(inputValues.type) : 'int';
-                const fields = [];
-                for (let i = 1; i <= numVal; i++) {
-                  const casePinName = `case_${i}`;
-                  const val = inputValues?.[casePinName] !== undefined ? inputValues[casePinName] : '';
-                  fields.push(
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', minHeight: '22px' }}>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Case {i}</span>
-                      <input
-                        type={typeVal === 'int' || typeVal === 'float' ? 'number' : 'text'}
-                        className="node-input-field"
-                        style={{ width: '80px' }}
-                        value={val}
-                        onChange={(e) => handleInputChange(casePinName, e.target.value, typeVal)}
-                        onKeyDown={(e) => e.stopPropagation()}
-                      />
-                    </div>
-                  );
-                }
-                return fields;
-              })()}
-            </div>
-          )}
         </div>
+
+        {/* Render Case Inputs for Switch node below custom-node-body container */}
+        {name === 'Switch' && (
+          <div style={{ borderTop: '1px solid var(--border-color)', padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Case Values</div>
+            {(() => {
+              const numVal = inputValues?.number !== undefined ? Number(inputValues.number) : 0;
+              const typeVal = inputValues?.type !== undefined ? String(inputValues.type) : 'int';
+              const fields = [];
+              for (let i = 1; i <= numVal; i++) {
+                const casePinName = `case_${i}`;
+                const val = inputValues?.[casePinName] !== undefined ? inputValues[casePinName] : '';
+                fields.push(
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', minHeight: '22px' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Case {i}</span>
+                    <input
+                      type={typeVal === 'int' || typeVal === 'float' ? 'number' : 'text'}
+                      className="node-input-field"
+                      style={{ width: '80px' }}
+                      value={val}
+                      onChange={(e) => handleInputChange(casePinName, e.target.value, typeVal)}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                );
+              }
+              return fields;
+            })()}
+          </div>
+        )}
 
         {/* Flow outputs for control nodes */}
         {name === 'IfElse' && (
@@ -327,6 +327,7 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
                 type="source"
                 position={Position.Right}
                 id="flow_true"
+                className="flow-handle-right"
                 style={{
                   top: '50%',
                   transform: 'translateY(-50%) rotate(45deg)',
@@ -345,6 +346,7 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
                 type="source"
                 position={Position.Right}
                 id="flow_false"
+                className="flow-handle-right"
                 style={{
                   top: '50%',
                   transform: 'translateY(-50%) rotate(45deg)',
@@ -368,6 +370,7 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
                 type="source"
                 position={Position.Right}
                 id="flow_loop"
+                className="flow-handle-right"
                 style={{
                   top: '50%',
                   transform: 'translateY(-50%) rotate(45deg)',
@@ -386,6 +389,7 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
                 type="source"
                 position={Position.Right}
                 id="flow_done"
+                className="flow-handle-right"
                 style={{
                   top: '50%',
                   transform: 'translateY(-50%) rotate(45deg)',
@@ -436,6 +440,7 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
                         type="source"
                         position={Position.Right}
                         id={c.handleId}
+                        className="flow-handle-right"
                         style={{
                           top: '50%',
                           transform: 'translateY(-50%) rotate(45deg)',
@@ -455,6 +460,7 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
                       type="source"
                       position={Position.Right}
                       id="flow_default"
+                      className="flow-handle-right"
                       style={{
                         top: '50%',
                         transform: 'translateY(-50%) rotate(45deg)',
