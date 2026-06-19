@@ -290,6 +290,8 @@ namespace FlowEngine.Engine
                             return;
                         }
                     }
+                    // Ensure the 'index' output pin is updated to the current loop counter 'i'
+                    loopOutputs["index"] = i;
                     _computedOutputs[nodeId] = loopOutputs;
                     _stateCallback?.Invoke(nodeId, i, "IDLE");
 
@@ -417,12 +419,15 @@ namespace FlowEngine.Engine
                         else if (outputsResult.Count > 0) caseVal = outputsResult.Values.First();
                         
                         string caseStr = caseVal?.ToString() ?? "null";
-                        string targetPort = "flow_" + caseStr;
-                        
-                        bool hasCaseLink = _graph.Links.Any(l => l.FromNode == nodeId && l.FromOutput == targetPort && l.ToInput == "flow_in");
-                        if (hasCaseLink)
+                        // Find matching link case-insensitively to prevent case mismatch issues (e.g. true vs True)
+                        var matchingLink = _graph.Links.FirstOrDefault(l => 
+                            l.FromNode == nodeId && 
+                            l.FromOutput.Equals("flow_" + caseStr, StringComparison.OrdinalIgnoreCase) && 
+                            l.ToInput == "flow_in");
+
+                        if (matchingLink != null)
                         {
-                            targetFlowPorts.Add(targetPort);
+                            targetFlowPorts.Add(matchingLink.FromOutput);
                         }
                         else
                         {
