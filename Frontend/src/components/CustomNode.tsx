@@ -322,12 +322,12 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
         {name === 'IfElse' && (
           <div style={{ borderTop: '1px solid var(--border-color)', padding: '6px 10px', display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: 'rgba(0,0,0,0.1)' }}>
             <div style={{ position: 'relative', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '20px' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--success-color)', marginRight: '6px' }}>True</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--success-color)', marginRight: '6px', pointerEvents: 'none' }}>True</span>
               <Handle
                 type="source"
                 position={Position.Right}
                 id="flow_true"
-                className="flow-handle-right"
+                className="flow-handle-right control-flow-handle"
                 style={{
                   top: '50%',
                   transform: 'translateY(-50%) rotate(45deg)',
@@ -341,12 +341,12 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
               />
             </div>
             <div style={{ position: 'relative', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '20px' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--error-color)', marginRight: '6px' }}>False</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--error-color)', marginRight: '6px', pointerEvents: 'none' }}>False</span>
               <Handle
                 type="source"
                 position={Position.Right}
                 id="flow_false"
-                className="flow-handle-right"
+                className="flow-handle-right control-flow-handle"
                 style={{
                   top: '50%',
                   transform: 'translateY(-50%) rotate(45deg)',
@@ -365,12 +365,12 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
         {name === 'Loop' && (
           <div style={{ borderTop: '1px solid var(--border-color)', padding: '6px 10px', display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: 'rgba(0,0,0,0.1)' }}>
             <div style={{ position: 'relative', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '20px' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-color)', marginRight: '6px' }}>Loop Body</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-color)', marginRight: '6px', pointerEvents: 'none' }}>Loop Body</span>
               <Handle
                 type="source"
                 position={Position.Right}
                 id="flow_loop"
-                className="flow-handle-right"
+                className="flow-handle-right control-flow-handle"
                 style={{
                   top: '50%',
                   transform: 'translateY(-50%) rotate(45deg)',
@@ -384,12 +384,12 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
               />
             </div>
             <div style={{ position: 'relative', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '20px' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginRight: '6px' }}>Done</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginRight: '6px', pointerEvents: 'none' }}>Done</span>
               <Handle
                 type="source"
                 position={Position.Right}
                 id="flow_done"
-                className="flow-handle-right"
+                className="flow-handle-right control-flow-handle"
                 style={{
                   top: '50%',
                   transform: 'translateY(-50%) rotate(45deg)',
@@ -416,17 +416,10 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
                   const casePinName = `case_${i}`;
                   const val = inputValues?.[casePinName];
                   const valStr = val !== undefined && val !== null ? val.toString().trim() : '';
-                  if (valStr !== '') {
-                    casesList.push({
-                      label: valStr,
-                      handleId: `flow_${valStr}`
-                    });
-                  } else {
-                    casesList.push({
-                      label: `[empty ${i}]`,
-                      handleId: `flow_case_empty_${i}`
-                    });
-                  }
+                  casesList.push({
+                    label: valStr !== '' ? valStr : `[empty ${i}]`,
+                    handleId: `flow_case_${i}`
+                  });
                 }
               } else {
                 casesList.push({ label: 'true', handleId: 'flow_true' }, { label: 'false', handleId: 'flow_false' });
@@ -435,12 +428,12 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
                 <>
                   {casesList.map((c, idx) => (
                     <div key={idx} style={{ position: 'relative', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '20px' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--info-color)', marginRight: '6px' }}>Case {c.label}</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--info-color)', marginRight: '6px', pointerEvents: 'none' }}>Case {c.label}</span>
                       <Handle
                         type="source"
                         position={Position.Right}
                         id={c.handleId}
-                        className="flow-handle-right"
+                        className="flow-handle-right control-flow-handle"
                         style={{
                           top: '50%',
                           transform: 'translateY(-50%) rotate(45deg)',
@@ -455,12 +448,12 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
                     </div>
                   ))}
                   <div style={{ position: 'relative', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '20px' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginRight: '6px' }}>Default</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginRight: '6px', pointerEvents: 'none' }}>Default</span>
                     <Handle
                       type="source"
                       position={Position.Right}
                       id="flow_default"
-                      className="flow-handle-right"
+                      className="flow-handle-right control-flow-handle"
                       style={{
                         top: '50%',
                         transform: 'translateY(-50%) rotate(45deg)',

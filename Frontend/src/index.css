@@ -821,6 +821,10 @@ body {
   right: -5px !important;
 }
 
+.react-flow__handle.flow-handle-right.control-flow-handle {
+  right: -15px !important;
+}
+
 /* Layout Resizers */
 .sidebar-resizer {
   width: 6px;

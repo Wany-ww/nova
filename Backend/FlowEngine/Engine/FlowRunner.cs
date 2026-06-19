@@ -414,16 +414,49 @@ namespace FlowEngine.Engine
                     }
                     else if (node.Type == "Switch")
                     {
+                        // Retrieve the evaluated value from the switch output
                         object? caseVal = null;
                         if (outputsResult.TryGetValue("value", out var valObj)) caseVal = valObj;
                         else if (outputsResult.TryGetValue("case", out var caseObj)) caseVal = caseObj;
                         else if (outputsResult.Count > 0) caseVal = outputsResult.Values.First();
                         
-                        string caseStr = caseVal?.ToString() ?? "null";
-                        // Find matching link case-insensitively to prevent case mismatch issues (e.g. true vs True)
+                        string caseStr = caseVal?.ToString()?.Trim() ?? "null";
+
+                        // Determine the stable handle ID (flow_case_1, flow_case_2, etc.) based on node inputs
+                        int numCases = 0;
+                        if (node.Inputs != null && node.Inputs.TryGetValue("number", out var numObj))
+                        {
+                            try
+                            {
+                                numCases = Convert.ToInt32(numObj);
+                            }
+                            catch (Exception)
+                            {
+                                numCases = 0;
+                            }
+                        }
+
+                        // Scan through the registered case input parameters to find a value match
+                        string targetFlowPort = "flow_default";
+                        for (int i = 1; i <= numCases; i++)
+                        {
+                            if (node.Inputs != null && node.Inputs.TryGetValue($"case_{i}", out var caseInputObj))
+                            {
+                                string caseInputStr = caseInputObj?.ToString()?.Trim() ?? string.Empty;
+                                if (caseInputStr.Equals(caseStr, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    targetFlowPort = $"flow_case_{i}";
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Locate the outgoing flow connection in the graph, checking both the new stable 
+                        // handle ID format (flow_case_i) and legacy dynamic value-based handle IDs (flow_[value]).
                         var matchingLink = _graph.Links.FirstOrDefault(l => 
                             l.FromNode == nodeId && 
-                            l.FromOutput.Equals("flow_" + caseStr, StringComparison.OrdinalIgnoreCase) && 
+                            (l.FromOutput.Equals(targetFlowPort, StringComparison.OrdinalIgnoreCase) ||
+                             l.FromOutput.Equals("flow_" + caseStr, StringComparison.OrdinalIgnoreCase)) && 
                             l.ToInput == "flow_in");
 
                         if (matchingLink != null)
