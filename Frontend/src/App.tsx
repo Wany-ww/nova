@@ -625,6 +625,123 @@ const API_DOCS: ApiDoc[] = [
       { type: "any", desc: "The retrieved value (bool, int, float, string, table), or nil if not found." }
     ],
     example: "-- Retrieve a value\nlocal cnt = variable.get(\"globalCount\")\nif cnt then\n    log.info(\"Current count: \" .. tostring(cnt))\nend\n\n-- Retrieve a table\nlocal opt = variable.get(\"options\")\nif opt then\n    log.info(\"Threshold: \" .. tostring(opt.threshold))\nend"
+  },
+  {
+    name: "filesystem.current",
+    category: "Filesystem",
+    signature: "filesystem.current()",
+    description: "Returns the current working directory path of the active application process.",
+    inputs: [],
+    outputs: [{ type: "string", desc: "The absolute path of the current directory." }],
+    example: "local dir = filesystem.current()\nlog.info(\"Current directory: \" .. dir)"
+  },
+  {
+    name: "filesystem.remove",
+    category: "Filesystem",
+    signature: "filesystem.remove(path: string)",
+    description: "Forcefully deletes the file or directory at the specified path (including all subdirectories and files recursively).",
+    inputs: [{ name: "path", type: "string", desc: "The absolute or relative path of the file or directory to delete." }],
+    outputs: [],
+    example: "filesystem.remove(\"output/old_temp\")\nfilesystem.remove(\"temp_log.txt\")"
+  },
+  {
+    name: "filesystem.create",
+    category: "Filesystem",
+    signature: "filesystem.create(path: string)",
+    description: "Recursively creates all directories and subdirectories along the specified path unless they already exist.",
+    inputs: [{ name: "path", type: "string", desc: "The directory path to create." }],
+    outputs: [],
+    example: "filesystem.create(\"output/images/processed\")"
+  },
+  {
+    name: "filesystem.is_exist",
+    category: "Filesystem",
+    signature: "filesystem.is_exist(file: string)",
+    description: "Checks if a file or directory exists at the specified path.",
+    inputs: [{ name: "file", type: "string", desc: "The path of the file or directory to check." }],
+    outputs: [{ type: "boolean", desc: "True if the file or directory exists, otherwise False." }],
+    example: "if filesystem.is_exist(\"save/2026_log.txt\") then\n    log.info(\"Log file exists.\")\nend"
+  },
+  {
+    name: "filesystem.copy",
+    category: "Filesystem",
+    signature: "filesystem.copy(src: string, dst: string)",
+    description: "Copies a file or an entire directory recursively from the source path to the destination path.",
+    inputs: [
+      { name: "src", type: "string", desc: "The source file or directory path." },
+      { name: "dst", type: "string", desc: "The target destination path." }
+    ],
+    outputs: [],
+    example: "filesystem.copy(\"config.json\", \"config_backup.json\")\nfilesystem.copy(\"nodes/\", \"backup/nodes_backup/\")"
+  },
+  {
+    name: "tcp.server.create",
+    category: "Network",
+    signature: "tcp.server.create(port: number)",
+    description: "Starts a TCP listener on the specified port. Returns a socket object that accepts incoming connections, or nil if creation fails.",
+    inputs: [{ name: "port", type: "number", desc: "The TCP port number to listen on." }],
+    outputs: [{ type: "socket", desc: "A TCP server socket object, or nil on failure." }],
+    example: "local server = tcp.server.create(8080)\nif server then\n    log.info(\"TCP server listening on port 8080\")\nend"
+  },
+  {
+    name: "tcp.client.connect",
+    category: "Network",
+    signature: "tcp.client.connect(ip: string, port: number)",
+    description: "Connects a TCP client to the target IP address and port. Returns a socket object on success, or nil if connection fails.",
+    inputs: [
+      { name: "ip", type: "string", desc: "The destination IP address (e.g. '127.0.0.1')." },
+      { name: "port", type: "number", desc: "The target TCP port number." }
+    ],
+    outputs: [{ type: "socket", desc: "A TCP client socket object, or nil on failure." }],
+    example: "local client = tcp.client.connect(\"127.0.0.1\", 8080)\nif client then\n    log.info(\"Connected to TCP server\")\nend"
+  },
+  {
+    name: "udp.server.create",
+    category: "Network",
+    signature: "udp.server.create(port: number)",
+    description: "Binds a UDP socket to the specified port to receive packages from any sender. Returns a socket object, or nil on failure.",
+    inputs: [{ name: "port", type: "number", desc: "The UDP port number to bind to." }],
+    outputs: [{ type: "socket", desc: "A UDP socket object, or nil on failure." }],
+    example: "local server = udp.server.create(9090)\nif server then\n    log.info(\"UDP server bound to port 9090\")\nend"
+  },
+  {
+    name: "udp.client.connect",
+    category: "Network",
+    signature: "udp.client.connect(ip: string, port: number)",
+    description: "Creates a UDP client socket pre-configured to send packages to the specified destination. Returns a socket object, or nil on failure.",
+    inputs: [
+      { name: "ip", type: "string", desc: "The target destination IP address." },
+      { name: "port", type: "number", desc: "The target UDP port number." }
+    ],
+    outputs: [{ type: "socket", desc: "A UDP socket object, or nil on failure." }],
+    example: "local client = udp.client.connect(\"127.0.0.1\", 9090)\nif client then\n    log.info(\"UDP client connected to 127.0.0.1:9090\")\nend"
+  },
+  {
+    name: "socket:set_timeout",
+    category: "Network",
+    signature: "socket:set_timeout(timeoutMs: number)",
+    description: "Sets the receive, send, and connection timeouts of the socket in milliseconds.",
+    inputs: [{ name: "timeoutMs", type: "number", desc: "The timeout duration in milliseconds." }],
+    outputs: [],
+    example: "client:set_timeout(1000) -- Set 1 second timeout"
+  },
+  {
+    name: "socket:transmit",
+    category: "Network",
+    signature: "socket:transmit(bytes: table)",
+    description: "Transmits a package of bytes (formatted as an array table containing byte integers 0-255) through the socket.",
+    inputs: [{ name: "bytes", type: "table", desc: "An array of byte integers (0-255) to send." }],
+    outputs: [],
+    example: "local packet = { 72, 101, 108, 108, 111 } -- 'Hello'\nclient:transmit(packet)"
+  },
+  {
+    name: "socket:receive",
+    category: "Network",
+    signature: "socket:receive()",
+    description: "Receives a byte package from the network stream or socket buffer. Blocks until data arrives or the socket times out.",
+    inputs: [],
+    outputs: [{ type: "table", desc: "A table array containing the received byte integers (0-255), or an empty table on timeout/failure." }],
+    example: "local data = client:receive()\nif #data > 0 then\n    log.info(\"Received \" .. tostring(#data) .. \" bytes\")\nend"
   }
 ];
 
@@ -1814,7 +1931,7 @@ export default function App() {
                 minHeight: 0
               }}>
                 <div style={{ padding: '0 16px 8px 16px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Categories</div>
-                {['All', 'Logging', 'Time', 'Global Memory', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper'].map(cat => (
+                {['All', 'Logging', 'Time', 'Global Memory', 'Filesystem', 'Network', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper'].map(cat => (
                   <button
                     key={cat}
                     onClick={() => setSelectedApiCategory(cat)}

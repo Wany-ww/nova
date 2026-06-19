@@ -20,6 +20,11 @@ namespace FlowEngine.Engine
         private static readonly Dictionary<string, object?> _globalMemory = new Dictionary<string, object?>();
         private static readonly object _globalMemoryLock = new object();
 
+        static LuaRunner()
+        {
+            UserData.RegisterType<LuaSocket>();
+        }
+
                 /// <summary>
         /// Configures real-time log saving to a default or specified file path.
         /// </summary>
@@ -246,6 +251,90 @@ namespace FlowEngine.Engine
                     return DynValue.FromObject(script, val);
                 });
                 script.Globals["variable"] = variableTable;
+
+                // Register global tcp API
+                var tcpTable = new Table(script);
+                var tcpServerTable = new Table(script);
+                var tcpClientTable = new Table(script);
+                tcpServerTable["create"] = (Func<int, LuaSocket?>)((port) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return LuaSocket.CreateTcpServer(port);
+                });
+                tcpClientTable["connect"] = (Func<string, int, LuaSocket?>)((ip, port) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return LuaSocket.ConnectTcpClient(ip, port);
+                });
+                tcpTable["server"] = tcpServerTable;
+                tcpTable["client"] = tcpClientTable;
+                script.Globals["tcp"] = tcpTable;
+
+                // Register global udp API
+                var udpTable = new Table(script);
+                var udpServerTable = new Table(script);
+                var udpClientTable = new Table(script);
+                udpServerTable["create"] = (Func<int, LuaSocket?>)((port) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return LuaSocket.CreateUdpServer(port);
+                });
+                udpClientTable["connect"] = (Func<string, int, LuaSocket?>)((ip, port) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return LuaSocket.ConnectUdpClient(ip, port);
+                });
+                udpTable["server"] = udpServerTable;
+                udpTable["client"] = udpClientTable;
+                script.Globals["udp"] = udpTable;
+
+                // Register global filesystem API
+                var fsTable = new Table(script);
+                fsTable["current"] = (Func<string>)(() =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return Directory.GetCurrentDirectory();
+                });
+                fsTable["remove"] = (Action<string>)((path) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
+                    else if (Directory.Exists(path))
+                    {
+                        Directory.Delete(path, true);
+                    }
+                });
+                fsTable["create"] = (Action<string>)((path) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    Directory.CreateDirectory(path);
+                });
+                fsTable["is_exist"] = (Func<string, bool>)((file) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return File.Exists(file) || Directory.Exists(file);
+                });
+                fsTable["copy"] = (Action<string, string>)((src, dst) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    if (File.Exists(src))
+                    {
+                        string? dir = Path.GetDirectoryName(dst);
+                        if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                        {
+                            Directory.CreateDirectory(dir);
+                        }
+                        File.Copy(src, dst, true);
+                    }
+                    else if (Directory.Exists(src))
+                    {
+                        CopyDirectory(src, dst);
+                    }
+                });
+                script.Globals["filesystem"] = fsTable;
 
                 // Register global cv API
                 OpenCvLuaApi.Register(script);
@@ -569,6 +658,26 @@ namespace FlowEngine.Engine
                     dict[key] = valObj;
                 }
                 return dict;
+            }
+        }
+
+        /// <summary>
+        /// Helper to copy directory content recursively.
+        /// </summary>
+        private static void CopyDirectory(string sourceDir, string destinationDir)
+        {
+            var dir = new DirectoryInfo(sourceDir);
+            if (!dir.Exists) return;
+            Directory.CreateDirectory(destinationDir);
+            foreach (FileInfo file in dir.GetFiles())
+            {
+                string targetFilePath = Path.Combine(destinationDir, file.Name);
+                file.CopyTo(targetFilePath, true);
+            }
+            foreach (DirectoryInfo subDir in dir.GetDirectories())
+            {
+                string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
+                CopyDirectory(subDir.FullName, newDestinationDir);
             }
         }
     }
