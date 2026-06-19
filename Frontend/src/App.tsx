@@ -742,8 +742,115 @@ const API_DOCS: ApiDoc[] = [
     inputs: [],
     outputs: [{ type: "table", desc: "A table array containing the received byte integers (0-255), or an empty table on timeout/failure." }],
     example: "local data = client:receive()\nif #data > 0 then\n    log.info(\"Received \" .. tostring(#data) .. \" bytes\")\nend"
+  },
+  {
+    name: "socket:has_data",
+    category: "Network",
+    signature: "socket:has_data()",
+    description: "Checks if there are bytes available to read in the socket buffer without blocking.",
+    inputs: [],
+    outputs: [{ type: "boolean", desc: "True if bytes are available, otherwise False." }],
+    example: "if client:has_data() then\n    local data = client:receive()\n    log.info(\"Read \" .. tostring(#data) .. \" bytes\")\nend"
+  },
+  {
+    name: "socket:is_connected",
+    category: "Network",
+    signature: "socket:is_connected()",
+    description: "Checks if the socket is currently connected (for TCP) or active (for UDP).",
+    inputs: [],
+    outputs: [{ type: "boolean", desc: "True if connected or active, otherwise False." }],
+    example: "if client:is_connected() then\n    client:transmit({65, 66, 67})\nend"
+  },
+  {
+    name: "socket:get_address",
+    category: "Network",
+    signature: "socket:get_address()",
+    description: "Retrieves the remote IP endpoint address if connected, or the local listener address.",
+    inputs: [],
+    outputs: [{ type: "string", desc: "The IP address and port string (e.g. '127.0.0.1:12345')." }],
+    example: "log.info(\"Socket address: \" .. client:get_address())"
+  },
+  {
+    name: "http.get",
+    category: "HTTP",
+    signature: "http.get(url: string, headers: table)",
+    description: "Sends an HTTP GET request to the specified URL with optional request headers.",
+    inputs: [
+      { name: "url", type: "string", desc: "The target URL." },
+      { name: "headers", type: "table", desc: "A table of key-value pairs representing HTTP request headers (can be nil)." }
+    ],
+    outputs: [{ type: "table", desc: "A response table containing 'status' (number), 'body' (string), 'headers' (table), and optionally 'error' (string)." }],
+    example: "local res = http.get(\"https://api.github.com/zen\", { [\"User-Agent\"] = \"NOVA\" })\nif res.status == 200 then\n    log.info(\"Zen: \" .. res.body)\nelse\n    log.error(\"Error: \" .. tostring(res.error))\nend"
+  },
+  {
+    name: "http.post",
+    category: "HTTP",
+    signature: "http.post(url: string, body: string, headers: table)",
+    description: "Sends an HTTP POST request to the specified URL with a body and optional request headers.",
+    inputs: [
+      { name: "url", type: "string", desc: "The target URL." },
+      { name: "body", type: "string", desc: "The request body payload string." },
+      { name: "headers", type: "table", desc: "A table of key-value pairs representing HTTP request headers (can be nil)." }
+    ],
+    outputs: [{ type: "table", desc: "A response table containing 'status' (number), 'body' (string), 'headers' (table), and optionally 'error' (string)." }],
+    example: "local headers = { [\"Content-Type\"] = \"application/json\" }\nlocal body = \"{\\\"msg\\\":\\\"hello\\\"}\"\nlocal res = http.post(\"https://httpbin.org/post\", body, headers)\nlog.info(\"Post status: \" .. tostring(res.status))"
+  },
+  {
+    name: "json.parse",
+    category: "JSON",
+    signature: "json.parse(str: string)",
+    description: "Parses a JSON-formatted string and converts it into a corresponding Lua table or basic type.",
+    inputs: [{ name: "str", type: "string", desc: "The JSON string to parse." }],
+    outputs: [{ type: "table|any", desc: "The parsed Lua table/value, or nil if parsing fails." }],
+    example: "local data = json.parse(\"{\\\"status\\\": \\\"ok\\\", \\\"value\\\": 123}\")\nif data then\n    log.info(\"Status: \" .. data.status .. \", Val: \" .. tostring(data.value))\nend"
+  },
+  {
+    name: "json.stringify",
+    category: "JSON",
+    signature: "json.stringify(data: any)",
+    description: "Serializes a Lua table, array, or basic type into a JSON-formatted string.",
+    inputs: [{ name: "data", type: "any", desc: "The Lua value (table, string, number, boolean) to serialize." }],
+    outputs: [{ type: "string", desc: "The serialized JSON string representation." }],
+    example: "local myTable = { name = \"NOVA 2\", tags = {\"api\", \"json\"} }\nlocal jsonStr = json.stringify(myTable)\nlog.info(\"JSON: \" .. jsonStr)"
+  },
+  {
+    name: "system.run",
+    category: "System",
+    signature: "system.run(command: string, args: table)",
+    description: "Executes an external system command or process with arguments in a hidden shell, returning stdout and exit code.",
+    inputs: [
+      { name: "command", type: "string", desc: "The executable name or path (e.g. 'cmd.exe', 'python')." },
+      { name: "args", type: "table", desc: "An array of argument strings to pass (can be nil)." }
+    ],
+    outputs: [
+      { type: "string", desc: "The combined standard output and error stream from the process." },
+      { type: "number", desc: "The process exit code." }
+    ],
+    example: "local stdout, exit_code = system.run(\"cmd.exe\", {\"/c\", \"dir\"})\nlog.info(\"Exit code: \" .. tostring(exit_code) .. \"\\nOutput: \\n\" .. stdout)"
+  },
+  {
+    name: "cv.imencode",
+    category: "OpenCV Core",
+    signature: "cv.imencode(format: string, mat: Mat)",
+    description: "Encodes an OpenCV Mat image into a byte array representation (Lua table of integers 0-255) in a specific file format.",
+    inputs: [
+      { name: "format", type: "string", desc: "The file format extension starting with dot (e.g. '.png', '.jpg')." },
+      { name: "mat", type: "Mat", desc: "The OpenCV Mat image object to encode." }
+    ],
+    outputs: [{ type: "table", desc: "A table array of byte integers (0-255) containing the encoded image." }],
+    example: "local pngBytes = cv.imencode(\".png\", myMat)\nlog.info(\"Encoded PNG size: \" .. tostring(#pngBytes) .. \" bytes\")"
+  },
+  {
+    name: "cv.imdecode",
+    category: "OpenCV Core",
+    signature: "cv.imdecode(bytes: table)",
+    description: "Decodes an OpenCV Mat image from a byte array representation (Lua table of integers 0-255).",
+    inputs: [{ name: "bytes", type: "table", desc: "A table array of byte integers (0-255) containing the encoded image." }],
+    outputs: [{ type: "Mat", desc: "The decoded OpenCV Mat image object." }],
+    example: "local newMat = cv.imdecode(pngBytes)\ncv.imshow(\"Decoded Image\", newMat)"
   }
 ];
+
 
 export default function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -1931,7 +2038,7 @@ export default function App() {
                 minHeight: 0
               }}>
                 <div style={{ padding: '0 16px 8px 16px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Categories</div>
-                {['All', 'Logging', 'Time', 'Global Memory', 'Filesystem', 'Network', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper'].map(cat => (
+                {['All', 'Logging', 'Time', 'Global Memory', 'Filesystem', 'Network', 'HTTP', 'JSON', 'System', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper'].map(cat => (
                   <button
                     key={cat}
                     onClick={() => setSelectedApiCategory(cat)}

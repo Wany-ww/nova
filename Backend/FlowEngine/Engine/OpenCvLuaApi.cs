@@ -118,6 +118,45 @@ namespace FlowEngine.Engine
                 return Cv2.ImWrite(filename, mat.Mat);
             });
 
+            // ImEncode & ImDecode
+            cv["imencode"] = (Func<string, MatWrapper, Table>)((ext, mat) =>
+            {
+                if (mat?.Mat == null) throw new ScriptRuntimeException("Mat is null");
+                byte[]? buffer = null;
+                if (Cv2.ImEncode(ext, mat.Mat, out buffer))
+                {
+                    var table = new Table(script);
+                    for (int i = 0; i < buffer.Length; i++)
+                    {
+                        table[i + 1] = (int)buffer[i];
+                    }
+                    return table;
+                }
+                throw new ScriptRuntimeException("Failed to encode Mat to " + ext);
+            });
+
+            cv["imdecode"] = (Func<Table, MatWrapper>)(bytes =>
+            {
+                if (bytes == null) throw new ScriptRuntimeException("Bytes table is null");
+                var byteList = new System.Collections.Generic.List<byte>();
+                foreach (var pair in bytes.Pairs)
+                {
+                    if (pair.Value.Type == DataType.Number)
+                    {
+                        byteList.Add((byte)pair.Value.Number);
+                    }
+                }
+                byte[] data = byteList.ToArray();
+                if (data.Length == 0) throw new ScriptRuntimeException("Empty bytes array for imdecode");
+                Mat decoded = Cv2.ImDecode(data, ImreadModes.Color);
+                if (decoded == null || decoded.Empty())
+                {
+                    throw new ScriptRuntimeException("Failed to decode Mat from bytes");
+                }
+                return new MatWrapper(decoded);
+            });
+
+
             // CvtColor & Threshold & Canny & Resize
             cv["cvtColor"] = (Func<MatWrapper, int, MatWrapper>)((src, code) =>
             {

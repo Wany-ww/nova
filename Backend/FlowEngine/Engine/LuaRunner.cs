@@ -336,8 +336,46 @@ namespace FlowEngine.Engine
                 });
                 script.Globals["filesystem"] = fsTable;
 
+                // Register global http API
+                var httpTable = new Table(script);
+                httpTable["get"] = (Func<string, Table?, Table>)((url, headers) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return HttpGet(script, url, headers);
+                });
+                httpTable["post"] = (Func<string, string, Table?, Table>)((url, body, headers) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return HttpPost(script, url, body, headers);
+                });
+                script.Globals["http"] = httpTable;
+
+                // Register global json API
+                var jsonTable = new Table(script);
+                jsonTable["parse"] = (Func<string, DynValue>)((jsonStr) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return JsonParse(script, jsonStr);
+                });
+                jsonTable["stringify"] = (Func<DynValue, string>)((val) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return JsonStringify(val);
+                });
+                script.Globals["json"] = jsonTable;
+
+                // Register global system API
+                var systemTable = new Table(script);
+                systemTable["run"] = (Func<string, Table?, DynValue>)((command, argsTable) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return SystemRun(script, command, argsTable);
+                });
+                script.Globals["system"] = systemTable;
+
                 // Register global cv API
                 OpenCvLuaApi.Register(script);
+
 
                 // Load custom script
                 script.DoString(metadata.CleanScript);
@@ -680,5 +718,242 @@ namespace FlowEngine.Engine
                 CopyDirectory(subDir.FullName, newDestinationDir);
             }
         }
+
+        /// <summary>
+        /// Sends an HTTP GET request to the specified URL with optional request headers.
+        /// </summary>
+        private static Table HttpGet(Script script, string url, Table? headers)
+        {
+            var resTable = new Table(script);
+            try
+            {
+                using (var client = new System.Net.Http.HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromSeconds(10);
+                    var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, url);
+                    if (headers != null)
+                    {
+                        foreach (var pair in headers.Pairs)
+                        {
+                            string key = pair.Key.String;
+                            if (key != null)
+                            {
+                                request.Headers.TryAddWithoutValidation(key, pair.Value.String ?? pair.Value.ToString());
+                            }
+                        }
+                    }
+                    var response = client.SendAsync(request).Result;
+                    resTable["status"] = (int)response.StatusCode;
+                    resTable["body"] = response.Content.ReadAsStringAsync().Result;
+                    
+                    var resHeaders = new Table(script);
+                    foreach (var header in response.Headers)
+                    {
+                        resHeaders[header.Key] = string.Join(", ", header.Value);
+                    }
+                    foreach (var header in response.Content.Headers)
+                    {
+                        resHeaders[header.Key] = string.Join(", ", header.Value);
+                    }
+                    resTable["headers"] = resHeaders;
+                }
+            }
+            catch (Exception ex)
+            {
+                resTable["status"] = 0;
+                resTable["body"] = "";
+                resTable["error"] = ex.InnerException?.Message ?? ex.Message;
+            }
+            return resTable;
+        }
+
+        /// <summary>
+        /// Sends an HTTP POST request to the specified URL with a body string and optional request headers.
+        /// </summary>
+        private static Table HttpPost(Script script, string url, string body, Table? headers)
+        {
+            var resTable = new Table(script);
+            try
+            {
+                using (var client = new System.Net.Http.HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromSeconds(10);
+                    var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Post, url);
+                    request.Content = new System.Net.Http.StringContent(body ?? "", System.Text.Encoding.UTF8);
+                    
+                    if (headers != null)
+                    {
+                        foreach (var pair in headers.Pairs)
+                        {
+                            string key = pair.Key.String;
+                            if (key != null)
+                            {
+                                if (key.Equals("content-type", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    request.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(pair.Value.String ?? pair.Value.ToString());
+                                }
+                                else
+                                {
+                                    request.Headers.TryAddWithoutValidation(key, pair.Value.String ?? pair.Value.ToString());
+                                }
+                            }
+                        }
+                    }
+                    var response = client.SendAsync(request).Result;
+                    resTable["status"] = (int)response.StatusCode;
+                    resTable["body"] = response.Content.ReadAsStringAsync().Result;
+                    
+                    var resHeaders = new Table(script);
+                    foreach (var header in response.Headers)
+                    {
+                        resHeaders[header.Key] = string.Join(", ", header.Value);
+                    }
+                    foreach (var header in response.Content.Headers)
+                    {
+                        resHeaders[header.Key] = string.Join(", ", header.Value);
+                    }
+                    resTable["headers"] = resHeaders;
+                }
+            }
+            catch (Exception ex)
+            {
+                resTable["status"] = 0;
+                resTable["body"] = "";
+                resTable["error"] = ex.InnerException?.Message ?? ex.Message;
+            }
+            return resTable;
+        }
+
+        /// <summary>
+        /// Recursively converts a JsonElement into a MoonSharp DynValue.
+        /// </summary>
+        private static DynValue JsonToDynValue(Script script, System.Text.Json.JsonElement element)
+        {
+            switch (element.ValueKind)
+            {
+                case System.Text.Json.JsonValueKind.Object:
+                    var objTable = new Table(script);
+                    foreach (var prop in element.EnumerateObject())
+                    {
+                        objTable[prop.Name] = JsonToDynValue(script, prop.Value);
+                    }
+                    return DynValue.NewTable(objTable);
+                case System.Text.Json.JsonValueKind.Array:
+                    var arrTable = new Table(script);
+                    int index = 1;
+                    foreach (var item in element.EnumerateArray())
+                    {
+                        arrTable[index++] = JsonToDynValue(script, item);
+                    }
+                    return DynValue.NewTable(arrTable);
+                case System.Text.Json.JsonValueKind.String:
+                    return DynValue.NewString(element.GetString());
+                case System.Text.Json.JsonValueKind.Number:
+                    return DynValue.NewNumber(element.GetDouble());
+                case System.Text.Json.JsonValueKind.True:
+                    return DynValue.NewBoolean(true);
+                case System.Text.Json.JsonValueKind.False:
+                    return DynValue.NewBoolean(false);
+                case System.Text.Json.JsonValueKind.Null:
+                default:
+                    return DynValue.Nil;
+            }
+        }
+
+        /// <summary>
+        /// Parses a JSON string and returns a Lua-compatible representation.
+        /// </summary>
+        private static DynValue JsonParse(Script script, string jsonStr)
+        {
+            try
+            {
+                using (var doc = System.Text.Json.JsonDocument.Parse(jsonStr))
+                {
+                    return JsonToDynValue(script, doc.RootElement.Clone());
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"JSON Parse error: {ex.Message}");
+                return DynValue.Nil;
+            }
+        }
+
+        /// <summary>
+        /// Serializes a MoonSharp DynValue to a JSON string.
+        /// </summary>
+        private static string JsonStringify(DynValue val)
+        {
+            try
+            {
+                object? obj = ConvertDynValue(val);
+                var options = new System.Text.Json.JsonSerializerOptions
+                {
+                    WriteIndented = false,
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All)
+                };
+                return System.Text.Json.JsonSerializer.Serialize(obj, options);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"JSON Stringify error: {ex.Message}");
+                return "{}";
+            }
+        }
+
+        /// <summary>
+        /// Runs an external system command with optional arguments and returns stdout and exit code.
+        /// </summary>
+        private static DynValue SystemRun(Script script, string command, Table? argsTable)
+        {
+            string stdout = "";
+            int exitCode = -1;
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo();
+                psi.FileName = command;
+                
+                var argList = new List<string>();
+                if (argsTable != null)
+                {
+                    foreach (var pair in argsTable.Pairs)
+                    {
+                        argList.Add(pair.Value.Type == DataType.String ? pair.Value.String : pair.Value.ToString());
+                    }
+                }
+                
+                if (argList.Count > 0)
+                {
+                    var escapedArgs = argList.Select(a => a.Contains(" ") && !a.StartsWith("\"") ? $"\"{a}\"" : a);
+                    psi.Arguments = string.Join(" ", escapedArgs);
+                }
+                
+                psi.RedirectStandardOutput = true;
+                psi.RedirectStandardError = true;
+                psi.UseShellExecute = false;
+                psi.CreateNoWindow = true;
+                
+                using (var process = System.Diagnostics.Process.Start(psi))
+                {
+                    if (process != null)
+                    {
+                        string output = process.StandardOutput.ReadToEnd();
+                        string error = process.StandardError.ReadToEnd();
+                        process.WaitForExit();
+                        
+                        stdout = output + (string.IsNullOrEmpty(error) ? "" : "\n" + error);
+                        exitCode = process.ExitCode;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                stdout = "Error: " + ex.Message;
+                exitCode = -1;
+            }
+            
+            return DynValue.NewTuple(DynValue.NewString(stdout), DynValue.NewNumber(exitCode));
+        }
     }
 }
+

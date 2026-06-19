@@ -303,6 +303,58 @@ namespace FlowEngine.Engine
         }
 
         /// <summary>
+        /// Checks if bytes are available to be read from the socket.
+        /// </summary>
+        public bool has_data()
+        {
+            if (_tcpClient != null)
+            {
+                return _tcpClient.Connected && _tcpClient.Available > 0;
+            }
+            if (_udpClient != null)
+            {
+                return _udpClient.Available > 0;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the socket is currently connected or active.
+        /// </summary>
+        public bool is_connected()
+        {
+            if (_mode == SocketMode.TcpClient || _mode == SocketMode.TcpServer)
+            {
+                return _tcpClient != null && _tcpClient.Connected;
+            }
+            return _udpClient != null;
+        }
+
+        /// <summary>
+        /// Retrieves the remote endpoint or local endpoint address of the socket.
+        /// </summary>
+        public string get_address()
+        {
+            if (_tcpClient != null && _tcpClient.Client.RemoteEndPoint != null)
+            {
+                return _tcpClient.Client.RemoteEndPoint.ToString() ?? "";
+            }
+            if (_udpRemoteEndPoint != null)
+            {
+                return _udpRemoteEndPoint.ToString();
+            }
+            if (_tcpListener != null)
+            {
+                return _tcpListener.LocalEndpoint.ToString() ?? "";
+            }
+            if (_udpClient != null && _udpClient.Client.LocalEndPoint != null)
+            {
+                return _udpClient.Client.LocalEndPoint.ToString() ?? "";
+            }
+            return "";
+        }
+
+        /// <summary>
         /// Disposes all wrapped TCP and UDP resources.
         /// </summary>
         public void Dispose()
@@ -313,3 +365,4 @@ namespace FlowEngine.Engine
         }
     }
 }
+
