@@ -345,10 +345,16 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
         {name === 'Switch' && (
           <div style={{ borderTop: '1px solid var(--border-color)', padding: '6px 10px', display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: 'rgba(0,0,0,0.1)' }}>
             {(() => {
-              const casesStr = inputValues?.cases !== undefined ? inputValues.cases : (computedInputs?.cases !== undefined ? computedInputs.cases : "true, false");
-              const casesList = typeof casesStr === 'string'
-                ? casesStr.split(',').map(c => c.trim()).filter(c => c.length > 0)
-                : [];
+              const numVal = inputValues?.number !== undefined ? Number(inputValues.number) : (computedInputs?.number !== undefined ? Number(computedInputs.number) : 0);
+              const typeVal = inputValues?.type !== undefined ? String(inputValues.type) : (computedInputs?.type !== undefined ? String(computedInputs.type) : '');
+              const casesList: string[] = [];
+              if (typeVal && numVal > 0) {
+                for (let i = 1; i <= numVal; i++) {
+                  casesList.push(`${typeVal} ${i}`);
+                }
+              } else {
+                casesList.push('true', 'false');
+              }
               return (
                 <>
                   {casesList.map((cName, idx) => (

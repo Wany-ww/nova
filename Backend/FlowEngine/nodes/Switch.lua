@@ -1,7 +1,7 @@
 -- @node: Switch
 -- @description: Evaluates the input value and routes flow to the matching Case branch or Default.
--- @input: value : string, cases : string
--- @output: value : string
-function switchNode(value : string, cases : string) -> value : string
+-- @input: value : any, number : int, type : string
+-- @output: value : any
+function switchNode(value : any, number : int, type : string) -> value : any
     return value
 end

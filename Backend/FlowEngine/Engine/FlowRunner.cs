@@ -155,7 +155,7 @@ namespace FlowEngine.Engine
                 // 2. Has an outgoing flow connection but NO incoming flow connection (start of flow).
                 var allTargetNodes = _graph.Links.Select(l => l.ToNode).ToHashSet();
                 var flowTargetNodes = _graph.Links.Where(l => l.ToInput == "flow_in").Select(l => l.ToNode).ToHashSet();
-                var nodesWithOutgoingFlow = _graph.Links.Where(l => l.FromOutput == "flow_out").Select(l => l.FromNode).ToHashSet();
+                var nodesWithOutgoingFlow = _graph.Links.Where(l => l.FromOutput.StartsWith("flow_")).Select(l => l.FromNode).ToHashSet();
 
                 var entryNodes = new List<string>();
                 foreach (var node in _graph.Nodes)
