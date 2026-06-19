@@ -61,11 +61,12 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
 
   const handleInputChange = (pinName: string, valStr: string, type: string) => {
     let parsed: any = valStr;
-    if (type === 'int') {
-      parsed = parseInt(valStr, 10) || 0;
-    } else if (type === 'float') {
-      parsed = parseFloat(valStr) || 0;
-    } else if (type === 'bool') {
+    const currentType = (name === 'Switch' && (pinName === 'value' || pinName.startsWith('case_'))) ? (inputValues?.type || 'int') : type;
+    if (currentType === 'int') {
+      parsed = valStr === '' ? '' : (parseInt(valStr, 10) ?? 0);
+    } else if (currentType === 'float') {
+      parsed = valStr === '' ? '' : (parseFloat(valStr) ?? 0.0);
+    } else if (currentType === 'bool') {
       parsed = valStr === 'true';
     }
     if (onUpdateInputValue) {
@@ -207,6 +208,10 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
               const isConnected = connectedInputs?.includes(pin.name);
               const currentVal = inputValues?.[pin.name] !== undefined ? inputValues[pin.name] : (pin.defaultValue ?? '');
               
+              // Dynamic type resolution for Switch node's value pin
+              const typeVal = inputValues?.type !== undefined ? String(inputValues.type) : 'int';
+              const displayType = (name === 'Switch' && pin.name === 'value') ? typeVal : pin.type;
+              
               return (
                 <div key={pin.name} className="pin-row" style={{ minHeight: '22px' }}>
                   <Handle
@@ -217,17 +222,41 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
                   />
                   
                   <span className="pin-label">{pin.name}</span>
-                  <span className="pin-type">:{pin.type}</span>
+                  <span className="pin-type">:{displayType}</span>
 
                   {/* Show input field if not connected */}
                   {!isConnected && pin.type !== 'table' && pin.type !== 'image' && (
-                    <input
-                      type={pin.type === 'int' || pin.type === 'float' ? 'number' : 'text'}
-                      className="node-input-field"
-                      value={currentVal}
-                      onChange={(e) => handleInputChange(pin.name, e.target.value, pin.type)}
-                      onKeyDown={(e) => e.stopPropagation()} // Stop backspace deleting node in canvas
-                    />
+                    <>
+                      {name === 'Switch' && pin.name === 'type' ? (
+                        <select
+                          className="node-input-field"
+                          value={currentVal}
+                          onChange={(e) => handleInputChange(pin.name, e.target.value, 'string')}
+                        >
+                          <option value="int">int</option>
+                          <option value="float">float</option>
+                          <option value="string">string</option>
+                          <option value="bool">bool</option>
+                        </select>
+                      ) : name === 'Switch' && pin.name === 'value' && typeVal === 'bool' ? (
+                        <select
+                          className="node-input-field"
+                          value={currentVal.toString()}
+                          onChange={(e) => handleInputChange(pin.name, e.target.value, 'bool')}
+                        >
+                          <option value="true">true</option>
+                          <option value="false">false</option>
+                        </select>
+                      ) : (
+                        <input
+                          type={displayType === 'int' || displayType === 'float' ? 'number' : 'text'}
+                          className="node-input-field"
+                          value={currentVal}
+                          onChange={(e) => handleInputChange(pin.name, e.target.value, pin.type)}
+                          onKeyDown={(e) => e.stopPropagation()} // Stop backspace deleting node in canvas
+                        />
+                      )}
+                    </>
                   )}
 
                   {/* Show computed value if connected */}
@@ -245,7 +274,7 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
           <div className="custom-node-column right">
             {outputs && outputs.map((pin) => (
               <div key={pin.name} className="pin-row right" style={{ minHeight: '22px' }}>
-                <span className="pin-type">:{pin.type} </span>
+                <span className="pin-type">:{(name === 'Switch' && pin.name === 'value') ? (inputValues?.type || 'any') : pin.type} </span>
                 <span className="pin-label">{pin.name}</span>
                 
                 <Handle
@@ -257,6 +286,36 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
               </div>
             ))}
           </div>
+
+          {/* Render Case Inputs for Switch node below the columns */}
+          {name === 'Switch' && (
+            <div style={{ width: '100%', borderTop: '1px solid var(--border-color)', marginTop: '8px', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Case Values</div>
+              {(() => {
+                const numVal = inputValues?.number !== undefined ? Number(inputValues.number) : 0;
+                const typeVal = inputValues?.type !== undefined ? String(inputValues.type) : 'int';
+                const fields = [];
+                for (let i = 1; i <= numVal; i++) {
+                  const casePinName = `case_${i}`;
+                  const val = inputValues?.[casePinName] !== undefined ? inputValues[casePinName] : '';
+                  fields.push(
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', minHeight: '22px' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Case {i}</span>
+                      <input
+                        type={typeVal === 'int' || typeVal === 'float' ? 'number' : 'text'}
+                        className="node-input-field"
+                        style={{ width: '80px' }}
+                        value={val}
+                        onChange={(e) => handleInputChange(casePinName, e.target.value, typeVal)}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      />
+                    </div>
+                  );
+                }
+                return fields;
+              })()}
+            </div>
+          )}
         </div>
 
         {/* Flow outputs for control nodes */}
@@ -345,25 +404,38 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
         {name === 'Switch' && (
           <div style={{ borderTop: '1px solid var(--border-color)', padding: '6px 10px', display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: 'rgba(0,0,0,0.1)' }}>
             {(() => {
-              const numVal = inputValues?.number !== undefined ? Number(inputValues.number) : (computedInputs?.number !== undefined ? Number(computedInputs.number) : 0);
-              const typeVal = inputValues?.type !== undefined ? String(inputValues.type) : (computedInputs?.type !== undefined ? String(computedInputs.type) : '');
-              const casesList: string[] = [];
-              if (typeVal && numVal > 0) {
+              const numVal = inputValues?.number !== undefined ? Number(inputValues.number) : 0;
+              
+              const casesList: { label: string; handleId: string }[] = [];
+              if (numVal > 0) {
                 for (let i = 1; i <= numVal; i++) {
-                  casesList.push(`${typeVal} ${i}`);
+                  const casePinName = `case_${i}`;
+                  const val = inputValues?.[casePinName];
+                  const valStr = val !== undefined && val !== null ? val.toString().trim() : '';
+                  if (valStr !== '') {
+                    casesList.push({
+                      label: valStr,
+                      handleId: `flow_${valStr}`
+                    });
+                  } else {
+                    casesList.push({
+                      label: `[empty ${i}]`,
+                      handleId: `flow_case_empty_${i}`
+                    });
+                  }
                 }
               } else {
-                casesList.push('true', 'false');
+                casesList.push({ label: 'true', handleId: 'flow_true' }, { label: 'false', handleId: 'flow_false' });
               }
               return (
                 <>
-                  {casesList.map((cName, idx) => (
+                  {casesList.map((c, idx) => (
                     <div key={idx} style={{ position: 'relative', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '20px' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--info-color)', marginRight: '6px' }}>Case {cName}</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--info-color)', marginRight: '6px' }}>Case {c.label}</span>
                       <Handle
                         type="source"
                         position={Position.Right}
-                        id={`flow_${cName}`}
+                        id={c.handleId}
                         style={{
                           top: '50%',
                           transform: 'translateY(-50%) rotate(45deg)',

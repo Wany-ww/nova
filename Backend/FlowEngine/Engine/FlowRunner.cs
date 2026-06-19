@@ -251,9 +251,9 @@ namespace FlowEngine.Engine
                 int endVal = 5;
                 int stepVal = 1;
 
-                if (inputValues.TryGetValue("start", out var sVal)) startVal = Convert.ToInt32(sVal);
-                if (inputValues.TryGetValue("end", out var eVal)) endVal = Convert.ToInt32(eVal);
-                if (inputValues.TryGetValue("step", out var stVal)) stepVal = Convert.ToInt32(stVal);
+                if (inputValues.TryGetValue("start", out var sVal)) startVal = ParseInt(sVal, 1);
+                if (inputValues.TryGetValue("end", out var eVal)) endVal = ParseInt(eVal, 5);
+                if (inputValues.TryGetValue("step", out var stVal)) stepVal = ParseInt(stVal, 1);
                 if (stepVal == 0) stepVal = 1;
 
                 _logCallback?.Invoke("INFO", $"Executing Loop node '{nodeId}': {startVal} to {endVal} step {stepVal}");
@@ -489,6 +489,21 @@ namespace FlowEngine.Engine
                 if (FlowExecutionManager.StopRequested) break;
                 ExecuteNode(downId);
             }
+        }
+
+        private int ParseInt(object? val, int defaultVal)
+        {
+            if (val == null) return defaultVal;
+            if (val is JsonElement je)
+            {
+                if (je.ValueKind == JsonValueKind.Number && je.TryGetInt32(out var res)) return res;
+                if (je.ValueKind == JsonValueKind.String && int.TryParse(je.GetString(), out var sRes)) return sRes;
+            }
+            if (val is int iVal) return iVal;
+            if (val is double dVal) return (int)dVal;
+            if (val is float fVal) return (int)fVal;
+            if (int.TryParse(val.ToString(), out var parsed)) return parsed;
+            return defaultVal;
         }
     }
 }
