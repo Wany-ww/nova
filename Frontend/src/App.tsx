@@ -562,6 +562,231 @@ const API_DOCS: ApiDoc[] = [
     example: "cv.putText(img, \"NOVA engine\", 20, 40, 1.2, {255, 255, 255}, 2)"
   },
   {
+    name: "cv.GaussianBlur",
+    category: "OpenCV Blurring",
+    signature: "cv.GaussianBlur(src: Mat, ksize_w: number, ksize_h: number, sigmaX: number, sigmaY?: number, borderType?: number)",
+    description: "Blurs an image using a Gaussian filter.",
+    inputs: [
+      { name: "src", type: "Mat", desc: "The source image matrix." },
+      { name: "ksize_w", type: "number", desc: "Gaussian kernel width (must be positive and odd)." },
+      { name: "ksize_h", type: "number", desc: "Gaussian kernel height (must be positive and odd)." },
+      { name: "sigmaX", type: "number", desc: "Gaussian kernel standard deviation in X direction." },
+      { name: "sigmaY", type: "number", desc: "(Optional) Gaussian kernel standard deviation in Y direction. Default is 0.0." },
+      { name: "borderType", type: "number", desc: "(Optional) Pixel extrapolation method. Default is Reflect101." }
+    ],
+    outputs: [{ type: "Mat", desc: "The blurred destination image matrix." }],
+    example: "local blurred = cv.GaussianBlur(img, 5, 5, 1.5)\ncv.imshow(\"Gaussian Blur\", blurred)\nblurred:release()"
+  },
+  {
+    name: "cv.medianBlur",
+    category: "OpenCV Blurring",
+    signature: "cv.medianBlur(src: Mat, ksize: number)",
+    description: "Blurs an image using a median filter (great for removing salt-and-pepper noise).",
+    inputs: [
+      { name: "src", type: "Mat", desc: "The source image matrix." },
+      { name: "ksize", type: "number", desc: "Aperture linear size (must be positive and odd, e.g. 3, 5, 7)." }
+    ],
+    outputs: [{ type: "Mat", desc: "The blurred destination image matrix." }],
+    example: "local clean = cv.medianBlur(noisyImg, 5)\ncv.imshow(\"Median Filtered\", clean)\nclean:release()"
+  },
+  {
+    name: "cv.getStructuringElement",
+    category: "OpenCV Morphology",
+    signature: "cv.getStructuringElement(shape: number, kw: number, kh: number)",
+    description: "Returns a structuring element (kernel matrix) of the specified size and shape for morphological operations.",
+    inputs: [
+      { name: "shape", type: "number", desc: "Element shape (cv.MORPH_RECT, cv.MORPH_CROSS, or cv.MORPH_ELLIPSE)." },
+      { name: "kw", type: "number", desc: "Structuring element width." },
+      { name: "kh", type: "number", desc: "Structuring element height." }
+    ],
+    outputs: [{ type: "Mat", desc: "Structuring element matrix kernel." }],
+    example: "local kernel = cv.getStructuringElement(cv.MORPH_RECT, 3, 3)\nkernel:release()"
+  },
+  {
+    name: "cv.erode",
+    category: "OpenCV Morphology",
+    signature: "cv.erode(src: Mat, element: Mat, iterations?: number)",
+    description: "Erodes an image by using a specific structuring element.",
+    inputs: [
+      { name: "src", type: "Mat", desc: "The source image matrix." },
+      { name: "element", type: "Mat", desc: "Structuring element kernel used for erosion." },
+      { name: "iterations", type: "number", desc: "(Optional) Number of times erosion is applied. Default is 1." }
+    ],
+    outputs: [{ type: "Mat", desc: "The eroded destination image matrix." }],
+    example: "local kernel = cv.getStructuringElement(cv.MORPH_RECT, 3, 3)\nlocal eroded = cv.erode(img, kernel, 1)\ncv.imshow(\"Erosion\", eroded)\neroded:release()\nkernel:release()"
+  },
+  {
+    name: "cv.dilate",
+    category: "OpenCV Morphology",
+    signature: "cv.dilate(src: Mat, element: Mat, iterations?: number)",
+    description: "Dilates an image by using a specific structuring element.",
+    inputs: [
+      { name: "src", type: "Mat", desc: "The source image matrix." },
+      { name: "element", type: "Mat", desc: "Structuring element kernel used for dilation." },
+      { name: "iterations", type: "number", desc: "(Optional) Number of times dilation is applied. Default is 1." }
+    ],
+    outputs: [{ type: "Mat", desc: "The dilated destination image matrix." }],
+    example: "local kernel = cv.getStructuringElement(cv.MORPH_RECT, 3, 3)\nlocal dilated = cv.dilate(img, kernel, 1)\ncv.imshow(\"Dilation\", dilated)\ndilated:release()\nkernel:release()"
+  },
+  {
+    name: "cv.getRotationMatrix2D",
+    category: "OpenCV Warping",
+    signature: "cv.getRotationMatrix2D(cx: number, cy: number, angle: number, scale: number)",
+    description: "Calculates an affine matrix of 2D rotation.",
+    inputs: [
+      { name: "cx", type: "number", desc: "X-coordinate of the center of rotation." },
+      { name: "cy", type: "number", desc: "Y-coordinate of the center of rotation." },
+      { name: "angle", type: "number", desc: "Rotation angle in degrees. Positive values mean counter-clockwise rotation." },
+      { name: "scale", type: "number", desc: "Isotropic scale factor." }
+    ],
+    outputs: [{ type: "Mat", desc: "The computed 2x3 affine rotation matrix." }],
+    example: "local M = cv.getRotationMatrix2D(100, 100, 45, 1.0)\nM:release()"
+  },
+  {
+    name: "cv.warpAffine",
+    category: "OpenCV Warping",
+    signature: "cv.warpAffine(src: Mat, M: Mat, dw: number, dh: number, flags?: number, borderMode?: number)",
+    description: "Applies an affine transformation to an image.",
+    inputs: [
+      { name: "src", type: "Mat", desc: "The source image matrix." },
+      { name: "M", type: "Mat", desc: "2x3 transformation matrix." },
+      { name: "dw", type: "number", desc: "Width of the destination image." },
+      { name: "dh", type: "number", desc: "Height of the destination image." },
+      { name: "flags", type: "number", desc: "(Optional) Combination of interpolation methods (e.g. cv.INTER_LINEAR)." },
+      { name: "borderMode", type: "number", desc: "(Optional) Pixel extrapolation method (e.g. cv.BORDER_CONSTANT)." }
+    ],
+    outputs: [{ type: "Mat", desc: "The warped destination image matrix." }],
+    example: "local M = cv.getRotationMatrix2D(img:cols()/2, img:rows()/2, 30, 1.0)\nlocal warped = cv.warpAffine(img, M, img:cols(), img:rows())\ncv.imshow(\"Rotated\", warped)\nwarped:release()\nM:release()"
+  },
+  {
+    name: "cv.bitwise_and",
+    category: "OpenCV Logical",
+    signature: "cv.bitwise_and(src1: Mat, src2: Mat, mask?: Mat)",
+    description: "Computes bitwise conjunction of two matrices element-wise.",
+    inputs: [
+      { name: "src1", type: "Mat", desc: "First source matrix." },
+      { name: "src2", type: "Mat", desc: "Second source matrix." },
+      { name: "mask", type: "Mat", desc: "(Optional) Operation mask. Specifies elements of the output matrix to be changed." }
+    ],
+    outputs: [{ type: "Mat", desc: "The logical AND destination matrix." }],
+    example: "local output = cv.bitwise_and(img1, img2)\noutput:release()"
+  },
+  {
+    name: "cv.bitwise_or",
+    category: "OpenCV Logical",
+    signature: "cv.bitwise_or(src1: Mat, src2: Mat, mask?: Mat)",
+    description: "Computes bitwise disjunction of two matrices element-wise.",
+    inputs: [
+      { name: "src1", type: "Mat", desc: "First source matrix." },
+      { name: "src2", type: "Mat", desc: "Second source matrix." },
+      { name: "mask", type: "Mat", desc: "(Optional) Operation mask." }
+    ],
+    outputs: [{ type: "Mat", desc: "The logical OR destination matrix." }],
+    example: "local output = cv.bitwise_or(img1, img2)\noutput:release()"
+  },
+  {
+    name: "cv.bitwise_xor",
+    category: "OpenCV Logical",
+    signature: "cv.bitwise_xor(src1: Mat, src2: Mat, mask?: Mat)",
+    description: "Computes bitwise exclusive-or of two matrices element-wise.",
+    inputs: [
+      { name: "src1", type: "Mat", desc: "First source matrix." },
+      { name: "src2", type: "Mat", desc: "Second source matrix." },
+      { name: "mask", type: "Mat", desc: "(Optional) Operation mask." }
+    ],
+    outputs: [{ type: "Mat", desc: "The logical XOR destination matrix." }],
+    example: "local output = cv.bitwise_xor(img1, img2)\noutput:release()"
+  },
+  {
+    name: "cv.bitwise_not",
+    category: "OpenCV Logical",
+    signature: "cv.bitwise_not(src: Mat, mask?: Mat)",
+    description: "Inverts every bit of an array.",
+    inputs: [
+      { name: "src", type: "Mat", desc: "Source matrix." },
+      { name: "mask", type: "Mat", desc: "(Optional) Operation mask." }
+    ],
+    outputs: [{ type: "Mat", desc: "The logical inverted destination matrix." }],
+    example: "local inverted = cv.bitwise_not(img)\ncv.imshow(\"Inverted\", inverted)\ninverted:release()"
+  },
+  {
+    name: "cv.split",
+    category: "OpenCV Channels",
+    signature: "cv.split(src: Mat)",
+    description: "Divides a multi-channel array into several single-channel arrays.",
+    inputs: [{ name: "src", type: "Mat", desc: "Source multi-channel matrix." }],
+    outputs: [{ type: "table", desc: "An array list containing individual single-channel Mat elements." }],
+    example: "local channels = cv.split(rgbImg)\nlocal blue = channels[1]\nlocal green = channels[2]\nlocal red = channels[3]\ncv.imshow(\"Blue Channel\", blue)\nblue:release()\ngreen:release()\nred:release()"
+  },
+  {
+    name: "cv.merge",
+    category: "OpenCV Channels",
+    signature: "cv.merge(channels: table)",
+    description: "Creates one multi-channel array out of several single-channel ones.",
+    inputs: [{ name: "channels", type: "table", desc: "An array table list containing individual single-channel Mat elements." }],
+    outputs: [{ type: "Mat", desc: "Combined multi-channel destination matrix." }],
+    example: "local rgbImg = cv.merge({bChannel, gChannel, rChannel})"
+  },
+  {
+    name: "cv.matchTemplate",
+    category: "OpenCV Detection",
+    signature: "cv.matchTemplate(image: Mat, templ: Mat, method: number)",
+    description: "Compares a template against overlapped image regions.",
+    inputs: [
+      { name: "image", type: "Mat", desc: "Image where the search is running." },
+      { name: "templ", type: "Mat", desc: "Searched template. It must be not greater than the source image." },
+      { name: "method", type: "number", desc: "OpenCV TemplateMatchModes constant (e.g. cv.TM_CCOEFF_NORMED)." }
+    ],
+    outputs: [{ type: "Mat", desc: "Comparison map matrix of type CV_32FC1." }],
+    example: "local map = cv.matchTemplate(img, template, cv.TM_CCOEFF_NORMED)\nmap:release()"
+  },
+  {
+    name: "cv.minMaxLoc",
+    category: "OpenCV Detection",
+    signature: "cv.minMaxLoc(src: Mat)",
+    description: "Finds the global minimum and maximum values and their locations in a single-channel array.",
+    inputs: [{ name: "src", type: "Mat", desc: "Source single-channel matrix." }],
+    outputs: [{ type: "table", desc: "Table structure containing fields: minVal, maxVal, minLoc (table {x,y}), and maxLoc (table {x,y})." }],
+    example: "local map = cv.matchTemplate(img, template, cv.TM_CCOEFF_NORMED)\nlocal locs = cv.minMaxLoc(map)\nlog.info(\"Max match confidence: \" .. tostring(locs.maxVal))\ncv.rectangle(img, locs.maxLoc.x, locs.maxLoc.y, locs.maxLoc.x + template:cols(), locs.maxLoc.y + template:rows(), {0, 255, 0}, 2)"
+  },
+  {
+    name: "cv.findContours",
+    category: "OpenCV Contours",
+    signature: "cv.findContours(src: Mat, mode: number, method: number)",
+    description: "Finds contours in a binary image.",
+    inputs: [
+      { name: "src", type: "Mat", desc: "Source 8-bit single-channel binary image." },
+      { name: "mode", type: "number", desc: "Contour retrieval mode (e.g. cv.RETR_EXTERNAL)." },
+      { name: "method", type: "number", desc: "Contour approximation method (e.g. cv.CHAIN_APPROX_SIMPLE)." }
+    ],
+    outputs: [{ type: "table", desc: "A list of contours. Each contour is an array list of points: { {x=10, y=20}, {x=12, y=21}, ... }." }],
+    example: "local bin = cv.Canny(img, 50, 150)\nlocal contours = cv.findContours(bin, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)\nlog.info(\"Found contours: \" .. tostring(#contours))"
+  },
+  {
+    name: "cv.drawContours",
+    category: "OpenCV Contours",
+    signature: "cv.drawContours(img: Mat, contours: table, contourIdx: number, color: table | number[], thickness: number)",
+    description: "Draws contours outlines or filled contours.",
+    inputs: [
+      { name: "img", type: "Mat", desc: "Destination image to draw on." },
+      { name: "contours", type: "table", desc: "All the contours table list returned from findContours." },
+      { name: "contourIdx", type: "number", desc: "Parameter indicating a contour to draw. If it is negative, all the contours are drawn." },
+      { name: "color", type: "table | number[]", desc: "Color BGR table {r, g, b}." },
+      { name: "thickness", type: "number", desc: "Thickness of lines the contours are drawn with. If it is negative (e.g. -1), the contour interiors are filled." }
+    ],
+    outputs: [],
+    example: "cv.drawContours(img, contours, -1, {0, 255, 0}, 2)"
+  },
+  {
+    name: "cv.boundingRect",
+    category: "OpenCV Contours",
+    signature: "cv.boundingRect(contour: table)",
+    description: "Calculates the up-right bounding rectangle of a point set/contour.",
+    inputs: [{ name: "contour", type: "table", desc: "A single contour (list of points {x, y}) from the list." }],
+    outputs: [{ type: "table", desc: "Bounding box table containing fields: x, y, width, height." }],
+    example: "for i = 1, #contours do\n    local rect = cv.boundingRect(contours[i])\n    cv.rectangle(img, rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, {255, 0, 0}, 1)\nend"
+  },
+  {
     name: "Mat:release",
     category: "Mat Wrapper",
     signature: "mat:release()",

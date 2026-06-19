@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Windows.Media.Imaging;
 using OpenCvSharp;
 using MoonSharp.Interpreter;
@@ -355,6 +356,362 @@ namespace FlowEngine.Engine
             cv["THRESH_BINARY"] = (int)ThresholdTypes.Binary;
             cv["THRESH_BINARY_INV"] = (int)ThresholdTypes.BinaryInv;
             cv["THRESH_OTSU"] = (int)ThresholdTypes.Otsu;
+
+            // Structuring Element Constants
+            cv["MORPH_RECT"] = (int)MorphShapes.Rect;
+            cv["MORPH_CROSS"] = (int)MorphShapes.Cross;
+            cv["MORPH_ELLIPSE"] = (int)MorphShapes.Ellipse;
+
+            // Retrieval Modes for findContours
+            cv["RETR_EXTERNAL"] = (int)RetrievalModes.External;
+            cv["RETR_LIST"] = (int)RetrievalModes.List;
+            cv["RETR_CCOMP"] = (int)RetrievalModes.CComp;
+            cv["RETR_TREE"] = (int)RetrievalModes.Tree;
+
+            // Contour Approximation Modes for findContours
+            cv["CHAIN_APPROX_NONE"] = (int)ContourApproximationModes.ApproxNone;
+            cv["CHAIN_APPROX_SIMPLE"] = (int)ContourApproximationModes.ApproxSimple;
+
+            // Template Match Modes for matchTemplate
+            cv["TM_SQDIFF"] = (int)TemplateMatchModes.SqDiff;
+            cv["TM_SQDIFF_NORMED"] = (int)TemplateMatchModes.SqDiffNormed;
+            cv["TM_CCORR"] = (int)TemplateMatchModes.CCorr;
+            cv["TM_CCORR_NORMED"] = (int)TemplateMatchModes.CCorrNormed;
+            cv["TM_CCOEFF"] = (int)TemplateMatchModes.CCoeff;
+            cv["TM_CCOEFF_NORMED"] = (int)TemplateMatchModes.CCoeffNormed;
+
+            // Blur & Smooth APIs
+            cv["GaussianBlur"] = (Func<CallbackArguments, MatWrapper>)(args =>
+            {
+                if (args.Count < 4) throw new ScriptRuntimeException("GaussianBlur requires src, ksize_w, ksize_h, sigmaX");
+                var src = args[0].UserData.Object as MatWrapper;
+                if (src?.Mat == null) throw new ScriptRuntimeException("Source Mat is null");
+                int kw = (int)GetNum(args[1]);
+                int kh = (int)GetNum(args[2]);
+                double sigmaX = GetNum(args[3]);
+                double sigmaY = args.Count > 4 ? GetNum(args[4]) : 0.0;
+                int borderType = args.Count > 5 ? (int)GetNum(args[5], (double)BorderTypes.Reflect101) : (int)BorderTypes.Reflect101;
+                
+                var dst = new Mat();
+                Cv2.GaussianBlur(src.Mat, dst, new Size(kw, kh), sigmaX, sigmaY, (BorderTypes)borderType);
+                return new MatWrapper(dst);
+            });
+
+            cv["medianBlur"] = (Func<MatWrapper, int, MatWrapper>)((src, ksize) =>
+            {
+                if (src?.Mat == null) throw new ScriptRuntimeException("Source Mat is null");
+                var dst = new Mat();
+                Cv2.MedianBlur(src.Mat, dst, ksize);
+                return new MatWrapper(dst);
+            });
+
+            // Morphological Operations
+            cv["getStructuringElement"] = (Func<int, int, int, MatWrapper>)((shape, kw, kh) =>
+            {
+                return new MatWrapper(Cv2.GetStructuringElement((MorphShapes)shape, new Size(kw, kh)));
+            });
+
+            cv["erode"] = (Func<CallbackArguments, MatWrapper>)(args =>
+            {
+                if (args.Count < 2) throw new ScriptRuntimeException("erode requires src, element");
+                var src = args[0].UserData.Object as MatWrapper;
+                if (src?.Mat == null) throw new ScriptRuntimeException("Source Mat is null");
+                var elem = args[1].UserData.Object as MatWrapper;
+                if (elem?.Mat == null) throw new ScriptRuntimeException("Structuring element is null");
+                Mat kernel = elem.Mat;
+                
+                int iterations = args.Count > 2 ? (int)GetNum(args[2], 1.0) : 1;
+                var dst = new Mat();
+                Cv2.Erode(src.Mat, dst, kernel, null, iterations);
+                return new MatWrapper(dst);
+            });
+
+            cv["dilate"] = (Func<CallbackArguments, MatWrapper>)(args =>
+            {
+                if (args.Count < 2) throw new ScriptRuntimeException("dilate requires src, element");
+                var src = args[0].UserData.Object as MatWrapper;
+                if (src?.Mat == null) throw new ScriptRuntimeException("Source Mat is null");
+                var elem = args[1].UserData.Object as MatWrapper;
+                if (elem?.Mat == null) throw new ScriptRuntimeException("Structuring element is null");
+                Mat kernel = elem.Mat;
+                
+                int iterations = args.Count > 2 ? (int)GetNum(args[2], 1.0) : 1;
+                var dst = new Mat();
+                Cv2.Dilate(src.Mat, dst, kernel, null, iterations);
+                return new MatWrapper(dst);
+            });
+
+            // Geometric Transformations (Rotation & Affine Warp)
+            cv["getRotationMatrix2D"] = (Func<double, double, double, double, MatWrapper>)((cx, cy, angle, scale) =>
+            {
+                return new MatWrapper(Cv2.GetRotationMatrix2D(new Point2f((float)cx, (float)cy), angle, scale));
+            });
+
+            cv["warpAffine"] = (Func<CallbackArguments, MatWrapper>)(args =>
+            {
+                if (args.Count < 4) throw new ScriptRuntimeException("warpAffine requires src, M, dsize_w, dsize_h");
+                var src = args[0].UserData.Object as MatWrapper;
+                if (src?.Mat == null) throw new ScriptRuntimeException("Source Mat is null");
+                var m = args[1].UserData.Object as MatWrapper;
+                if (m?.Mat == null) throw new ScriptRuntimeException("Matrix M is null");
+                int dw = (int)GetNum(args[2]);
+                int dh = (int)GetNum(args[3]);
+                
+                int flags = args.Count > 4 ? (int)GetNum(args[4], (double)InterpolationFlags.Linear) : (int)InterpolationFlags.Linear;
+                int borderMode = args.Count > 5 ? (int)GetNum(args[5], (double)BorderTypes.Constant) : (int)BorderTypes.Constant;
+                
+                var dst = new Mat();
+                Cv2.WarpAffine(src.Mat, dst, m.Mat, new Size(dw, dh), (InterpolationFlags)flags, (BorderTypes)borderMode);
+                return new MatWrapper(dst);
+            });
+
+            // Logical/Bitwise Operations
+            cv["bitwise_and"] = (Func<CallbackArguments, MatWrapper>)(args =>
+            {
+                if (args.Count < 2) throw new ScriptRuntimeException("bitwise_and requires src1, src2");
+                var src1 = args[0].UserData.Object as MatWrapper;
+                if (src1?.Mat == null) throw new ScriptRuntimeException("Source1 Mat is null");
+                var src2 = args[1].UserData.Object as MatWrapper;
+                if (src2?.Mat == null) throw new ScriptRuntimeException("Source2 Mat is null");
+                
+                var maskWrapper = args.Count > 2 ? args[2].UserData?.Object as MatWrapper : null;
+                var dst = new Mat();
+                if (maskWrapper != null)
+                {
+                    if (maskWrapper.Mat == null) throw new ScriptRuntimeException("Mask Mat is null");
+                    Cv2.BitwiseAnd(src1.Mat, src2.Mat, dst, maskWrapper.Mat);
+                }
+                else
+                {
+                    Cv2.BitwiseAnd(src1.Mat, src2.Mat, dst);
+                }
+                return new MatWrapper(dst);
+            });
+
+            cv["bitwise_or"] = (Func<CallbackArguments, MatWrapper>)(args =>
+            {
+                if (args.Count < 2) throw new ScriptRuntimeException("bitwise_or requires src1, src2");
+                var src1 = args[0].UserData.Object as MatWrapper;
+                if (src1?.Mat == null) throw new ScriptRuntimeException("Source1 Mat is null");
+                var src2 = args[1].UserData.Object as MatWrapper;
+                if (src2?.Mat == null) throw new ScriptRuntimeException("Source2 Mat is null");
+                
+                var maskWrapper = args.Count > 2 ? args[2].UserData?.Object as MatWrapper : null;
+                var dst = new Mat();
+                if (maskWrapper != null)
+                {
+                    if (maskWrapper.Mat == null) throw new ScriptRuntimeException("Mask Mat is null");
+                    Cv2.BitwiseOr(src1.Mat, src2.Mat, dst, maskWrapper.Mat);
+                }
+                else
+                {
+                    Cv2.BitwiseOr(src1.Mat, src2.Mat, dst);
+                }
+                return new MatWrapper(dst);
+            });
+
+            cv["bitwise_xor"] = (Func<CallbackArguments, MatWrapper>)(args =>
+            {
+                if (args.Count < 2) throw new ScriptRuntimeException("bitwise_xor requires src1, src2");
+                var src1 = args[0].UserData.Object as MatWrapper;
+                if (src1?.Mat == null) throw new ScriptRuntimeException("Source1 Mat is null");
+                var src2 = args[1].UserData.Object as MatWrapper;
+                if (src2?.Mat == null) throw new ScriptRuntimeException("Source2 Mat is null");
+                
+                var maskWrapper = args.Count > 2 ? args[2].UserData?.Object as MatWrapper : null;
+                var dst = new Mat();
+                if (maskWrapper != null)
+                {
+                    if (maskWrapper.Mat == null) throw new ScriptRuntimeException("Mask Mat is null");
+                    Cv2.BitwiseXor(src1.Mat, src2.Mat, dst, maskWrapper.Mat);
+                }
+                else
+                {
+                    Cv2.BitwiseXor(src1.Mat, src2.Mat, dst);
+                }
+                return new MatWrapper(dst);
+            });
+
+            cv["bitwise_not"] = (Func<CallbackArguments, MatWrapper>)(args =>
+            {
+                if (args.Count < 1) throw new ScriptRuntimeException("bitwise_not requires src");
+                var src = args[0].UserData.Object as MatWrapper;
+                if (src?.Mat == null) throw new ScriptRuntimeException("Source Mat is null");
+                
+                var maskWrapper = args.Count > 1 ? args[1].UserData?.Object as MatWrapper : null;
+                var dst = new Mat();
+                if (maskWrapper != null)
+                {
+                    if (maskWrapper.Mat == null) throw new ScriptRuntimeException("Mask Mat is null");
+                    Cv2.BitwiseNot(src.Mat, dst, maskWrapper.Mat);
+                }
+                else
+                {
+                    Cv2.BitwiseNot(src.Mat, dst);
+                }
+                return new MatWrapper(dst);
+            });
+
+            // Channel Processing
+            cv["split"] = (Func<MatWrapper, Table>)(src =>
+            {
+                if (src?.Mat == null) throw new ScriptRuntimeException("Source Mat is null");
+                var mats = Cv2.Split(src.Mat);
+                var table = new Table(script);
+                for (int i = 0; i < mats.Length; i++)
+                {
+                    table[i + 1] = new MatWrapper(mats[i]);
+                }
+                return table;
+            });
+
+            cv["merge"] = (Func<Table, MatWrapper>)(table =>
+            {
+                if (table == null) throw new ScriptRuntimeException("Table is null");
+                var list = new List<Mat>();
+                foreach (var pair in table.Pairs)
+                {
+                    var wrapper = pair.Value.UserData?.Object as MatWrapper;
+                    if (wrapper?.Mat != null)
+                    {
+                        list.Add(wrapper.Mat);
+                    }
+                }
+                var dst = new Mat();
+                Cv2.Merge(list.ToArray(), dst);
+                return new MatWrapper(dst);
+            });
+
+            // Template Matching
+            cv["matchTemplate"] = (Func<CallbackArguments, MatWrapper>)(args =>
+            {
+                if (args.Count < 3) throw new ScriptRuntimeException("matchTemplate requires image, templ, method");
+                var image = args[0].UserData.Object as MatWrapper;
+                if (image?.Mat == null) throw new ScriptRuntimeException("Image Mat is null");
+                var templ = args[1].UserData.Object as MatWrapper;
+                if (templ?.Mat == null) throw new ScriptRuntimeException("Template Mat is null");
+                int method = (int)GetNum(args[2]);
+                
+                var dst = new Mat();
+                Cv2.MatchTemplate(image.Mat, templ.Mat, dst, (TemplateMatchModes)method);
+                return new MatWrapper(dst);
+            });
+
+            cv["minMaxLoc"] = (Func<MatWrapper, Table>)(src =>
+            {
+                if (src?.Mat == null) throw new ScriptRuntimeException("Source Mat is null");
+                double minVal, maxVal;
+                Point minLoc, maxLoc;
+                Cv2.MinMaxLoc(src.Mat, out minVal, out maxVal, out minLoc, out maxLoc);
+                
+                var ret = new Table(script);
+                ret["minVal"] = minVal;
+                ret["maxVal"] = maxVal;
+                
+                var minLocTable = new Table(script);
+                minLocTable["x"] = minLoc.X;
+                minLocTable["y"] = minLoc.Y;
+                ret["minLoc"] = minLocTable;
+
+                var maxLocTable = new Table(script);
+                maxLocTable["x"] = maxLoc.X;
+                maxLocTable["y"] = maxLoc.Y;
+                ret["maxLoc"] = maxLocTable;
+
+                return ret;
+            });
+
+            // Shape Analysis & Contour APIs
+            cv["findContours"] = (Func<CallbackArguments, Table>)(args =>
+            {
+                if (args.Count < 3) throw new ScriptRuntimeException("findContours requires src, mode, method");
+                var src = args[0].UserData.Object as MatWrapper;
+                if (src?.Mat == null) throw new ScriptRuntimeException("Source Mat is null");
+                int mode = (int)GetNum(args[1]);
+                int method = (int)GetNum(args[2]);
+
+                Point[][] contours;
+                HierarchyIndex[] hierarchy;
+                Cv2.FindContours(src.Mat, out contours, out hierarchy, (RetrievalModes)mode, (ContourApproximationModes)method);
+
+                var outerTable = new Table(script);
+                for (int i = 0; i < contours.Length; i++)
+                {
+                    var contourTable = new Table(script);
+                    for (int j = 0; j < contours[i].Length; j++)
+                    {
+                        var ptTable = new Table(script);
+                        ptTable["x"] = contours[i][j].X;
+                        ptTable["y"] = contours[i][j].Y;
+                        contourTable[j + 1] = ptTable;
+                    }
+                    outerTable[i + 1] = contourTable;
+                }
+                return outerTable;
+            });
+
+            cv["drawContours"] = (Action<CallbackArguments>)(args =>
+            {
+                if (args.Count < 5) throw new ScriptRuntimeException("drawContours requires img, contours, contourIdx, color, thickness");
+                var img = args[0].UserData.Object as MatWrapper;
+                if (img?.Mat == null) throw new ScriptRuntimeException("Mat is null");
+                var contoursTable = args[1].Table;
+                if (contoursTable == null) throw new ScriptRuntimeException("Contours table is null");
+                int contourIdx = (int)GetNum(args[2]);
+                
+                Scalar scalar = Scalar.White;
+                if (args[3].Type == DataType.Table)
+                {
+                    scalar = TableToScalar(args[3].Table);
+                }
+                int thickness = (int)GetNum(args[4]);
+
+                var contoursList = new List<Point[]>();
+                foreach (var pair in contoursTable.Pairs)
+                {
+                    var contourTable = pair.Value.Table;
+                    if (contourTable != null)
+                    {
+                        var pts = new List<Point>();
+                        foreach (var ptPair in contourTable.Pairs)
+                        {
+                            var ptTable = ptPair.Value.Table;
+                            if (ptTable != null)
+                            {
+                                int px = (int)GetNum(ptTable.Get("x"));
+                                int py = (int)GetNum(ptTable.Get("y"));
+                                pts.Add(new Point(px, py));
+                            }
+                        }
+                        contoursList.Add(pts.ToArray());
+                    }
+                }
+
+                Cv2.DrawContours(img.Mat, contoursList.ToArray(), contourIdx, scalar, thickness);
+            });
+
+            cv["boundingRect"] = (Func<Table, Table>)(contourTable =>
+            {
+                if (contourTable == null) throw new ScriptRuntimeException("Contour table is null");
+                var pts = new List<Point>();
+                foreach (var pair in contourTable.Pairs)
+                {
+                    var ptTable = pair.Value.Table;
+                    if (ptTable != null)
+                    {
+                        int px = (int)GetNum(ptTable.Get("x"));
+                        int py = (int)GetNum(ptTable.Get("y"));
+                        pts.Add(new Point(px, py));
+                    }
+                }
+                var rect = Cv2.BoundingRect(pts);
+                var ret = new Table(script);
+                ret["x"] = rect.X;
+                ret["y"] = rect.Y;
+                ret["width"] = rect.Width;
+                ret["height"] = rect.Height;
+                return ret;
+            });
 
             script.Globals["cv"] = cv;
         }

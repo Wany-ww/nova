@@ -625,7 +625,7 @@
     <header>
         <div>
             <h1>NOVA Static Analysis Dashboard</h1>
-            <div class="timestamp">분석 일시: 2026-06-20 01:34:36</div>
+            <div class="timestamp">분석 일시: 2026-06-20 01:58:06</div>
         </div>
         <div>
             <span style="font-weight: 600; background: rgba(255,255,255,0.06); padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">프로젝트: NOVA (WPF + Lua)</span>
@@ -2049,7 +2049,7 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 171,
+    "line": 172,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -2058,7 +2058,7 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 216,
+    "line": 217,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '8' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -2067,7 +2067,7 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 224,
+    "line": 225,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '6' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -2076,7 +2076,7 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 235,
+    "line": 236,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -2085,7 +2085,7 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 245,
+    "line": 246,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '7' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -2094,7 +2094,7 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 275,
+    "line": 276,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '8' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -2103,7 +2103,7 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 283,
+    "line": 284,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '6' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -2112,7 +2112,7 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 294,
+    "line": 295,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -2121,7 +2121,7 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 307,
+    "line": 308,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '8' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -2130,7 +2130,7 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 315,
+    "line": 316,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '6' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -2139,7 +2139,43 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 367,
+    "line": 386,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "if (args.Count < 4) throw new ScriptRuntimeException(\"GaussianBlur requires src, ksize_w, ksize_h, sigmaX\");"
+  },
+  {
+    "file": "Engine/OpenCvLuaApi.cs",
+    "line": 392,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "double sigmaY = args.Count > 4 ? GetNum(args[4]) : 0.0;"
+  },
+  {
+    "file": "Engine/OpenCvLuaApi.cs",
+    "line": 452,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "if (args.Count < 4) throw new ScriptRuntimeException(\"warpAffine requires src, M, dsize_w, dsize_h\");"
+  },
+  {
+    "file": "Engine/OpenCvLuaApi.cs",
+    "line": 460,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "int flags = args.Count > 4 ? (int)GetNum(args[4], (double)InterpolationFlags.Linear) : (int)InterpolationFlags.Linear;"
+  },
+  {
+    "file": "Engine/OpenCvLuaApi.cs",
+    "line": 724,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -2148,7 +2184,7 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 443,
+    "line": 800,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '20' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -2157,7 +2193,7 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 444,
+    "line": 801,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '32' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -2166,12 +2202,30 @@
   },
   {
     "file": "Engine/OpenCvLuaApi.cs",
-    "line": 45,
+    "line": 46,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
     "severity": "INFO",
     "code_snippet": "if (other != null && other.Mat != null)"
+  },
+  {
+    "file": "Engine/OpenCvLuaApi.cs",
+    "line": 676,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "foreach (var ptPair in contourTable.Pairs)"
+  },
+  {
+    "file": "Engine/OpenCvLuaApi.cs",
+    "line": 679,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (ptTable != null)"
   },
   {
     "file": "Engine/TrayNotification.cs",
@@ -2442,13 +2496,13 @@
   {
     "file": "Engine/OpenCvLuaApi.cs",
     "type": "C#",
-    "loc": 470,
-    "code_lines": 402,
-    "cc": 74,
+    "loc": 827,
+    "code_lines": 707,
+    "cc": 132,
     "rating": "Moderate",
     "rating_class": "rating-moderate",
-    "loc_rating": "Low",
-    "loc_rating_class": "rating-low"
+    "loc_rating": "Moderate",
+    "loc_rating_class": "rating-moderate"
   },
   {
     "file": "Engine/ProjectManager.cs",
@@ -2928,15 +2982,15 @@
   "total_files": 59,
   "cs_files": 19,
   "lua_files": 40,
-  "lines_of_code": 7245,
-  "code_lines": 5800,
-  "comment_lines": 703,
-  "blank_lines": 742,
-  "total_cc": 1150,
-  "avg_cc": 19.5,
+  "lines_of_code": 7602,
+  "code_lines": 6105,
+  "comment_lines": 714,
+  "blank_lines": 783,
+  "total_cc": 1208,
+  "avg_cc": 20.5,
   "critical_issues": 0,
   "warning_issues": 0,
-  "info_issues": 152
+  "info_issues": 158
 };
         const scores = {
   "analysis_score": 90.0,
