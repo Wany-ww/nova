@@ -506,6 +506,7 @@ end";
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
+            Engine.TrayNotification.Cleanup();
             
             // Unsubscribe from events to prevent memory leaks
             Engine.ThemeManager.ThemeChanged -= OnThemeChanged;

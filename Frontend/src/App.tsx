@@ -848,8 +848,93 @@ const API_DOCS: ApiDoc[] = [
     inputs: [{ name: "bytes", type: "table", desc: "A table array of byte integers (0-255) containing the encoded image." }],
     outputs: [{ type: "Mat", desc: "The decoded OpenCV Mat image object." }],
     example: "local newMat = cv.imdecode(pngBytes)\ncv.imshow(\"Decoded Image\", newMat)"
+  },
+  {
+    name: "ftp.upload",
+    category: "FTP",
+    signature: "ftp.upload(host: string, port: number, user: string, pass: string, localFile: string, remoteFile: string)",
+    description: "Uploads a local file to the specified FTP server host and path.",
+    inputs: [
+      { name: "host", type: "string", desc: "The FTP server host IP or hostname." },
+      { name: "port", type: "number", desc: "The FTP port number (use 21 for default)." },
+      { name: "user", type: "string", desc: "The username for authentication." },
+      { name: "pass", type: "string", desc: "The password for authentication." },
+      { name: "localFile", type: "string", desc: "The absolute or relative path of the local file to upload." },
+      { name: "remoteFile", type: "string", desc: "The destination file path on the FTP server." }
+    ],
+    outputs: [{ type: "boolean", desc: "True if the upload succeeded, otherwise False." }],
+    example: "local ok = ftp.upload(\"127.0.0.1\", 21, \"admin\", \"1234\", \"save/log.txt\", \"/logs/log_backup.txt\")\nif ok then\n    log.info(\"FTP Upload Succeeded\")\nend"
+  },
+  {
+    name: "ftp.download",
+    category: "FTP",
+    signature: "ftp.download(host: string, port: number, user: string, pass: string, remoteFile: string, localFile: string)",
+    description: "Downloads a file from the specified FTP server to the local file path.",
+    inputs: [
+      { name: "host", type: "string", desc: "The FTP server host IP or hostname." },
+      { name: "port", type: "number", desc: "The FTP port number (use 21 for default)." },
+      { name: "user", type: "string", desc: "The username for authentication." },
+      { name: "pass", type: "string", desc: "The password for authentication." },
+      { name: "remoteFile", type: "string", desc: "The source file path on the FTP server." },
+      { name: "localFile", type: "string", desc: "The destination path where the file will be saved locally." }
+    ],
+    outputs: [{ type: "boolean", desc: "True if the download succeeded, otherwise False." }],
+    example: "local ok = ftp.download(\"127.0.0.1\", 21, \"admin\", \"1234\", \"/configs/app.json\", \"config/downloaded_app.json\")\nif ok then\n    log.info(\"FTP Download Succeeded\")\nend"
+  },
+  {
+    name: "system.notify",
+    category: "System",
+    signature: "system.notify(title: string, message: string, type: string)",
+    description: "Displays a standard Windows balloon notification from the system tray taskbar.",
+    inputs: [
+      { name: "title", type: "string", desc: "The title of the notification balloon." },
+      { name: "message", type: "string", desc: "The main body message of the notification." },
+      { name: "type", type: "string", desc: "The notification icon type: 'info', 'warning', or 'error'." }
+    ],
+    outputs: [],
+    example: "system.notify(\"Flow Engine Alert\", \"Process finished successfully!\", \"info\")"
+  },
+  {
+    name: "input.mouse_move",
+    category: "Input",
+    signature: "input.mouse_move(x: number, y: number)",
+    description: "Simulates moving the mouse cursor to absolute screen coordinates (x, y).",
+    inputs: [
+      { name: "x", type: "number", desc: "The target X coordinate." },
+      { name: "y", type: "number", desc: "The target Y coordinate." }
+    ],
+    outputs: [],
+    example: "input.mouse_move(500, 300)"
+  },
+  {
+    name: "input.mouse_click",
+    category: "Input",
+    signature: "input.mouse_click(button: string)",
+    description: "Simulates a mouse click (left, right, or middle) at the current cursor position.",
+    inputs: [{ name: "button", type: "string", desc: "The mouse button to click: 'left', 'right', or 'middle'." }],
+    outputs: [],
+    example: "input.mouse_click(\"left\")"
+  },
+  {
+    name: "input.key_press",
+    category: "Input",
+    signature: "input.key_press(keyCode: number)",
+    description: "Simulates a single virtual key press and release using the Windows Virtual-Key code.",
+    inputs: [{ name: "keyCode", type: "number", desc: "The Virtual-Key Code integer (e.g. 13 for Enter, 27 for Escape)." }],
+    outputs: [],
+    example: "input.key_press(13) -- Press Enter key"
+  },
+  {
+    name: "input.key_type",
+    category: "Input",
+    signature: "input.key_type(text: string)",
+    description: "Simulates sequential typing of a string of unicode characters.",
+    inputs: [{ name: "text", type: "string", desc: "The text string to type out." }],
+    outputs: [],
+    example: "input.key_type(\"Hello, NOVA!\")"
   }
 ];
+
 
 
 export default function App() {
@@ -2038,7 +2123,7 @@ export default function App() {
                 minHeight: 0
               }}>
                 <div style={{ padding: '0 16px 8px 16px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Categories</div>
-                {['All', 'Logging', 'Time', 'Global Memory', 'Filesystem', 'Network', 'HTTP', 'JSON', 'System', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper'].map(cat => (
+                {['All', 'Logging', 'Time', 'Global Memory', 'Filesystem', 'Network', 'HTTP', 'JSON', 'System', 'FTP', 'Input', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper'].map(cat => (
                   <button
                     key={cat}
                     onClick={() => setSelectedApiCategory(cat)}

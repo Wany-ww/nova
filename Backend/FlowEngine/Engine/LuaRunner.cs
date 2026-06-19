@@ -371,7 +371,51 @@ namespace FlowEngine.Engine
                     if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
                     return SystemRun(script, command, argsTable);
                 });
+                systemTable["notify"] = (Action<string, string, string>)((title, message, type) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    TrayNotification.Show(title, message, type);
+                });
                 script.Globals["system"] = systemTable;
+
+                // Register global ftp API
+                var ftpTable = new Table(script);
+                ftpTable["upload"] = (Func<string, int, string, string, string, string, bool>)((host, port, user, pass, localFile, remoteFile) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return FtpUpload(host, port, user, pass, localFile, remoteFile);
+                });
+                ftpTable["download"] = (Func<string, int, string, string, string, string, bool>)((host, port, user, pass, remoteFile, localFile) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return FtpDownload(host, port, user, pass, remoteFile, localFile);
+                });
+                script.Globals["ftp"] = ftpTable;
+
+                // Register global input API
+                var inputTable = new Table(script);
+                inputTable["mouse_move"] = (Action<int, int>)((x, y) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    InputAutomation.MouseMove(x, y);
+                });
+                inputTable["mouse_click"] = (Action<string>)((btn) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    InputAutomation.MouseClick(btn);
+                });
+                inputTable["key_press"] = (Action<int>)((keyCode) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    InputAutomation.KeyPress(keyCode);
+                });
+                inputTable["key_type"] = (Action<string>)((text) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    InputAutomation.KeyType(text);
+                });
+                script.Globals["input"] = inputTable;
+
 
                 // Register global cv API
                 OpenCvLuaApi.Register(script);
@@ -954,6 +998,77 @@ namespace FlowEngine.Engine
             
             return DynValue.NewTuple(DynValue.NewString(stdout), DynValue.NewNumber(exitCode));
         }
+
+#pragma warning disable SYSLIB0014
+        /// <summary>
+        /// Uploads a local file to the specified FTP server.
+        /// </summary>
+        private static bool FtpUpload(string host, int port, string user, string pass, string localFile, string remoteFile)
+        {
+            try
+            {
+                if (port <= 0) port = 21;
+                string url = $"ftp://{host}:{port}/{remoteFile.TrimStart('/')}";
+                var request = (System.Net.FtpWebRequest)System.Net.WebRequest.Create(url);
+                request.Method = System.Net.WebRequestMethods.Ftp.UploadFile;
+                request.Credentials = new System.Net.NetworkCredential(user, pass);
+                
+                using (var fileStream = System.IO.File.OpenRead(localFile))
+                using (var requestStream = request.GetRequestStream())
+                {
+                    fileStream.CopyTo(requestStream);
+                }
+                
+                using (var response = (System.Net.FtpWebResponse)request.GetResponse())
+                {
+                    return response.StatusCode == System.Net.FtpStatusCode.CommandOK || 
+                           response.StatusCode == System.Net.FtpStatusCode.FileActionOK || 
+                           response.StatusCode == System.Net.FtpStatusCode.ClosingData;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("FTP Upload error: " + ex.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Downloads a file from the specified FTP server to the local path.
+        /// </summary>
+        private static bool FtpDownload(string host, int port, string user, string pass, string remoteFile, string localFile)
+        {
+            try
+            {
+                if (port <= 0) port = 21;
+                string url = $"ftp://{host}:{port}/{remoteFile.TrimStart('/')}";
+                var request = (System.Net.FtpWebRequest)System.Net.WebRequest.Create(url);
+                request.Method = System.Net.WebRequestMethods.Ftp.DownloadFile;
+                request.Credentials = new System.Net.NetworkCredential(user, pass);
+                
+                using (var response = (System.Net.FtpWebResponse)request.GetResponse())
+                using (var responseStream = response.GetResponseStream())
+                {
+                    string? dir = System.IO.Path.GetDirectoryName(localFile);
+                    if (!string.IsNullOrEmpty(dir) && !System.IO.Directory.Exists(dir))
+                    {
+                        System.IO.Directory.CreateDirectory(dir);
+                    }
+                    using (var fileStream = System.IO.File.Create(localFile))
+                    {
+                        responseStream.CopyTo(fileStream);
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("FTP Download error: " + ex.Message);
+                return false;
+            }
+        }
+#pragma warning restore SYSLIB0014
     }
 }
+
 
