@@ -1,0 +1,23 @@
+# User secrets
+secrets.toml
+
+# Node.js
+node_modules/
+dist/
+
+# .NET / MSBuild / VS
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Python / Cache
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
