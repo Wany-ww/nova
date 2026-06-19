@@ -1435,6 +1435,7 @@ function ApiDocCard({ doc, apiSearchQuery, copiedName, handleCopy }: ApiDocCardP
               border: '1px solid var(--border-color)',
               color: 'var(--text-color)',
               overflowX: 'auto',
+              maxWidth: '100%',
               lineHeight: 1.4
             }}>{doc.example}</pre>
           </div>
@@ -2606,7 +2607,7 @@ export default function App() {
       {/* Script API Help Modal */}
       {showApiHelpModal && (
         <div className="modal-overlay" onClick={() => setShowApiHelpModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '960px', maxWidth: '95vw', height: '700px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '1080px', maxWidth: '95vw', height: '760px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div className="modal-header">
               <div className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <BookOpen size={18} color="var(--accent-color)" />
@@ -2617,10 +2618,11 @@ export default function App() {
               </button>
             </div>
             
-            <div className="modal-body" style={{ display: 'flex', flexDirection: 'row', gap: '0px', padding: '0px', overflow: 'hidden', flex: 1, maxHeight: 'none' }}>
+            <div className="modal-body" style={{ display: 'flex', flexDirection: 'row', gap: '0px', padding: '0px', overflow: 'hidden', flex: 1, maxHeight: 'none', minHeight: 0 }}>
               {/* Category Sidebar (Left) */}
               <div style={{
-                width: '200px',
+                width: '220px',
+                flexShrink: 0,
                 borderRight: '1px solid var(--border-color)',
                 backgroundColor: 'var(--sidebar-bg)',
                 display: 'flex',
@@ -2669,8 +2671,7 @@ export default function App() {
                 ))}
               </div>
 
-              {/* Main Content Area (Right) */}
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', minHeight: 0 }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', minHeight: 0, minWidth: 0 }}>
                 {/* Search Bar */}
                 <div style={{
                   padding: '12px 18px',
