@@ -1294,7 +1294,8 @@ function ApiDocCard({ doc, apiSearchQuery, copiedName, handleCopy }: ApiDocCardP
         flexDirection: 'column',
         transition: 'all 0.2s ease',
         boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        flexShrink: 0
       }}
       onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-color)'}
       onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
