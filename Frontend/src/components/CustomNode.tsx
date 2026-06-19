@@ -180,22 +180,24 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
         </div>
 
         {/* Flow output handle (Diamond, purple) */}
-        <Handle
-          type="source"
-          position={Position.Right}
-          id="flow_out"
-          className="flow-handle-right"
-          style={{
-            top: '17px',
-            background: 'var(--node-handle-flow-bg)',
-            width: '10px',
-            height: '10px',
-            borderRadius: '2px',
-            transform: 'translateY(-50%) rotate(45deg)',
-            border: '1.5px solid var(--node-border)',
-            zIndex: 10
-          }}
-        />
+        {name !== 'IfElse' && name !== 'Loop' && name !== 'Switch' && (
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="flow_out"
+            className="flow-handle-right"
+            style={{
+              top: '17px',
+              background: 'var(--node-handle-flow-bg)',
+              width: '10px',
+              height: '10px',
+              borderRadius: '2px',
+              transform: 'translateY(-50%) rotate(45deg)',
+              border: '1.5px solid var(--node-border)',
+              zIndex: 10
+            }}
+          />
+        )}
 
         {/* Node Body */}
         <div className="custom-node-body">
@@ -256,6 +258,142 @@ export const CustomNode = React.memo(({ id, data, selected }: NodeProps<any>) =>
             ))}
           </div>
         </div>
+
+        {/* Flow outputs for control nodes */}
+        {name === 'IfElse' && (
+          <div style={{ borderTop: '1px solid var(--border-color)', padding: '6px 10px', display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: 'rgba(0,0,0,0.1)' }}>
+            <div style={{ position: 'relative', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '20px' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--success-color)', marginRight: '6px' }}>True</span>
+              <Handle
+                type="source"
+                position={Position.Right}
+                id="flow_true"
+                style={{
+                  top: '50%',
+                  transform: 'translateY(-50%) rotate(45deg)',
+                  background: 'var(--node-handle-flow-bg)',
+                  width: '9px',
+                  height: '9px',
+                  borderRadius: '2px',
+                  border: '1.5px solid var(--node-border)',
+                  right: '-5px'
+                }}
+              />
+            </div>
+            <div style={{ position: 'relative', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '20px' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--error-color)', marginRight: '6px' }}>False</span>
+              <Handle
+                type="source"
+                position={Position.Right}
+                id="flow_false"
+                style={{
+                  top: '50%',
+                  transform: 'translateY(-50%) rotate(45deg)',
+                  background: 'var(--node-handle-flow-bg)',
+                  width: '9px',
+                  height: '9px',
+                  borderRadius: '2px',
+                  border: '1.5px solid var(--node-border)',
+                  right: '-5px'
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {name === 'Loop' && (
+          <div style={{ borderTop: '1px solid var(--border-color)', padding: '6px 10px', display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: 'rgba(0,0,0,0.1)' }}>
+            <div style={{ position: 'relative', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '20px' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-color)', marginRight: '6px' }}>Loop Body</span>
+              <Handle
+                type="source"
+                position={Position.Right}
+                id="flow_loop"
+                style={{
+                  top: '50%',
+                  transform: 'translateY(-50%) rotate(45deg)',
+                  background: 'var(--node-handle-flow-bg)',
+                  width: '9px',
+                  height: '9px',
+                  borderRadius: '2px',
+                  border: '1.5px solid var(--node-border)',
+                  right: '-5px'
+                }}
+              />
+            </div>
+            <div style={{ position: 'relative', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '20px' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginRight: '6px' }}>Done</span>
+              <Handle
+                type="source"
+                position={Position.Right}
+                id="flow_done"
+                style={{
+                  top: '50%',
+                  transform: 'translateY(-50%) rotate(45deg)',
+                  background: 'var(--node-handle-flow-bg)',
+                  width: '9px',
+                  height: '9px',
+                  borderRadius: '2px',
+                  border: '1.5px solid var(--node-border)',
+                  right: '-5px'
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {name === 'Switch' && (
+          <div style={{ borderTop: '1px solid var(--border-color)', padding: '6px 10px', display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: 'rgba(0,0,0,0.1)' }}>
+            {(() => {
+              const casesStr = inputValues?.cases !== undefined ? inputValues.cases : (computedInputs?.cases !== undefined ? computedInputs.cases : "true, false");
+              const casesList = typeof casesStr === 'string'
+                ? casesStr.split(',').map(c => c.trim()).filter(c => c.length > 0)
+                : [];
+              return (
+                <>
+                  {casesList.map((cName, idx) => (
+                    <div key={idx} style={{ position: 'relative', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '20px' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--info-color)', marginRight: '6px' }}>Case {cName}</span>
+                      <Handle
+                        type="source"
+                        position={Position.Right}
+                        id={`flow_${cName}`}
+                        style={{
+                          top: '50%',
+                          transform: 'translateY(-50%) rotate(45deg)',
+                          background: 'var(--node-handle-flow-bg)',
+                          width: '9px',
+                          height: '9px',
+                          borderRadius: '2px',
+                          border: '1.5px solid var(--node-border)',
+                          right: '-5px'
+                        }}
+                      />
+                    </div>
+                  ))}
+                  <div style={{ position: 'relative', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', minHeight: '20px' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginRight: '6px' }}>Default</span>
+                    <Handle
+                      type="source"
+                      position={Position.Right}
+                      id="flow_default"
+                      style={{
+                        top: '50%',
+                        transform: 'translateY(-50%) rotate(45deg)',
+                        background: 'var(--node-handle-flow-bg)',
+                        width: '9px',
+                        height: '9px',
+                        borderRadius: '2px',
+                        border: '1.5px solid var(--node-border)',
+                        right: '-5px'
+                      }}
+                    />
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        )}
       </div>
     </div>
   );

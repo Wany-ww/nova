@@ -19,10 +19,42 @@ namespace FlowEngine.Engine
 
         private static readonly Dictionary<string, object?> _globalMemory = new Dictionary<string, object?>();
         private static readonly object _globalMemoryLock = new object();
+        private static readonly System.Diagnostics.PerformanceCounter? _cpuCounter;
+
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential, CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+        private class MEMORYSTATUSEX
+        {
+            public uint dwLength;
+            public uint dwMemoryLoad;
+            public ulong ullTotalPhys;
+            public ulong ullAvailPhys;
+            public ulong ullTotalPageFile;
+            public ulong ullAvailPageFile;
+            public ulong ullTotalVirtual;
+            public ulong ullAvailVirtual;
+            public ulong ullAvailExtendedVirtual;
+            public MEMORYSTATUSEX()
+            {
+                this.dwLength = (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(MEMORYSTATUSEX));
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, SetLastError = true)]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        private static extern bool GlobalMemoryStatusEx([System.Runtime.InteropServices.In, System.Runtime.InteropServices.Out] MEMORYSTATUSEX lpBuffer);
 
         static LuaRunner()
         {
             UserData.RegisterType<LuaSocket>();
+            try
+            {
+                _cpuCounter = new System.Diagnostics.PerformanceCounter("Processor", "% Processor Time", "_Total");
+                _cpuCounter.NextValue();
+            }
+            catch
+            {
+                _cpuCounter = null;
+            }
         }
 
                 /// <summary>
@@ -348,6 +380,11 @@ namespace FlowEngine.Engine
                     if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
                     return HttpPost(script, url, body, headers);
                 });
+                httpTable["download"] = (Func<string, string, bool>)((url, destPath) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return HttpDownload(url, destPath);
+                });
                 script.Globals["http"] = httpTable;
 
                 // Register global json API
@@ -376,7 +413,66 @@ namespace FlowEngine.Engine
                     if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
                     TrayNotification.Show(title, message, type);
                 });
+                systemTable["cpu_usage"] = (Func<double>)(() =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return GetCpuUsage();
+                });
+                systemTable["ram_usage"] = (Func<Table>)(() =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return GetRamUsage(script);
+                });
+                systemTable["disk_free"] = (Func<string, double>)((drive) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return GetDiskFreeSpace(drive);
+                });
+                systemTable["speak"] = (Action<string>)((text) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    SystemSpeak(text);
+                });
                 script.Globals["system"] = systemTable;
+
+                // Register global crypto API
+                var cryptoTable = new Table(script);
+                cryptoTable["sha256"] = (Func<string, string>)((str) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return Sha256(str);
+                });
+                cryptoTable["md5"] = (Func<string, string>)((str) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return Md5(str);
+                });
+                cryptoTable["base64_encode"] = (Func<string, string>)((str) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return Base64Encode(str);
+                });
+                cryptoTable["base64_decode"] = (Func<string, string>)((str) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return Base64Decode(str);
+                });
+                script.Globals["crypto"] = cryptoTable;
+
+                // Register global csv API
+                var csvTable = new Table(script);
+                csvTable["read"] = (Func<string, Table>)((file) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return CsvRead(script, file);
+                });
+                csvTable["write"] = (Func<string, Table, bool>)((file, data) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    return CsvWrite(file, data);
+                });
+                script.Globals["csv"] = csvTable;
+
 
                 // Register global ftp API
                 var ftpTable = new Table(script);
@@ -919,6 +1015,7 @@ namespace FlowEngine.Engine
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"JSON Parse error: {ex.Message}");
+                // throw;
                 return DynValue.Nil;
             }
         }
@@ -928,6 +1025,7 @@ namespace FlowEngine.Engine
         /// </summary>
         private static string JsonStringify(DynValue val)
         {
+            string emptyJson = "{}";
             try
             {
                 object? obj = ConvertDynValue(val);
@@ -941,7 +1039,8 @@ namespace FlowEngine.Engine
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"JSON Stringify error: {ex.Message}");
-                return "{}";
+                // throw;
+                return emptyJson;
             }
         }
 
@@ -1029,6 +1128,7 @@ namespace FlowEngine.Engine
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("FTP Upload error: " + ex.Message);
+                // throw;
                 return false;
             }
         }
@@ -1064,10 +1164,312 @@ namespace FlowEngine.Engine
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("FTP Download error: " + ex.Message);
+                // throw;
                 return false;
             }
         }
 #pragma warning restore SYSLIB0014
+
+        private static double GetCpuUsage()
+        {
+            if (_cpuCounter == null) return 0.0;
+            try
+            {
+                return _cpuCounter.NextValue();
+            }
+            catch
+            {
+                return 0.0;
+            }
+        }
+
+        private static Table GetRamUsage(Script script)
+        {
+            var table = new Table(script);
+            var memStatus = new MEMORYSTATUSEX();
+            if (GlobalMemoryStatusEx(memStatus))
+            {
+                double total = memStatus.ullTotalPhys / (1024.0 * 1024.0 * 1024.0);
+                double avail = memStatus.ullAvailPhys / (1024.0 * 1024.0 * 1024.0);
+                double used = total - avail;
+                table["totalGb"] = total;
+                table["availableGb"] = avail;
+                table["usedGb"] = used;
+                table["load"] = (double)memStatus.dwMemoryLoad;
+            }
+            else
+            {
+                table["totalGb"] = 0.0;
+                table["availableGb"] = 0.0;
+                table["usedGb"] = 0.0;
+                table["load"] = 0.0;
+            }
+            return table;
+        }
+
+        private static double GetDiskFreeSpace(string driveName)
+        {
+            try
+            {
+                string root = Path.GetPathRoot(driveName) ?? driveName;
+                var driveInfo = new System.IO.DriveInfo(root);
+                if (driveInfo.IsReady)
+                {
+                    return driveInfo.AvailableFreeSpace / (1024.0 * 1024.0 * 1024.0);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Disk free space error: " + ex.Message);
+                // throw;
+            }
+            return 0.0;
+        }
+
+        private static void SystemSpeak(string text)
+        {
+            try
+            {
+                Type? speakType = Type.GetTypeFromProgID("SAPI.SpVoice");
+                if (speakType != null)
+                {
+                    object? speakObj = Activator.CreateInstance(speakType);
+                    if (speakObj != null)
+                    {
+                        speakType.InvokeMember("Speak", System.Reflection.BindingFlags.InvokeMethod, null, speakObj, new object[] { text, 0 });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("TTS speak error: " + ex.Message);
+                // throw;
+            }
+        }
+
+        private static string Sha256(string str)
+        {
+            try
+            {
+                using (var sha = System.Security.Cryptography.SHA256.Create())
+                {
+                    byte[] bytes = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(str));
+                    return string.Concat(bytes.Select(b => b.ToString("x2")));
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("SHA256 error: " + ex.Message);
+                // throw;
+                return "";
+            }
+        }
+
+        private static string Md5(string str)
+        {
+            try
+            {
+                using (var md5 = System.Security.Cryptography.MD5.Create())
+                {
+                    byte[] bytes = md5.ComputeHash(System.Text.Encoding.UTF8.GetBytes(str));
+                    return string.Concat(bytes.Select(b => b.ToString("x2")));
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("MD5 error: " + ex.Message);
+                // throw;
+                return "";
+            }
+        }
+
+        private static string Base64Encode(string str)
+        {
+            try
+            {
+                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(str);
+                return Convert.ToBase64String(bytes);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Base64Encode error: " + ex.Message);
+                // throw;
+                return "";
+            }
+        }
+
+        private static string Base64Decode(string str)
+        {
+            try
+            {
+                byte[] bytes = Convert.FromBase64String(str);
+                return System.Text.Encoding.UTF8.GetString(bytes);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Base64Decode error: " + ex.Message);
+                // throw;
+                return "";
+            }
+        }
+
+        private static Table CsvRead(Script script, string file)
+        {
+            var table = new Table(script);
+            try
+            {
+                if (File.Exists(file))
+                {
+                    string[] lines = File.ReadAllLines(file);
+                    int rowIndex = 1;
+                    foreach (string line in lines)
+                    {
+                        if (string.IsNullOrWhiteSpace(line)) continue;
+                        var columns = ParseCsvLine(line);
+                        var rowTable = new Table(script);
+                        for (int colIndex = 0; colIndex < columns.Count; colIndex++)
+                        {
+                            rowTable[colIndex + 1] = columns[colIndex];
+                        }
+                        table[rowIndex] = rowTable;
+                        rowIndex++;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("CSV Read error: " + ex.Message);
+                // throw;
+            }
+            return table;
+        }
+
+        private static List<string> ParseCsvLine(string line)
+        {
+            var result = new List<string>();
+            bool inQuotes = false;
+            var currentField = new System.Text.StringBuilder();
+            for (int i = 0; i < line.Length; i++)
+            {
+                char c = line[i];
+                if (c == '"')
+                {
+                    if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                    {
+                        currentField.Append('"');
+                        i++; // Skip next quote
+                    }
+                    else
+                    {
+                        inQuotes = !inQuotes;
+                    }
+                }
+                else if (c == ',' && !inQuotes)
+                {
+                    result.Add(currentField.ToString());
+                    currentField.Clear();
+                }
+                else
+                {
+                    currentField.Append(c);
+                }
+            }
+            result.Add(currentField.ToString());
+            return result;
+        }
+
+        private static bool CsvWrite(string file, Table data)
+        {
+            try
+            {
+                var lines = new List<string>();
+                int rowCount = 0;
+                foreach (var pair in data.Pairs)
+                {
+                    if (pair.Key.Type == DataType.Number)
+                    {
+                        int index = (int)pair.Key.Number;
+                        if (index > rowCount) rowCount = index;
+                    }
+                }
+
+                for (int r = 1; r <= rowCount; r++)
+                {
+                    var rowVal = data.Get(r);
+                    if (rowVal.Type == DataType.Table)
+                    {
+                        var rowTable = rowVal.Table;
+                        int colCount = 0;
+                        foreach (var pair in rowTable.Pairs)
+                        {
+                            if (pair.Key.Type == DataType.Number)
+                            {
+                                int index = (int)pair.Key.Number;
+                                if (index > colCount) colCount = index;
+                            }
+                        }
+
+                        var rowFields = new List<string>();
+                        for (int c = 1; c <= colCount; c++)
+                        {
+                            var colVal = rowTable.Get(c);
+                            string valStr = colVal.IsNil() ? "" : (colVal.String ?? colVal.ToObject()?.ToString() ?? "");
+                            if (valStr.Contains(",") || valStr.Contains("\"") || valStr.Contains("\n") || valStr.Contains("\r"))
+                            {
+                                valStr = "\"" + valStr.Replace("\"", "\"\"") + "\"";
+                            }
+                            rowFields.Add(valStr);
+                        }
+                        lines.Add(string.Join(",", rowFields));
+                    }
+                }
+
+                string? dir = Path.GetDirectoryName(file);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+                File.WriteAllLines(file, lines, System.Text.Encoding.UTF8);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("CSV Write error: " + ex.Message);
+                // throw;
+                return false;
+            }
+        }
+
+        private static bool HttpDownload(string url, string destPath)
+        {
+            try
+            {
+                using (var client = new System.Net.Http.HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromSeconds(30);
+                    var response = client.GetAsync(url).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string? dir = Path.GetDirectoryName(destPath);
+                        if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                        {
+                            Directory.CreateDirectory(dir);
+                        }
+                        using (var fileStream = File.Create(destPath))
+                        {
+                            response.Content.CopyToAsync(fileStream).Wait();
+                        }
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("HTTP Download error: " + ex.Message);
+                // throw;
+            }
+            return false;
+        }
     }
 }
 

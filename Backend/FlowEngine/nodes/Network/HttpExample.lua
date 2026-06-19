@@ -16,7 +16,7 @@ function run_http_example()
         -- JSON 파싱
         local data = json.parse(res.body)
         if data and data.args then
-            log.info("Parsed Args: name=" .. tostring(data.args.name) .. ", version=" .. tostring(data.args.version))
+            log.info("Parsed Args: name: " .. tostring(data.args.name) .. ", version: " .. tostring(data.args.version))
         else
             log.warn("Failed to parse args from response body")
         end

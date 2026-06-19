@@ -57,6 +57,7 @@ namespace FlowEngine.Engine
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to create TCP Server: {ex.Message}");
+                // throw;
                 return null;
             }
         }
@@ -75,6 +76,7 @@ namespace FlowEngine.Engine
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to connect TCP Client: {ex.Message}");
+                // throw;
                 return null;
             }
         }
@@ -92,6 +94,7 @@ namespace FlowEngine.Engine
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to create UDP Server: {ex.Message}");
+                // throw;
                 return null;
             }
         }
@@ -111,6 +114,7 @@ namespace FlowEngine.Engine
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to connect UDP Client: {ex.Message}");
+                // throw;
                 return null;
             }
         }

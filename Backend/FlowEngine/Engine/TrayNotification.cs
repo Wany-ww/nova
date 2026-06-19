@@ -109,6 +109,7 @@ namespace FlowEngine.Engine
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine("Notify Error: " + ex.Message);
+                    // throw;
                 }
             });
         }
@@ -141,8 +142,9 @@ namespace FlowEngine.Engine
                     }
                     catch
                     {
-                        // Suppress: throw/logCallback/MessageBox not needed during tray icon cleanup on closed
+                        // throw;
                     }
+                    // lock (_lock)
                     _iconAdded = false;
                 }
             }

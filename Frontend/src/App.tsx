@@ -217,7 +217,7 @@ function updateGraphFlowProperties(nodes: Node[], edges: Edge[]): Node[] {
       if (visited.has(current)) continue;
       visited.add(current);
 
-      const outgoing = edges.filter(e => e.source === current && e.sourceHandle === 'flow_out' && e.targetHandle === 'flow_in');
+      const outgoing = edges.filter(e => e.source === current && e.sourceHandle?.startsWith('flow_') && e.sourceHandle !== 'flow_in' && e.targetHandle === 'flow_in');
       for (const edge of outgoing) {
         if (!visited.has(edge.target)) {
           queue.push(edge.target);
@@ -932,6 +932,111 @@ const API_DOCS: ApiDoc[] = [
     inputs: [{ name: "text", type: "string", desc: "The text string to type out." }],
     outputs: [],
     example: "input.key_type(\"Hello, NOVA!\")"
+  },
+  {
+    name: "system.cpu_usage",
+    category: "System",
+    signature: "system.cpu_usage()",
+    description: "Returns the current overall system CPU usage percentage.",
+    inputs: [],
+    outputs: [{ type: "number", desc: "The CPU usage percentage (0.0 to 100.0)." }],
+    example: "local cpu = system.cpu_usage()\nlog.info(\"CPU Usage: \" .. string.format(\"%.1f%%\", cpu))"
+  },
+  {
+    name: "system.ram_usage",
+    category: "System",
+    signature: "system.ram_usage()",
+    description: "Returns physical memory (RAM) utilization statistics.",
+    inputs: [],
+    outputs: [{ type: "table", desc: "A table with keys: totalGb, availableGb, usedGb, and load (percentage)." }],
+    example: "local ram = system.ram_usage()\nlog.info(string.format(\"RAM: %.1f / %.1f GB (%.1f%%)\", ram.usedGb, ram.totalGb, ram.load))"
+  },
+  {
+    name: "system.disk_free",
+    category: "System",
+    signature: "system.disk_free(drive: string)",
+    description: "Returns the available free space on the specified disk partition in gigabytes (GB).",
+    inputs: [{ name: "drive", type: "string", desc: "The drive letter or root path (e.g. 'C:', 'D:/')." }],
+    outputs: [{ type: "number", desc: "The free space in GB." }],
+    example: "local freeGb = system.disk_free(\"C:\")\nlog.info(\"C: Free Space: \" .. string.format(\"%.1f GB\", freeGb))"
+  },
+  {
+    name: "system.speak",
+    category: "System",
+    signature: "system.speak(text: string)",
+    description: "Speaks the specified message using the system's default text-to-speech (TTS) voice.",
+    inputs: [{ name: "text", type: "string", desc: "The text message to synthesize." }],
+    outputs: [],
+    example: "system.speak(\"System resources warning. CPU usage is too high.\")"
+  },
+  {
+    name: "crypto.sha256",
+    category: "Cryptography",
+    signature: "crypto.sha256(str: string)",
+    description: "Computes the SHA-256 cryptographic hash of the input string, returning it as a hexadecimal string.",
+    inputs: [{ name: "str", type: "string", desc: "The input string to hash." }],
+    outputs: [{ type: "string", desc: "The calculated SHA-256 hash in hexadecimal." }],
+    example: "local hash = crypto.sha256(\"admin123\")\nlog.info(\"SHA256: \" .. hash)"
+  },
+  {
+    name: "crypto.md5",
+    category: "Cryptography",
+    signature: "crypto.md5(str: string)",
+    description: "Computes the MD5 cryptographic hash of the input string, returning it as a hexadecimal string.",
+    inputs: [{ name: "str", type: "string", desc: "The input string to hash." }],
+    outputs: [{ type: "string", desc: "The calculated MD5 hash in hexadecimal." }],
+    example: "local hash = crypto.md5(\"hello\")\nlog.info(\"MD5: \" .. hash)"
+  },
+  {
+    name: "crypto.base64_encode",
+    category: "Cryptography",
+    signature: "crypto.base64_encode(str: string)",
+    description: "Encodes a plain text string into a Base64-encoded string.",
+    inputs: [{ name: "str", type: "string", desc: "The plain text string to encode." }],
+    outputs: [{ type: "string", desc: "The encoded Base64 representation." }],
+    example: "local encoded = crypto.base64_encode(\"NOVA Engine\")\nlog.info(\"Base64: \" .. encoded)"
+  },
+  {
+    name: "crypto.base64_decode",
+    category: "Cryptography",
+    signature: "crypto.base64_decode(str: string)",
+    description: "Decodes a Base64-encoded string back into its original plain text representation.",
+    inputs: [{ name: "str", type: "string", desc: "The Base64 string to decode." }],
+    outputs: [{ type: "string", desc: "The decoded plain text." }],
+    example: "local decoded = crypto.base64_decode(\"Tk9WQSBFbmdpbmU=\")\nlog.info(\"Decoded: \" .. decoded)"
+  },
+  {
+    name: "csv.read",
+    category: "CSV",
+    signature: "csv.read(filePath: string)",
+    description: "Reads a CSV spreadsheet file and parses it into a 2D Lua table array (rows and columns). Supports double-quoted values containing commas.",
+    inputs: [{ name: "filePath", type: "string", desc: "The absolute or relative path to the CSV file." }],
+    outputs: [{ type: "table", desc: "A 2D array representing rows containing columns." }],
+    example: "local data = csv.read(\"save/results.csv\")\nif #data > 0 then\n    log.info(\"First Row, First Col: \" .. tostring(data[1][1]))\nend"
+  },
+  {
+    name: "csv.write",
+    category: "CSV",
+    signature: "csv.write(filePath: string, dataTable: table)",
+    description: "Writes a 2D Lua table array of rows and columns to a CSV file. Automatically quotes values containing commas or quotes.",
+    inputs: [
+      { name: "filePath", type: "string", desc: "The destination path where the CSV will be saved." },
+      { name: "dataTable", type: "table", desc: "A 2D array of strings/numbers to write." }
+    ],
+    outputs: [{ type: "boolean", desc: "True if writing succeeded, otherwise False." }],
+    example: "local myData = {\n  {\"Name\", \"Score\", \"Passed\"},\n  {\"Alice\", 95, \"true\"},\n  {\"Bob\", 82, \"false\"}\n}\nlocal success = csv.write(\"save/output.csv\", myData)\nif success then\n    log.info(\"CSV written successfully!\")\nend"
+  },
+  {
+    name: "http.download",
+    category: "HTTP",
+    signature: "http.download(url: string, destPath: string)",
+    description: "Downloads a file from the specified URL and saves it directly to the local destination path.",
+    inputs: [
+      { name: "url", type: "string", desc: "The web address of the file to download." },
+      { name: "destPath", type: "string", desc: "The local destination path to save the file." }
+    ],
+    outputs: [{ type: "boolean", desc: "True if downloading succeeded, otherwise False." }],
+    example: "local ok = http.download(\"https://picsum.photos/200/300\", \"save/random.jpg\")\nif ok then\n    log.info(\"Download succeeded and image saved!\")\nend"
   }
 ];
 
@@ -1230,7 +1335,7 @@ export default function App() {
       return;
     }
 
-    const isSourceFlow = params.sourceHandle === 'flow_out';
+    const isSourceFlow = params.sourceHandle?.startsWith('flow_') && params.sourceHandle !== 'flow_in';
     const isTargetFlow = params.targetHandle === 'flow_in';
 
     // 5. flow 출력핀은 flow 입력핀하고만 연결 가능
@@ -2123,7 +2228,7 @@ export default function App() {
                 minHeight: 0
               }}>
                 <div style={{ padding: '0 16px 8px 16px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Categories</div>
-                {['All', 'Logging', 'Time', 'Global Memory', 'Filesystem', 'Network', 'HTTP', 'JSON', 'System', 'FTP', 'Input', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper'].map(cat => (
+                {['All', 'Logging', 'Time', 'Global Memory', 'Filesystem', 'Network', 'HTTP', 'JSON', 'System', 'FTP', 'Input', 'Cryptography', 'CSV', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper'].map(cat => (
                   <button
                     key={cat}
                     onClick={() => setSelectedApiCategory(cat)}

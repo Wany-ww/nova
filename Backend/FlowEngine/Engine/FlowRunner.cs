@@ -230,16 +230,104 @@ namespace FlowEngine.Engine
             }
 
             // Parse metadata
-            NodeMetadata metadata;
-            try
+            NodeMetadata metadata = new NodeMetadata();
+            if (!string.IsNullOrEmpty(node.Script))
             {
-                metadata = LuaParser.Parse(node.Script);
+                try
+                {
+                    metadata = LuaParser.Parse(node.Script);
+                }
+                catch (Exception ex)
+                {
+                    _logCallback?.Invoke("ERROR", $"Failed to parse Lua script for node '{nodeId}': {ex.Message}");
+                    return;
+                }
             }
-            catch (Exception ex)
+
+            // Intercept Loop node behavior
+            if (node.Type == "Loop")
             {
-                _logCallback?.Invoke("ERROR", $"Failed to parse Lua script for node '{nodeId}': {ex.Message}");
+                int startVal = 1;
+                int endVal = 5;
+                int stepVal = 1;
+
+                if (inputValues.TryGetValue("start", out var sVal)) startVal = Convert.ToInt32(sVal);
+                if (inputValues.TryGetValue("end", out var eVal)) endVal = Convert.ToInt32(eVal);
+                if (inputValues.TryGetValue("step", out var stVal)) stepVal = Convert.ToInt32(stVal);
+                if (stepVal == 0) stepVal = 1;
+
+                _logCallback?.Invoke("INFO", $"Executing Loop node '{nodeId}': {startVal} to {endVal} step {stepVal}");
+
+                for (int i = startVal; (stepVal > 0 ? i <= endVal : i >= endVal); i += stepVal)
+                {
+                    if (FlowExecutionManager.StopRequested)
+                    {
+                        _stateCallback?.Invoke(nodeId, i, "IDLE");
+                        return;
+                    }
+
+                    _stateCallback?.Invoke(nodeId, i, "RUNNING");
+                    
+                    var loopOutputs = new Dictionary<string, object> { { "index", i } };
+                    
+                    if (!string.IsNullOrEmpty(node.Script))
+                    {
+                        try
+                        {
+                            var scriptOutputs = LuaRunner.Run(metadata, inputValues, _logCallback!);
+                            if (scriptOutputs != null)
+                            {
+                                foreach (var kvp in scriptOutputs)
+                                {
+                                    loopOutputs[kvp.Key] = kvp.Value;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _stateCallback?.Invoke(nodeId, i, "ERROR");
+                            _logCallback?.Invoke("ERROR", $"Execution failed inside loop node '{nodeId}' at index {i}: {ex.Message}");
+                            return;
+                        }
+                    }
+                    _computedOutputs[nodeId] = loopOutputs;
+                    _stateCallback?.Invoke(nodeId, i, "IDLE");
+
+                    // Propagate through "flow_loop" links
+                    var loopLinks = _graph.Links.Where(l => l.FromNode == nodeId && l.FromOutput == "flow_loop" && l.ToInput == "flow_in").ToList();
+                    foreach (var link in loopLinks)
+                    {
+                        ExecuteNode(link.ToNode);
+                    }
+                }
+
+                // Loop completed, propagate to "flow_done" or "flow_out"
+                var doneLinks = _graph.Links.Where(l => l.FromNode == nodeId && (l.FromOutput == "flow_done" || l.FromOutput == "flow_out") && l.ToInput == "flow_in").ToList();
+                foreach (var link in doneLinks)
+                {
+                    ExecuteNode(link.ToNode);
+                }
+
+                // Propagate to data downstream nodes (nodes that do not have flow inputs)
+                var loopOutgoingLinks = _graph.Links.Where(l => l.FromNode == nodeId).ToList();
+                var loopDownstreamDataIds = new List<string>();
+                foreach (var link in loopOutgoingLinks)
+                {
+                    string downId = link.ToNode;
+                    bool downHasFlowInput = _graph.Links.Any(l => l.ToNode == downId && l.ToInput == "flow_in");
+                    if (!downHasFlowInput)
+                    {
+                        loopDownstreamDataIds.Add(downId);
+                    }
+                }
+                foreach (var downId in loopDownstreamDataIds.Distinct())
+                {
+                    ExecuteNode(downId);
+                }
+
                 return;
             }
+
 
             // Get total count
             int total = 1;
@@ -306,8 +394,48 @@ namespace FlowEngine.Engine
                 {
                     _computedOutputs[nodeId] = outputsResult;
 
+                    // Determine which output flow ports to trigger
+                    List<string> targetFlowPorts = new List<string>();
+                    if (node.Type == "IfElse")
+                    {
+                        bool condition = false;
+                        if (outputsResult.TryGetValue("condition", out var condObj))
+                        {
+                            condition = Convert.ToBoolean(condObj);
+                        }
+                        else if (outputsResult.Count > 0)
+                        {
+                            condition = Convert.ToBoolean(outputsResult.Values.First());
+                        }
+                        targetFlowPorts.Add(condition ? "flow_true" : "flow_false");
+                    }
+                    else if (node.Type == "Switch")
+                    {
+                        object? caseVal = null;
+                        if (outputsResult.TryGetValue("value", out var valObj)) caseVal = valObj;
+                        else if (outputsResult.TryGetValue("case", out var caseObj)) caseVal = caseObj;
+                        else if (outputsResult.Count > 0) caseVal = outputsResult.Values.First();
+                        
+                        string caseStr = caseVal?.ToString() ?? "null";
+                        string targetPort = "flow_" + caseStr;
+                        
+                        bool hasCaseLink = _graph.Links.Any(l => l.FromNode == nodeId && l.FromOutput == targetPort && l.ToInput == "flow_in");
+                        if (hasCaseLink)
+                        {
+                            targetFlowPorts.Add(targetPort);
+                        }
+                        else
+                        {
+                            targetFlowPorts.Add("flow_default");
+                        }
+                    }
+                    else
+                    {
+                        targetFlowPorts.Add("flow_out");
+                    }
+
                     // Propagate to downstream flow nodes inside the loop
-                    var outgoingFlowLinks = _graph.Links.Where(l => l.FromNode == nodeId && l.FromOutput == "flow_out" && l.ToInput == "flow_in").ToList();
+                    var outgoingFlowLinks = _graph.Links.Where(l => l.FromNode == nodeId && targetFlowPorts.Contains(l.FromOutput) && l.ToInput == "flow_in").ToList();
                     var downstreamFlowIds = outgoingFlowLinks.Select(l => l.ToNode).Distinct().ToList();
 
                     foreach (var downId in downstreamFlowIds)

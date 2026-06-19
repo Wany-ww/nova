@@ -74,28 +74,60 @@ Create a searchable, categorized scripting API documentation modal inside the He
 
 ---
 
-## 6. Global Variable Memory API (`variable.set` / `variable.get`)
+## 7. Filesystem, Sockets & Advanced APIs (Resolves #6, #7)
 ### Objective
-Implement Lua scripting APIs that allow nodes to store values (bool, int, float, string, table) in a shared global memory, enabling cross-node data communication.
+Implement Lua filesystem operations, TCP/UDP sockets factory/methods, HTTP GET/POST, dynamic JSON serialization/deserialization, system command runner, and OpenCV buffer encode/decode APIs.
 
 ### Changes Made
-- **LuaRunner.cs**:
-  - Implemented static `_globalMemory` dictionary and a corresponding thread lock.
-  - Implemented `variable.set(name, value)` to store variables (recursively converting Lua tables to C# collections).
-  - Implemented `variable.get(name)` to retrieve variables (recursively reconstructing tables from C# collections using `DynValue.FromObject`).
-  - Added recursive `TableToCSharp` helper and fixed the key string conversion quotes bug.
-- **FlowRunner.cs**:
-  - Added `LuaRunner.ClearGlobalMemory()` call at the start of `Run` to clear variables on each new execution.
-- **App.tsx**:
-  - Added `Global Memory` category to the sidebar and defined `variable.set` / `variable.get` documentation cards inside the Help dialog database.
-- **nodes/Variables/SetVariable.lua & nodes/Variables/GetVariable.lua**:
-  - Created pre-loaded nodes for setting and retrieving variables.
+- **LuaRunner.cs & LuaSocket.cs**:
+  - Registered `filesystem`, `tcp`, `udp`, `http`, `json`, and `system` namespaces.
+  - Implemented client connections and server socket wrapping, adding timeout and byte transmission/reception.
+  - Exposed recursive copy/delete helpers, JSON parsing, HTTP client methods, and process creation.
+- **OpenCvLuaApi.cs**:
+  - Implemented `cv.imencode` and `cv.imdecode` for byte stream transfers.
 
 ---
 
-## 7. Verification Plan
-- Run `npm run build` in Frontend directory to ensure Vite successfully outputs assets.
-- Run the integration test app to verify `variable.set` and `variable.get` correctly store and propagate string, number, boolean, and table types across nodes.
+## 8. FTP, Tray Notifications, & Input Automation (Resolves #8)
+### Objective
+Provide Lua scripting support for FTP file transfer, native Win32 balloon alerts in the taskbar, and virtual mouse/keyboard input simulation.
+
+### Changes Made
+- **LuaRunner.cs & TrayNotification.cs**:
+  - Registered `ftp` client upload and download methods.
+  - Implemented `system.notify` using Win32 `Shell_NotifyIcon` for tray alerts.
+- **InputAutomation.cs**:
+  - Registered `input` client simulation using Win32 `SendInput` (mouse movement, clicks, key press, text typing).
+
+---
+
+## 9. Advanced System, Cryptography, CSV, TTS APIs & Control Flow Branches (Resolves #9)
+### Objective
+Implement Lua system resource monitors, cryptographic hashing/encoding, CSV parsing, text-to-speech speak API, and multi-routing flow control nodes.
+
+### Changes Made
+- **LuaRunner.cs**:
+  - Implemented system diagnostics (`system.cpu_usage`, `system.ram_usage`, `system.disk_free`).
+  - Added Speech Synthesis API (`system.speak`) utilizing local SAPI interface.
+  - Added cryptography functions (`crypto.sha256`, `crypto.md5`, `crypto.base64_encode`, `crypto.base64_decode`).
+  - Added CSV parser/writer (`csv.read`, `csv.write`) supporting quotes and commas.
+  - Added HttpClient download wrapper (`http.download`).
+- **FlowRunner.cs**:
+  - Refactored flow execution engine to support multi-branching output routing (`flow_true`, `flow_false`, `flow_loop`, `flow_done`, `flow_[case]`, `flow_default`).
+  - Implemented custom interceptors for `Loop` execution sequences.
+- **App.tsx & CustomNode.tsx**:
+  - Added categories (`Cryptography`, `CSV`) to the documentation database.
+  - Updated connection validation and path traversal to handle multi-routing flow handle prefixes (`flow_`).
+  - Updated dynamic handle rendering for `IfElse`, `Loop`, and `Switch` nodes.
+- **nodes/**:
+  - Created templates for `IfElse.lua`, `Loop.lua`, and `Switch.lua` and added example scripts (`ResourceExample.lua`, `SpeakExample.lua`, `HttpDownloadExample.lua`, `CryptoExample.lua`, `CsvExample.lua`).
+
+---
+
+## 10. Verification Plan
+- Run `npm run build` in the Frontend directory to compile web assets.
 - Verify `python analyze.py` outputs no warning/critical issues and overall score is >= 90 (Grade A).
-- Verify the WPF application launches and the Help dropdown menu includes "API Reference" showing variables documentation under the "Global Memory" category.
+- Verify the C# backend project builds cleanly.
+- Verify execution of flow control branching nodes (`IfElse`, `Loop`, `Switch`) works correctly.
+
 
