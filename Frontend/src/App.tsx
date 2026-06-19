@@ -600,6 +600,31 @@ const API_DOCS: ApiDoc[] = [
       { type: "number", desc: "channels: number of color channels (e.g. 1 for grayscale, 3 for RGB)." }
     ],
     example: "log.info(\"Image Dim: \" .. tostring(img.width) .. \"x\" .. tostring(img.height))\nlog.info(\"Channels: \" .. tostring(img.channels))"
+  },
+  {
+    name: "variable.set",
+    category: "Global Memory",
+    signature: "variable.set(name: string, value: any)",
+    description: "Saves a value of type bool, int, float, string, or table to the global memory under a specific variable name. This value is shared across all executing script nodes and persists throughout the execution run.",
+    inputs: [
+      { name: "name", type: "string", desc: "The identifier/name of the variable." },
+      { name: "value", type: "any", desc: "The value to store (bool, int, float, string, or table)." }
+    ],
+    outputs: [],
+    example: "-- Store a numeric value\nvariable.set(\"globalCount\", 10)\n\n-- Store a configuration table\nvariable.set(\"options\", { threshold = 128, mode = \"binary\" })"
+  },
+  {
+    name: "variable.get",
+    category: "Global Memory",
+    signature: "variable.get(name: string)",
+    description: "Retrieves a variable stored in global memory by name. Returns the value, or nil if the variable does not exist.",
+    inputs: [
+      { name: "name", type: "string", desc: "The identifier/name of the variable to retrieve." }
+    ],
+    outputs: [
+      { type: "any", desc: "The retrieved value (bool, int, float, string, table), or nil if not found." }
+    ],
+    example: "-- Retrieve a value\nlocal cnt = variable.get(\"globalCount\")\nif cnt then\n    log.info(\"Current count: \" .. tostring(cnt))\nend\n\n-- Retrieve a table\nlocal opt = variable.get(\"options\")\nif opt then\n    log.info(\"Threshold: \" .. tostring(opt.threshold))\nend"
   }
 ];
 
@@ -1789,7 +1814,7 @@ export default function App() {
                 minHeight: 0
               }}>
                 <div style={{ padding: '0 16px 8px 16px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Categories</div>
-                {['All', 'Logging', 'Time', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper'].map(cat => (
+                {['All', 'Logging', 'Time', 'Global Memory', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper'].map(cat => (
                   <button
                     key={cat}
                     onClick={() => setSelectedApiCategory(cat)}

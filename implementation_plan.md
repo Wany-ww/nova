@@ -74,7 +74,28 @@ Create a searchable, categorized scripting API documentation modal inside the He
 
 ---
 
-## 6. Verification Plan
+## 6. Global Variable Memory API (`variable.set` / `variable.get`)
+### Objective
+Implement Lua scripting APIs that allow nodes to store values (bool, int, float, string, table) in a shared global memory, enabling cross-node data communication.
+
+### Changes Made
+- **LuaRunner.cs**:
+  - Implemented static `_globalMemory` dictionary and a corresponding thread lock.
+  - Implemented `variable.set(name, value)` to store variables (recursively converting Lua tables to C# collections).
+  - Implemented `variable.get(name)` to retrieve variables (recursively reconstructing tables from C# collections using `DynValue.FromObject`).
+  - Added recursive `TableToCSharp` helper and fixed the key string conversion quotes bug.
+- **FlowRunner.cs**:
+  - Added `LuaRunner.ClearGlobalMemory()` call at the start of `Run` to clear variables on each new execution.
+- **App.tsx**:
+  - Added `Global Memory` category to the sidebar and defined `variable.set` / `variable.get` documentation cards inside the Help dialog database.
+- **nodes/Variables/SetVariable.lua & nodes/Variables/GetVariable.lua**:
+  - Created pre-loaded nodes for setting and retrieving variables.
+
+---
+
+## 7. Verification Plan
 - Run `npm run build` in Frontend directory to ensure Vite successfully outputs assets.
+- Run the integration test app to verify `variable.set` and `variable.get` correctly store and propagate string, number, boolean, and table types across nodes.
 - Verify `python analyze.py` outputs no warning/critical issues and overall score is >= 90 (Grade A).
-- Verify the WPF application launches and the Help dropdown menu includes "API Reference" opening the modal.
+- Verify the WPF application launches and the Help dropdown menu includes "API Reference" showing variables documentation under the "Global Memory" category.
+

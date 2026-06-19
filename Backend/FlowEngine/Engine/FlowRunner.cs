@@ -133,6 +133,9 @@ namespace FlowEngine.Engine
             // Reset StopRequested on new run
             FlowExecutionManager.StopRequested = false;
 
+            // Clear global memory variables on each new run
+            LuaRunner.ClearGlobalMemory();
+
             // 1. Cycle Detection
             if (_graph.HasCycle())
             {

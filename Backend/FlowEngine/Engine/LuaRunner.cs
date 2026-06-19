@@ -17,6 +17,9 @@ namespace FlowEngine.Engine
         private static string? _logSaveFilePath = null;
         private static readonly object _logFileLock = new object();
 
+        private static readonly Dictionary<string, object?> _globalMemory = new Dictionary<string, object?>();
+        private static readonly object _globalMemoryLock = new object();
+
                 /// <summary>
         /// Configures real-time log saving to a default or specified file path.
         /// </summary>
@@ -217,6 +220,32 @@ namespace FlowEngine.Engine
                 });
                 timeTable["sleep"] = sleepTable;
                 script.Globals["time"] = timeTable;
+
+                // Register global variable API
+                var variableTable = new Table(script);
+                variableTable["set"] = (Action<string, DynValue>)((name, val) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    lock (_globalMemoryLock)
+                    {
+                        _globalMemory[name] = ConvertDynValue(val);
+                    }
+                });
+                variableTable["get"] = (Func<string, DynValue>)((name) =>
+                {
+                    if (FlowExecutionManager.StopRequested) throw new ScriptRuntimeException("Execution stopped by user.");
+                    object? val = null;
+                    lock (_globalMemoryLock)
+                    {
+                        _globalMemory.TryGetValue(name, out val);
+                    }
+                    if (val == null)
+                    {
+                        return DynValue.Nil;
+                    }
+                    return DynValue.FromObject(script, val);
+                });
+                script.Globals["variable"] = variableTable;
 
                 // Register global cv API
                 OpenCvLuaApi.Register(script);
@@ -425,7 +454,7 @@ namespace FlowEngine.Engine
             var dict = new Dictionary<string, object?>();
             foreach (var pair in table.Pairs)
             {
-                string key = pair.Key.ToString();
+                string key = pair.Key.Type == DataType.String ? pair.Key.String : (pair.Key.ToObject()?.ToString() ?? "");
                 object? valObj = null;
                 if (pair.Value.Type == DataType.Table)
                 {
@@ -452,6 +481,94 @@ namespace FlowEngine.Engine
             while (sw.ElapsedTicks < ticksToWait)
             {
                 System.Threading.Thread.SpinWait(10);
+            }
+        }
+
+        /// <summary>
+        /// Clears all variables stored in the global memory dictionary.
+        /// </summary>
+        public static void ClearGlobalMemory()
+        {
+            lock (_globalMemoryLock)
+            {
+                _globalMemory.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Converts MoonSharp DynValues to standard C# values for global variable storage.
+        /// </summary>
+        private static object? ConvertDynValue(DynValue val)
+        {
+            if (val == null || val.IsNil()) return null;
+            switch (val.Type)
+            {
+                case DataType.Boolean:
+                    return val.Boolean;
+                case DataType.Number:
+                    return val.Number;
+                case DataType.String:
+                    return val.String;
+                case DataType.Table:
+                    return TableToCSharp(val.Table);
+                default:
+                    return val.ToObject();
+            }
+        }
+
+        /// <summary>
+        /// Recursively converts a MoonSharp Table into standard C# collections (List or Dictionary).
+        /// </summary>
+        private static object TableToCSharp(Table table)
+        {
+            bool isSequence = true;
+            int count = 0;
+            foreach (var pair in table.Pairs)
+            {
+                count++;
+            }
+            
+            for (int i = 1; i <= count; i++)
+            {
+                var item = table.Get(i);
+                if (item.IsNil())
+                {
+                    isSequence = false;
+                    break;
+                }
+            }
+            
+            if (isSequence && count > 0)
+            {
+                var list = new List<object?>();
+                for (int i = 1; i <= count; i++)
+                {
+                    var val = table.Get(i);
+                    if (val.Type == DataType.Table)
+                        list.Add(TableToCSharp(val.Table));
+                    else
+                        list.Add(val.ToObject());
+                }
+                return list;
+            }
+            else
+            {
+                var dict = new Dictionary<string, object?>();
+                foreach (var pair in table.Pairs)
+                {
+                    string key = pair.Key.Type == DataType.String ? pair.Key.String : (pair.Key.ToObject()?.ToString() ?? "");
+                    object? valObj = null;
+                    if (pair.Value.Type == DataType.Table)
+                    {
+                        valObj = TableToCSharp(pair.Value.Table);
+                    }
+                    else
+                    {
+                        valObj = pair.Value.ToObject();
+                    }
+                    dict[key] = valObj;
+                }
+                return dict;
             }
         }
     }
