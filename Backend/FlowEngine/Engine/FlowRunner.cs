@@ -420,20 +420,13 @@ namespace FlowEngine.Engine
                         else if (outputsResult.TryGetValue("case", out var caseObj)) caseVal = caseObj;
                         else if (outputsResult.Count > 0) caseVal = outputsResult.Values.First();
                         
-                        string caseStr = caseVal?.ToString()?.Trim() ?? "null";
+                        string caseStr = ParseString(caseVal).Trim();
 
                         // Determine the stable handle ID (flow_case_1, flow_case_2, etc.) based on node inputs
                         int numCases = 0;
                         if (node.Inputs != null && node.Inputs.TryGetValue("number", out var numObj))
                         {
-                            try
-                            {
-                                numCases = Convert.ToInt32(numObj);
-                            }
-                            catch (Exception)
-                            {
-                                numCases = 0;
-                            }
+                            numCases = ParseInt(numObj, 0);
                         }
 
                         // Scan through the registered case input parameters to find a value match
@@ -442,7 +435,7 @@ namespace FlowEngine.Engine
                         {
                             if (node.Inputs != null && node.Inputs.TryGetValue($"case_{i}", out var caseInputObj))
                             {
-                                string caseInputStr = caseInputObj?.ToString()?.Trim() ?? string.Empty;
+                                string caseInputStr = ParseString(caseInputObj).Trim();
                                 if (caseInputStr.Equals(caseStr, StringComparison.OrdinalIgnoreCase))
                                 {
                                     targetFlowPort = $"flow_case_{i}";
@@ -538,6 +531,22 @@ namespace FlowEngine.Engine
             if (val is float fVal) return (int)fVal;
             if (int.TryParse(val.ToString(), out var parsed)) return parsed;
             return defaultVal;
+        }
+
+        /// <summary>
+        /// Safely converts any value (including JsonElement string/primitives) into a standard C# string.
+        /// </summary>
+        /// <param name="val">The raw object to parse</param>
+        /// <returns>The parsed string, or empty string if null</returns>
+        private string ParseString(object? val)
+        {
+            if (val == null) return string.Empty;
+            if (val is JsonElement je)
+            {
+                if (je.ValueKind == JsonValueKind.String) return je.GetString() ?? string.Empty;
+                return je.ToString();
+            }
+            return val.ToString() ?? string.Empty;
         }
     }
 }
