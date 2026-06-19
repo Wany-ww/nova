@@ -563,7 +563,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.GaussianBlur",
-    category: "OpenCV Blurring",
+    category: "OpenCV Processing",
     signature: "cv.GaussianBlur(src: Mat, ksize_w: number, ksize_h: number, sigmaX: number, sigmaY?: number, borderType?: number)",
     description: "Blurs an image using a Gaussian filter.",
     inputs: [
@@ -579,7 +579,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.medianBlur",
-    category: "OpenCV Blurring",
+    category: "OpenCV Processing",
     signature: "cv.medianBlur(src: Mat, ksize: number)",
     description: "Blurs an image using a median filter (great for removing salt-and-pepper noise).",
     inputs: [
@@ -591,7 +591,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.getStructuringElement",
-    category: "OpenCV Morphology",
+    category: "OpenCV Processing",
     signature: "cv.getStructuringElement(shape: number, kw: number, kh: number)",
     description: "Returns a structuring element (kernel matrix) of the specified size and shape for morphological operations.",
     inputs: [
@@ -604,7 +604,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.erode",
-    category: "OpenCV Morphology",
+    category: "OpenCV Processing",
     signature: "cv.erode(src: Mat, element: Mat, iterations?: number)",
     description: "Erodes an image by using a specific structuring element.",
     inputs: [
@@ -617,7 +617,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.dilate",
-    category: "OpenCV Morphology",
+    category: "OpenCV Processing",
     signature: "cv.dilate(src: Mat, element: Mat, iterations?: number)",
     description: "Dilates an image by using a specific structuring element.",
     inputs: [
@@ -630,7 +630,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.getRotationMatrix2D",
-    category: "OpenCV Warping",
+    category: "OpenCV Processing",
     signature: "cv.getRotationMatrix2D(cx: number, cy: number, angle: number, scale: number)",
     description: "Calculates an affine matrix of 2D rotation.",
     inputs: [
@@ -644,7 +644,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.warpAffine",
-    category: "OpenCV Warping",
+    category: "OpenCV Processing",
     signature: "cv.warpAffine(src: Mat, M: Mat, dw: number, dh: number, flags?: number, borderMode?: number)",
     description: "Applies an affine transformation to an image.",
     inputs: [
@@ -660,7 +660,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.bitwise_and",
-    category: "OpenCV Logical",
+    category: "OpenCV Processing",
     signature: "cv.bitwise_and(src1: Mat, src2: Mat, mask?: Mat)",
     description: "Computes bitwise conjunction of two matrices element-wise.",
     inputs: [
@@ -673,9 +673,9 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.bitwise_or",
-    category: "OpenCV Logical",
+    category: "OpenCV Processing",
     signature: "cv.bitwise_or(src1: Mat, src2: Mat, mask?: Mat)",
-    description: "Computes bitwise disjunction of two matrices element-wise.",
+    description: "Computes bitwise bgr/gray disjunction of two matrices element-wise.",
     inputs: [
       { name: "src1", type: "Mat", desc: "First source matrix." },
       { name: "src2", type: "Mat", desc: "Second source matrix." },
@@ -686,7 +686,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.bitwise_xor",
-    category: "OpenCV Logical",
+    category: "OpenCV Processing",
     signature: "cv.bitwise_xor(src1: Mat, src2: Mat, mask?: Mat)",
     description: "Computes bitwise exclusive-or of two matrices element-wise.",
     inputs: [
@@ -699,7 +699,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.bitwise_not",
-    category: "OpenCV Logical",
+    category: "OpenCV Processing",
     signature: "cv.bitwise_not(src: Mat, mask?: Mat)",
     description: "Inverts every bit of an array.",
     inputs: [
@@ -711,7 +711,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.split",
-    category: "OpenCV Channels",
+    category: "OpenCV Core",
     signature: "cv.split(src: Mat)",
     description: "Divides a multi-channel array into several single-channel arrays.",
     inputs: [{ name: "src", type: "Mat", desc: "Source multi-channel matrix." }],
@@ -720,7 +720,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.merge",
-    category: "OpenCV Channels",
+    category: "OpenCV Core",
     signature: "cv.merge(channels: table)",
     description: "Creates one multi-channel array out of several single-channel ones.",
     inputs: [{ name: "channels", type: "table", desc: "An array table list containing individual single-channel Mat elements." }],
@@ -729,7 +729,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.matchTemplate",
-    category: "OpenCV Detection",
+    category: "OpenCV Processing",
     signature: "cv.matchTemplate(image: Mat, templ: Mat, method: number)",
     description: "Compares a template against overlapped image regions.",
     inputs: [
@@ -742,7 +742,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.minMaxLoc",
-    category: "OpenCV Detection",
+    category: "OpenCV Processing",
     signature: "cv.minMaxLoc(src: Mat)",
     description: "Finds the global minimum and maximum values and their locations in a single-channel array.",
     inputs: [{ name: "src", type: "Mat", desc: "Source single-channel matrix." }],
@@ -751,7 +751,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.findContours",
-    category: "OpenCV Contours",
+    category: "OpenCV Processing",
     signature: "cv.findContours(src: Mat, mode: number, method: number)",
     description: "Finds contours in a binary image.",
     inputs: [
@@ -764,7 +764,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.drawContours",
-    category: "OpenCV Contours",
+    category: "OpenCV Drawing",
     signature: "cv.drawContours(img: Mat, contours: table, contourIdx: number, color: table | number[], thickness: number)",
     description: "Draws contours outlines or filled contours.",
     inputs: [
@@ -779,7 +779,7 @@ const API_DOCS: ApiDoc[] = [
   },
   {
     name: "cv.boundingRect",
-    category: "OpenCV Contours",
+    category: "OpenCV Processing",
     signature: "cv.boundingRect(contour: table)",
     description: "Calculates the up-right bounding rectangle of a point set/contour.",
     inputs: [{ name: "contour", type: "table", desc: "A single contour (list of points {x, y}) from the list." }],
@@ -1265,7 +1265,184 @@ const API_DOCS: ApiDoc[] = [
   }
 ];
 
+interface ApiDocCardProps {
+  doc: ApiDoc;
+  apiSearchQuery: string;
+  copiedName: string | null;
+  handleCopy: (name: string, text: string) => void;
+}
 
+function ApiDocCard({ doc, apiSearchQuery, copiedName, handleCopy }: ApiDocCardProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Auto-expand when a search query is active
+  useEffect(() => {
+    if (apiSearchQuery.trim() !== '') {
+      setIsOpen(true);
+    } else {
+      setIsOpen(false);
+    }
+  }, [apiSearchQuery]);
+
+  return (
+    <div
+      style={{
+        backgroundColor: 'var(--panel-bg)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '8px',
+        display: 'flex',
+        flexDirection: 'column',
+        transition: 'all 0.2s ease',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        overflow: 'hidden'
+      }}
+      onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-color)'}
+      onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
+    >
+      {/* Header (always visible, clickable to toggle) */}
+      <div
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          padding: '14px 16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          cursor: 'pointer',
+          userSelect: 'none',
+          backgroundColor: isOpen ? 'color-mix(in srgb, var(--accent-color) 4%, transparent)' : 'transparent',
+          transition: 'background-color 0.2s'
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: 0, paddingRight: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.95rem', fontWeight: 700, color: 'var(--info-color)' }}>
+              {doc.name}
+            </span>
+            <span style={{
+              fontSize: '0.7rem',
+              backgroundColor: 'color-mix(in srgb, var(--accent-color) 15%, transparent)',
+              color: 'var(--accent-color)',
+              padding: '1px 6px',
+              borderRadius: '10px',
+              fontWeight: 600,
+              border: '1px solid color-mix(in srgb, var(--accent-color) 25%, transparent)'
+            }}>
+              {doc.category}
+            </span>
+          </div>
+          <span style={{
+            fontFamily: 'JetBrains Mono, monospace',
+            fontSize: '0.75rem',
+            color: 'var(--text-muted)',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
+            {doc.signature}
+          </span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Copy button in header for quick access */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); // don't toggle open/close
+              handleCopy(doc.name, doc.example);
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: copiedName === doc.name ? 'var(--success-color)' : 'var(--text-muted)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '0.75rem',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              transition: 'all 0.2s',
+              backgroundColor: copiedName === doc.name ? 'color-mix(in srgb, var(--success-color) 10%, transparent)' : 'transparent'
+            }}
+          >
+            {copiedName === doc.name ? <Check size={12} /> : <Copy size={12} />}
+            <span>{copiedName === doc.name ? 'Copied!' : 'Copy'}</span>
+          </button>
+          
+          {/* Chevron icon indicating state */}
+          <div style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+            <ChevronRight size={16} />
+          </div>
+        </div>
+      </div>
+
+      {/* Body content (visible only when open) */}
+      {isOpen && (
+        <div style={{
+          padding: '16px',
+          borderTop: '1px solid var(--border-color)',
+          backgroundColor: 'var(--panel-bg)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px'
+        }}>
+          {/* Description */}
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-color)', lineHeight: 1.5 }}>
+            {doc.description}
+          </div>
+
+          {/* Inputs/Outputs */}
+          {(doc.inputs.length > 0 || doc.outputs.length > 0) && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px dashed var(--border-color)', paddingTop: '10px' }}>
+              {doc.inputs.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Parameters</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '8px' }}>
+                    {doc.inputs.map(input => (
+                      <div key={input.name} style={{ fontSize: '0.8rem', lineHeight: 1.4 }}>
+                        <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 600, color: 'var(--warning-color)' }}>{input.name}</span>
+                        <span style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-muted)', fontSize: '0.75rem' }}> ({input.type})</span>
+                        <span style={{ color: 'var(--text-color)' }}>: {input.desc}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {doc.outputs.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: doc.inputs.length > 0 ? '4px' : '0' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Returns</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '8px' }}>
+                    {doc.outputs.map((output, oIdx) => (
+                      <div key={oIdx} style={{ fontSize: '0.8rem', lineHeight: 1.4 }}>
+                        <span style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-muted)', fontSize: '0.75rem' }}>({output.type})</span>
+                        <span style={{ color: 'var(--text-color)' }}> {output.desc}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Example */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', borderTop: '1px dashed var(--border-color)', paddingTop: '10px' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Usage Example</div>
+            <pre style={{
+              margin: 0,
+              fontFamily: 'JetBrains Mono, monospace',
+              fontSize: '0.75rem',
+              backgroundColor: 'var(--sidebar-bg)',
+              padding: '10px 12px',
+              borderRadius: '6px',
+              border: '1px solid var(--border-color)',
+              color: 'var(--text-color)',
+              overflowX: 'auto',
+              lineHeight: 1.4
+            }}>{doc.example}</pre>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -2429,7 +2606,7 @@ export default function App() {
       {/* Script API Help Modal */}
       {showApiHelpModal && (
         <div className="modal-overlay" onClick={() => setShowApiHelpModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '960px', maxWidth: '95vw', height: '700px', maxHeight: '90vh' }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '960px', maxWidth: '95vw', height: '700px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div className="modal-header">
               <div className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <BookOpen size={18} color="var(--accent-color)" />
@@ -2555,133 +2732,13 @@ export default function App() {
                     }
 
                     return filteredDocs.map((doc) => (
-                      <div
+                      <ApiDocCard
                         key={doc.name}
-                        style={{
-                          backgroundColor: 'var(--panel-bg)',
-                          border: '1px solid var(--border-color)',
-                          borderRadius: '8px',
-                          padding: '16px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '12px',
-                          transition: 'border-color 0.2s',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-color)'}
-                        onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
-                      >
-                        {/* Title & Badge */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1.05rem', fontWeight: 700, color: 'var(--info-color)' }}>
-                            {doc.name}
-                          </span>
-                          <span style={{
-                            fontSize: '0.75rem',
-                            backgroundColor: 'color-mix(in srgb, var(--accent-color) 15%, transparent)',
-                            color: 'var(--accent-color)',
-                            padding: '3px 8px',
-                            borderRadius: '12px',
-                            fontWeight: 600,
-                            border: '1px solid color-mix(in srgb, var(--accent-color) 25%, transparent)'
-                          }}>
-                            {doc.category}
-                          </span>
-                        </div>
-
-                        {/* Signature */}
-                        <div style={{
-                          fontFamily: 'JetBrains Mono, monospace',
-                          fontSize: '0.8rem',
-                          backgroundColor: 'var(--bg-color)',
-                          padding: '8px 12px',
-                          borderRadius: '6px',
-                          border: '1px solid var(--border-color)',
-                          color: 'var(--text-color)',
-                          whiteSpace: 'pre-wrap',
-                          wordBreak: 'break-all'
-                        }}>
-                          <span style={{ color: 'var(--syntax-type)' }}>function </span>
-                          <span style={{ color: 'var(--syntax-function)' }}>{doc.signature}</span>
-                        </div>
-
-                        {/* Description */}
-                        <div style={{ fontSize: '0.85rem', color: 'var(--text-color)', lineHeight: 1.5 }}>
-                          {doc.description}
-                        </div>
-
-                        {/* Inputs/Outputs */}
-                        {(doc.inputs.length > 0 || doc.outputs.length > 0) && (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px dashed var(--border-color)', paddingTop: '10px' }}>
-                            {doc.inputs.length > 0 && (
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Parameters</div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '8px' }}>
-                                  {doc.inputs.map(input => (
-                                    <div key={input.name} style={{ fontSize: '0.8rem', lineHeight: 1.4 }}>
-                                      <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 600, color: 'var(--warning-color)' }}>{input.name}</span>
-                                      <span style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-muted)', fontSize: '0.75rem' }}> ({input.type})</span>
-                                      <span style={{ color: 'var(--text-color)' }}>: {input.desc}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                            {doc.outputs.length > 0 && (
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: doc.inputs.length > 0 ? '4px' : '0' }}>
-                                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Returns</div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '8px' }}>
-                                  {doc.outputs.map((output, oIdx) => (
-                                    <div key={oIdx} style={{ fontSize: '0.8rem', lineHeight: 1.4 }}>
-                                      <span style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-muted)', fontSize: '0.75rem' }}>({output.type})</span>
-                                      <span style={{ color: 'var(--text-color)' }}> {output.desc}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Example */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', borderTop: '1px dashed var(--border-color)', paddingTop: '10px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Usage Example</span>
-                            <button
-                              onClick={() => handleCopy(doc.name, doc.example)}
-                              style={{
-                                background: 'none',
-                                border: 'none',
-                                color: copiedName === doc.name ? 'var(--success-color)' : 'var(--text-muted)',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                fontSize: '0.75rem',
-                                padding: '2px 6px',
-                                borderRadius: '4px',
-                                transition: 'all 0.2s',
-                                backgroundColor: copiedName === doc.name ? 'color-mix(in srgb, var(--success-color) 10%, transparent)' : 'transparent'
-                              }}
-                            >
-                              {copiedName === doc.name ? <Check size={12} /> : <Copy size={12} />}
-                              <span>{copiedName === doc.name ? 'Copied!' : 'Copy'}</span>
-                            </button>
-                          </div>
-                          <pre style={{
-                            margin: 0,
-                            fontFamily: 'JetBrains Mono, monospace',
-                            fontSize: '0.75rem',
-                            backgroundColor: 'var(--sidebar-bg)',
-                            padding: '10px 12px',
-                            borderRadius: '6px',
-                            border: '1px solid var(--border-color)',
-                            color: 'var(--text-color)',
-                            overflowX: 'auto',
-                            lineHeight: 1.4
-                          }}>{doc.example}</pre>
-                        </div>
-                      </div>
+                        doc={doc}
+                        apiSearchQuery={apiSearchQuery}
+                        copiedName={copiedName}
+                        handleCopy={handleCopy}
+                      />
                     ));
                   })()}
                 </div>
