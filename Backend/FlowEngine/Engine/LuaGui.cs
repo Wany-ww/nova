@@ -472,6 +472,29 @@ namespace FlowEngine.Engine
                         }
                         break;
 
+                    case "legend":
+                        if (widget.Type == "plot2d" && widget.Element is Canvas plotCanvas2d)
+                        {
+                            if (!(plotCanvas2d.Tag is Plot2DState state2d))
+                            {
+                                state2d = new Plot2DState();
+                                plotCanvas2d.Tag = state2d;
+                            }
+                            state2d.Legend = value.CastToString() ?? string.Empty;
+                            RenderPlot2D(plotCanvas2d, state2d.Data);
+                        }
+                        else if (widget.Type == "plot3d" && widget.Element is Canvas plotCanvas3d)
+                        {
+                            if (!(plotCanvas3d.Tag is Plot3DState state3d))
+                            {
+                                state3d = new Plot3DState();
+                                plotCanvas3d.Tag = state3d;
+                            }
+                            state3d.Legend = value.CastToString() ?? string.Empty;
+                            RenderPlot3D(plotCanvas3d, state3d.GridData);
+                        }
+                        break;
+
                     case "pos":
                         var pos = ParsePos(value);
                         if (pos != null)
@@ -612,6 +635,12 @@ namespace FlowEngine.Engine
                             {
                                 pts.Add(tbl.Get(i).Number);
                             }
+                            if (!(plotCanvas.Tag is Plot2DState state))
+                            {
+                                state = new Plot2DState();
+                                plotCanvas.Tag = state;
+                            }
+                            state.Data = pts;
                             RenderPlot2D(plotCanvas, pts);
                         }
                         else if (widget.Element is Canvas plot3dCanvas && widget.Type == "plot3d" && value.Type == DataType.Table)
@@ -990,6 +1019,7 @@ namespace FlowEngine.Engine
 
         private static void RenderPlot2D(Canvas canvas, List<double> data)
         {
+            canvas.ClipToBounds = true;
             canvas.Children.Clear();
             if (data.Count == 0) return;
 
@@ -1041,10 +1071,53 @@ namespace FlowEngine.Engine
             }
 
             canvas.Children.Add(polyline);
+
+            // Add legend if configured
+            if (canvas.Tag is Plot2DState state && !string.IsNullOrEmpty(state.Legend))
+            {
+                var legendPanel = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+                
+                var accentLine = new Line
+                {
+                    X1 = 0,
+                    Y1 = 0,
+                    X2 = 12,
+                    Y2 = 0,
+                    Stroke = ThemeManager.AccentBrush,
+                    StrokeThickness = 2,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(0, 0, 4, 0)
+                };
+                legendPanel.Children.Add(accentLine);
+
+                var legendText = new TextBlock
+                {
+                    Text = state.Legend,
+                    Foreground = ThemeManager.TitleBarFgBrush,
+                    FontSize = 9,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                legendPanel.Children.Add(legendText);
+
+                var legendBorder = new Border
+                {
+                    Background = new SolidColorBrush(Color.FromArgb(200, 17, 17, 27)),
+                    BorderBrush = ThemeManager.BorderBrush,
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(3),
+                    Padding = new Thickness(6, 3, 6, 3),
+                    Child = legendPanel
+                };
+
+                Canvas.SetTop(legendBorder, 6);
+                Canvas.SetRight(legendBorder, 6);
+                canvas.Children.Add(legendBorder);
+            }
         }
 
         private static void RenderPlot3D(Canvas canvas, List<List<double>> grid)
         {
+            canvas.ClipToBounds = true;
             canvas.Children.Clear();
             if (grid.Count == 0 || grid[0].Count == 0) return;
 
@@ -1086,6 +1159,20 @@ namespace FlowEngine.Engine
                         state.LastMousePos = pos;
                         RenderPlot3D(canvas, state.GridData);
                     }
+                };
+
+                canvas.MouseWheel += (s, e) =>
+                {
+                    if (e.Delta > 0)
+                        state.Zoom *= 1.1;
+                    else
+                        state.Zoom /= 1.1;
+
+                    if (state.Zoom < 0.1) state.Zoom = 0.1;
+                    if (state.Zoom > 10.0) state.Zoom = 10.0;
+
+                    e.Handled = true;
+                    RenderPlot3D(canvas, state.GridData);
                 };
             }
 
@@ -1136,7 +1223,7 @@ namespace FlowEngine.Engine
                 double x2 = x * cosX - y1 * sinX;
                 double y2 = x * sinX + y1 * cosX;
 
-                double scale = width * 0.7;
+                double scale = width * 0.7 * state.Zoom;
                 double screenX = width / 2.0 + x2 * scale;
                 double screenY = height / 2.0 + y2 * scale - z1 * (scale * 0.5);
 
@@ -1179,6 +1266,45 @@ namespace FlowEngine.Engine
                     };
                     canvas.Children.Add(line);
                 }
+            }
+
+            // Add legend if configured
+            if (canvas.Tag is Plot3DState statePlot3D && !string.IsNullOrEmpty(statePlot3D.Legend))
+            {
+                var legendPanel = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+                
+                var accentMarker = new Rectangle
+                {
+                    Width = 8,
+                    Height = 8,
+                    Fill = ThemeManager.AccentBrush,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(0, 0, 4, 0)
+                };
+                legendPanel.Children.Add(accentMarker);
+
+                var legendText = new TextBlock
+                {
+                    Text = statePlot3D.Legend,
+                    Foreground = ThemeManager.TitleBarFgBrush,
+                    FontSize = 9,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                legendPanel.Children.Add(legendText);
+
+                var legendBorder = new Border
+                {
+                    Background = new SolidColorBrush(Color.FromArgb(200, 17, 17, 27)),
+                    BorderBrush = ThemeManager.BorderBrush,
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(3),
+                    Padding = new Thickness(6, 3, 6, 3),
+                    Child = legendPanel
+                };
+
+                Canvas.SetTop(legendBorder, 6);
+                Canvas.SetRight(legendBorder, 6);
+                canvas.Children.Add(legendBorder);
             }
         }
     }
@@ -1262,6 +1388,12 @@ namespace FlowEngine.Engine
         }
     }
 
+    public class Plot2DState
+    {
+        public List<double> Data { get; set; } = new List<double>();
+        public string Legend { get; set; } = string.Empty;
+    }
+
     public class Plot3DState
     {
         public double RotateX { get; set; } = 45.0;
@@ -1269,5 +1401,7 @@ namespace FlowEngine.Engine
         public Point LastMousePos { get; set; }
         public bool IsDragging { get; set; }
         public List<List<double>> GridData { get; set; } = new List<List<double>>();
+        public double Zoom { get; set; } = 1.0;
+        public string Legend { get; set; } = string.Empty;
     }
 }

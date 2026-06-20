@@ -1288,7 +1288,7 @@ const API_DOCS: ApiDoc[] = [
     name: "gui.widget.create",
     category: "GUI",
     signature: "gui.widget.create(name: string, type: string, parent: string)",
-    description: "Creates a dynamic visual widget under a specified parent dialog or parent panel. If the widget name already exists, or the parent does not exist, or the parent cannot host children, this does nothing. Suffix masking ('##' convention) applies to widget names as well (hides the unique suffix in visual text labels).\n\n### Available Widget Types:\n- **panel**: A container box that can host child widgets. Has a border.\n- **button**: An interactive button.\n- **label**: Simple static text block.\n- **slider**: Horizontal slider bar with adjustable ranges.\n- **checkbox**: Standard binary tick checkbox.\n- **dropdown**: Selection box with a list of text options.\n- **textinput**: Single-line text input field.\n- **image**: Displays a static or dynamic matrix image.\n- **plot2d**: Renders a 2D line graph from a list of numbers.\n- **plot3d**: Renders a 3D wireframe mesh from a 2D grid matrix.\n- **progress**: Renders a progress completion bar (0-100).\n- **colorpicker**: Color selection box that opens an RGB dark-themed picker window.",
+    description: "Creates a dynamic visual widget under a parent dialog or panel. If the widget name exists, or the parent is invalid, this call is ignored. Suffix masking (`##` convention) hides the unique trailing identifier.\n\n### Available Widget Types:\n- **panel**: A container box that can host child widgets.\n- **button**: An interactive button control.\n- **label**: Simple static text block.\n- **slider**: Horizontal slider bar with adjustable ranges.\n- **checkbox**: Standard binary tick checkbox.\n- **dropdown**: Selection box with a list of text options.\n- **textinput**: Single-line text input field.\n- **image**: Displays a static/dynamic matrix image.\n- **plot2d**: Renders a 2D line graph from a list of numbers.\n- **plot3d**: Renders a 3D wireframe mesh from a 2D grid matrix.\n- **progress**: Renders a progress completion bar (0-100).\n- **colorpicker**: Button opening a dark-themed RGB color picker window.",
     inputs: [
       { name: "name", type: "string", desc: "Unique identifier name of the widget (e.g. 'btnStart##btn')." },
       { name: "type", type: "string", desc: "One of: 'panel', 'button', 'label', 'slider', 'checkbox', 'dropdown', 'textinput', 'image', 'plot2d', 'plot3d', 'progress', 'colorpicker'." },
@@ -1301,7 +1301,7 @@ const API_DOCS: ApiDoc[] = [
     name: "gui.config.set",
     category: "GUI",
     signature: "gui.config.set(name: string, type: string, key: string, value: any)",
-    description: "Sets properties, styles, ranges, datasets, and event callbacks for widgets and parent dialogs. If the name and type do not match any created widget/dialog, the call does nothing.\n\n### Detailed Key Reference:\n- **size** (`table`): Dimensions `{width, height}` in pixels. (e.g. `{300, 200}`). Can be applied to **dialog** to resize the window, or to any widget.\n- **pos** (`table`): Coordinates `{x, y}` relative to the top-left of its parent. (e.g. `{10, 50}`).\n- **foreground_color** (`table`): Color `{r, g, b, a}` (0-255) for text or visual borders.\n- **background_color** (`table`): Background color `{r, g, b, a}` (0-255). Can be applied to **dialog** (styles parent window background) or widgets.\n- **label** (`string`): Modifies visual display text for `button`, `label`, and `checkbox` controls.\n- **horizontal** (`boolean`): Set to `true` on a **panel** widget to arrange all its child widgets in a sequential horizontal flow (left-to-right) instead of absolute coordinates.\n\n### Event Callback Signatures:\n- **onclick** (`function`): Executed on click. Callback signature: `function()`\n- **onhover** (`function`): Executed when mouse hovers. Callback signature: `function()`\n- **ondoubleclick** (`function`): Executed on double click. Callback signature: `function()`\n- **onchanged** (`function`): Executed when value changes. Callback signature differs by control type:\n  - **slider**: `function(value: number)`\n  - **checkbox**: `function(checked: boolean)`\n  - **dropdown**: `function(selectedIndex: number)` (1-based index)\n  - **textinput**: `function(text: string)`\n  - **colorpicker**: `function(color: table)` (receives `{r, g, b, a}` color table)\n\n### Widget Data Specifications (`data` key):\n- **slider / progress**: Number representing active value.\n- **checkbox**: Boolean (`true`/`false`).\n- **dropdown**: Integer index (`1`-based choice index).\n- **textinput**: String value.\n- **colorpicker**: Color table `{r, g, b, a}`.\n- **image**: A `cv.Mat` object to display matrix frames in real-time.\n- **plot2d**: Array of numbers representing Y-values (e.g. `{10, 20, 15, 30}`).\n- **plot3d**: 2D array representing grid points `{{z11, z12, ...}, {z21, z22, ...}}`.",
+    description: "Sets properties, styles, ranges, datasets, and callbacks for widgets/dialogs. If the widget/dialog does not exist, the call is ignored.\n\n### Configuration Keys:\n- **size** (`table`): Dimensions `{width, height}` in pixels. (e.g. `{300, 200}`). Applies to dialog or any widget.\n- **pos** (`table`): Coordinates `{x, y}` relative to parent. (e.g. `{10, 50}`).\n- **foreground_color** (`table`): Text or border color `{r, g, b, a}` (0-255).\n- **background_color** (`table`): Canvas/widget background color `{r, g, b, a}` (0-255).\n- **label** (`string`): Visual display text for buttons, labels, and checkboxes.\n- **horizontal** (`boolean`): Arrange panel children in a left-to-right flow.\n- **legend** (`string`): Overlay text at the top-right corner of 2D/3D plots.\n\n### Callback Functions:\n- **onclick**: Action triggered when clicked. Callback: `function()`\n- **onhover**: Action triggered when hovered. Callback: `function()`\n- **ondoubleclick**: Action triggered when double clicked. Callback: `function()`\n- **onchanged**: Action triggered on value change. Callbacks by control type:\n  - **slider**: `function(value: number)`\n  - **checkbox**: `function(checked: boolean)`\n  - **dropdown**: `function(selectedIndex: number)` (1-based index)\n  - **textinput**: `function(text: string)`\n  - **colorpicker**: `function(color: table)` (receives `{r, g, b, a}`)\n\n### Data Inputs (`data` key):\n- **slider / progress**: Numerical value.\n- **checkbox**: Boolean (`true`/`false`).\n- **dropdown**: Integer index (`1`-based choice index).\n- **textinput**: String text.\n- **colorpicker**: Color table `{r, g, b, a}`.\n- **image**: A `cv.Mat` object to display matrix frames in real-time.\n- **plot2d**: Array of numbers representing Y-values.\n- **plot3d**: 2D array of grid heights `{{z11, z12, ...}, {z21, z22, ...}}`.",
     inputs: [
       { name: "name", type: "string", desc: "The widget or dialog unique identifier name." },
       { name: "type", type: "string", desc: "Type of the target (e.g. 'dialog', 'button', 'slider', 'colorpicker')." },
@@ -1312,6 +1312,110 @@ const API_DOCS: ApiDoc[] = [
     example: "-- 1. Create and customize a dialog with custom background\nlocal dlg = \"MyDashboard##1\"\ngui.dialog.create(dlg)\ngui.config.set(dlg, \"dialog\", \"size\", {500, 400})\ngui.config.set(dlg, \"dialog\", \"background_color\", {30, 30, 46, 255})\ngui.dialog.show(dlg, true)\n\n-- 2. Create parent panel\ngui.widget.create(\"panel1##pn\", \"panel\", dlg)\ngui.config.set(\"panel1##pn\", \"panel\", \"pos\", {10, 10})\ngui.config.set(\"panel1##pn\", \"panel\", \"size\", {480, 380})\n\n-- 3. Setup bidirectional slider & textinput sync\ngui.widget.create(\"mySlider##sl\", \"slider\", \"panel1##pn\")\ngui.config.set(\"mySlider##sl\", \"slider\", \"pos\", {10, 40})\ngui.config.set(\"mySlider##sl\", \"slider\", \"range\", {0, 100})\ngui.config.set(\"mySlider##sl\", \"slider\", \"data\", 50)\n\ngui.widget.create(\"myInput##txt\", \"textinput\", \"panel1##pn\")\ngui.config.set(\"myInput##txt\", \"textinput\", \"pos\", {150, 40})\ngui.config.set(\"myInput##txt\", \"textinput\", \"data\", \"50\")\n\ngui.config.set(\"mySlider##sl\", \"slider\", \"onchanged\", function(val)\n    gui.config.set(\"myInput##txt\", \"textinput\", \"data\", tostring(val))\nend)\n\ngui.config.set(\"myInput##txt\", \"textinput\", \"onchanged\", function(val)\n    local num = tonumber(val)\n    if num and num >= 0 and num <= 100 then\n        gui.config.set(\"mySlider##sl\", \"slider\", \"data\", num)\n    end\nend)\n\n-- 4. ColorPicker changing dialog background in real-time\ngui.widget.create(\"myPicker##cp\", \"colorpicker\", \"panel1##pn\")\ngui.config.set(\"myPicker##cp\", \"colorpicker\", \"pos\", {10, 80})\ngui.config.set(\"myPicker##cp\", \"colorpicker\", \"onchanged\", function(color)\n    gui.config.set(dlg, \"dialog\", \"background_color\", color)\nend)"
   }
 ];
+
+function parseInlineStyles(text: string): React.ReactNode[] | string {
+  const parts: React.ReactNode[] = [];
+  let currentIdx = 0;
+  const regex = /(\*\*.*?\*\*|`.*?`)/g;
+  let match;
+  
+  while ((match = regex.exec(text)) !== null) {
+    const matchStr = match[0];
+    const matchIdx = match.index;
+    
+    if (matchIdx > currentIdx) {
+      parts.push(text.substring(currentIdx, matchIdx));
+    }
+    
+    if (matchStr.startsWith('**') && matchStr.endsWith('**')) {
+      parts.push(
+        <strong key={matchIdx} style={{ color: 'var(--text-color)', fontWeight: 600 }}>
+          {matchStr.slice(2, -2)}
+        </strong>
+      );
+    } else if (matchStr.startsWith('`') && matchStr.endsWith('`')) {
+      parts.push(
+        <code key={matchIdx} style={{ 
+          fontFamily: 'JetBrains Mono, monospace', 
+          backgroundColor: 'color-mix(in srgb, var(--primary-color) 10%, transparent)', 
+          padding: '2px 4px', 
+          borderRadius: '4px',
+          fontSize: '0.75rem',
+          color: 'var(--warning-color)'
+        }}>
+          {matchStr.slice(1, -1)}
+        </code>
+      );
+    }
+    
+    currentIdx = regex.lastIndex;
+  }
+  
+  if (currentIdx < text.length) {
+    parts.push(text.substring(currentIdx));
+  }
+  
+  return parts.length > 0 ? parts : text;
+}
+
+function renderFormattedDescription(description: string) {
+  if (!description) return null;
+  const lines = description.split('\n');
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {lines.map((line, idx) => {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('### ')) {
+          return (
+            <h4 key={idx} style={{ 
+              fontSize: '0.9rem', 
+              fontWeight: 600, 
+              color: 'var(--primary-color)', 
+              marginTop: '12px', 
+              marginBottom: '4px',
+              borderBottom: '1px solid var(--border-color)',
+              paddingBottom: '4px'
+            }}>
+              {trimmed.substring(4)}
+            </h4>
+          );
+        }
+        if (trimmed.startsWith('- ')) {
+          const content = trimmed.substring(2);
+          const boldMatch = content.match(/^\*\*(.*?)\*\*(.*)$/);
+          if (boldMatch) {
+            const [, boldText, rest] = boldMatch;
+            return (
+              <div key={idx} style={{ fontSize: '0.8rem', paddingLeft: '8px', lineHeight: 1.4, display: 'flex', alignItems: 'flex-start', gap: '4px' }}>
+                <span style={{ color: 'var(--primary-color)', fontSize: '0.75rem', marginTop: '2px' }}>•</span>
+                <div>
+                  <strong style={{ color: 'var(--text-color)', fontWeight: 600 }}>{boldText}</strong>
+                  {parseInlineStyles(rest)}
+                </div>
+              </div>
+            );
+          }
+          return (
+            <div key={idx} style={{ fontSize: '0.8rem', paddingLeft: '8px', lineHeight: 1.4, display: 'flex', alignItems: 'flex-start', gap: '4px' }}>
+              <span style={{ color: 'var(--primary-color)', fontSize: '0.75rem', marginTop: '2px' }}>•</span>
+              <span style={{ color: 'var(--text-color)' }}>{parseInlineStyles(content)}</span>
+            </div>
+          );
+        }
+        
+        if (trimmed === '') {
+          return <div key={idx} style={{ height: '4px' }} />;
+        }
+        
+        return (
+          <p key={idx} style={{ fontSize: '0.82rem', margin: 0, color: 'var(--text-color)', lineHeight: 1.45 }}>
+            {parseInlineStyles(trimmed)}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
 
 interface ApiDocCardProps {
   doc: ApiDoc;
@@ -1435,7 +1539,7 @@ function ApiDocCard({ doc, apiSearchQuery, copiedName, handleCopy }: ApiDocCardP
         }}>
           {/* Description */}
           <div style={{ fontSize: '0.85rem', color: 'var(--text-color)', lineHeight: 1.5 }}>
-            {doc.description}
+            {renderFormattedDescription(doc.description)}
           </div>
 
           {/* Inputs/Outputs */}

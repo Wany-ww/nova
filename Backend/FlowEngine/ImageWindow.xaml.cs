@@ -23,6 +23,11 @@ namespace FlowEngine
             ApplyCurrentTheme();
             Engine.ThemeManager.ThemeChanged += OnThemeChanged;
             this.Activated += ImageWindow_Activated;
+
+            if (Application.Current != null && Application.Current.MainWindow != null && Application.Current.MainWindow != this)
+            {
+                this.Owner = Application.Current.MainWindow;
+            }
         }
 
         private void ImageWindow_Activated(object? sender, EventArgs e)
