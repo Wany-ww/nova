@@ -465,8 +465,8 @@ namespace FlowEngine
             if (ImageTabControl.SelectedItem is TabItem selectedTab)
             {
                 string title = selectedTab.Tag as string ?? "Image View";
-                this.Title = title;
-                this.TitleTextBlock.Text = title;
+                this.Title = Engine.GuiManager.GetDisplayName(title);
+                this.TitleTextBlock.Text = Engine.GuiManager.GetDisplayName(title);
             }
             ApplyCurrentTheme();
         }
@@ -509,12 +509,17 @@ namespace FlowEngine
             Engine.ThemeManager.ThemeChanged -= OnThemeChanged;
             this.Activated -= ImageWindow_Activated;
             
-            // Clean up all tab registrations in OpenCV API
+            // Clean up all tab registrations and clear parents
             foreach (TabItem item in ImageTabControl.Items)
             {
                 if (item.Tag is string title)
                 {
                     Engine.OpenCvLuaApi.RemoveImage(title);
+                    Engine.GuiManager.HideGuiDialog(title);
+                }
+                if (item.Content is Border border)
+                {
+                    border.Child = null;
                 }
             }
 

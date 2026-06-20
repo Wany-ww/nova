@@ -9,150 +9,123 @@ function show_gui(src : table)
     -- =========================================================================
     -- 1. Create and Configure Dialog Window
     -- =========================================================================
-    -- gui.dialog.create initializes a docking-enabled window in the workspace.
-    -- The suffix "##dlg1" acts as a unique ID while hiding itself from visual labels.
-    -- This allows duplicate dialog headers to coexist as unique instances in memory.
     local dlgName = "Dashboard##dlg1"
     gui.dialog.create(dlgName)
-    
-    -- Configure parent dialog dimensions (Width: 580, Height: 400).
-    gui.config.set(dlgName, "dialog", "size", {580, 400})
-    
-    -- Configure dialog background color behind panels (Catppuccin Crust Dark: 30, 30, 46).
-    -- This sets the background color of the parent dialog window frame.
+    gui.config.set(dlgName, "dialog", "size", {600, 480})
     gui.config.set(dlgName, "dialog", "background_color", {30, 30, 46, 255})
-    
-    -- gui.dialog.show reveals the created layout on the screen and shifts focus to it.
-    -- If it was previously hidden, this restores the tab or opens a floating window.
     gui.dialog.show(dlgName, true)
 
     -- =========================================================================
-    -- 2. Create Panel Container
+    -- 2. Create Main Panel Container
     -- =========================================================================
-    -- Panels act as border containers to organize child widgets.
-    -- Here we create "panel1##pn" as a child of the root dialog.
     gui.widget.create("panel1##pn", "panel", dlgName)
-    gui.config.set("panel1##pn", "panel", "size", {560, 380})
+    gui.config.set("panel1##pn", "panel", "size", {580, 460})
     gui.config.set("panel1##pn", "panel", "pos", {10, 10})
 
     -- =========================================================================
     -- 3. Create Title Label
     -- =========================================================================
-    -- Create a TextBlock label as a child of the panel widget.
     gui.widget.create("lblTitle##lb", "label", "panel1##pn")
-    gui.config.set("lblTitle##lb", "label", "pos", {10, 10})
-    
-    -- Config key "label" modifies the visible content.
+    gui.config.set("lblTitle##lb", "label", "pos", {15, 10})
     gui.config.set("lblTitle##lb", "label", "label", "System Configuration Dashboard")
-    
-    -- Customize colors using {Red, Green, Blue, Alpha} structure (0-255).
-    gui.config.set("lblTitle##lb", "label", "foreground_color", {137, 180, 250, 255}) -- Light blue color
+    gui.config.set("lblTitle##lb", "label", "foreground_color", {137, 180, 250, 255})
 
     -- =========================================================================
-    -- 4. Create Slider and Textbox pair
+    -- 4. Left Control Panel (Vertical Panel)
     -- =========================================================================
-    -- Create a slider range bar.
-    gui.widget.create("sliderValue##sl", "slider", "panel1##pn")
-    gui.config.set("sliderValue##sl", "slider", "pos", {10, 40})
-    
-    -- Configure minimum and maximum value ranges.
+    gui.widget.create("ctrlPanel##pn", "panel", "panel1##pn")
+    gui.config.set("ctrlPanel##pn", "panel", "pos", {15, 40})
+    gui.config.set("ctrlPanel##pn", "panel", "size", {260, 280})
+    gui.config.set("ctrlPanel##pn", "panel", "background_color", {45, 45, 70, 100})
+
+    -- Sliders and inputs inside left panel
+    gui.widget.create("lblSpeed##lb", "label", "ctrlPanel##pn")
+    gui.config.set("lblSpeed##lb", "label", "pos", {10, 10})
+    gui.config.set("lblSpeed##lb", "label", "label", "Engine Speed Control")
+
+    gui.widget.create("sliderValue##sl", "slider", "ctrlPanel##pn")
+    gui.config.set("sliderValue##sl", "slider", "pos", {10, 30})
     gui.config.set("sliderValue##sl", "slider", "range", {0, 100})
-    
-    -- Define step increments for slider movements.
     gui.config.set("sliderValue##sl", "slider", "step", 1)
-    
-    -- Set the initial value.
     gui.config.set("sliderValue##sl", "slider", "data", 65)
-    
-    -- Textboxes allow standard textual inputs.
-    gui.widget.create("txtSliderVal##txt", "textinput", "panel1##pn")
-    gui.config.set("txtSliderVal##txt", "textinput", "pos", {140, 40})
+
+    gui.widget.create("txtSliderVal##txt", "textinput", "ctrlPanel##pn")
+    gui.config.set("txtSliderVal##txt", "textinput", "pos", {140, 30})
     gui.config.set("txtSliderVal##txt", "textinput", "size", {50, 20})
     gui.config.set("txtSliderVal##txt", "textinput", "data", "65")
 
-    -- Sync slider modifications directly with the textinput box.
-    -- Onchanged event returns the updated value of the slider widget.
+    -- Slider-Textinput Sync
     gui.config.set("sliderValue##sl", "slider", "onchanged", function(val)
         gui.config.set("txtSliderVal##txt", "textinput", "data", tostring(val))
-        log.info("System speed value changed to: " .. tostring(val))
+        log.info("Slider changed: " .. tostring(val))
     end)
 
-    -- Bidirectional syncing: when user updates text input, sync back to slider.
     gui.config.set("txtSliderVal##txt", "textinput", "onchanged", function(val)
         local num = tonumber(val)
         if num and num >= 0 and num <= 100 then
             gui.config.set("sliderValue##sl", "slider", "data", num)
-            log.info("Slider value updated from textinput to: " .. tostring(num))
+            log.info("TextInput changed slider to: " .. tostring(num))
         end
     end)
 
-    -- =========================================================================
-    -- 5. Create Checkbox and Dropdown Choice Menu
-    -- =========================================================================
-    -- Checkboxes offer binary true/false switches.
-    gui.widget.create("chkEnable##cb", "checkbox", "panel1##pn")
-    gui.config.set("chkEnable##cb", "checkbox", "pos", {10, 70})
-    gui.config.set("chkEnable##cb", "checkbox", "label", "Automatic Temp Calibration")
+    -- Checkbox & Dropdown inside left panel
+    gui.widget.create("chkEnable##cb", "checkbox", "ctrlPanel##pn")
+    gui.config.set("chkEnable##cb", "checkbox", "pos", {10, 65})
+    gui.config.set("chkEnable##cb", "checkbox", "label", "Automatic Calibration")
     gui.config.set("chkEnable##cb", "checkbox", "data", true)
 
-    -- Dropdowns offer a selection of multiple values.
-    gui.widget.create("dropModes##dd", "dropdown", "panel1##pn")
-    gui.config.set("dropModes##dd", "dropdown", "pos", {10, 100})
-    
-    -- Set the selectable options using standard array strings.
-    gui.config.set("dropModes##dd", "dropdown", "menus", {"Laser Mode", "Pulse Mode", "CW Mode"})
-    
-    -- Set the initial selected choice index (1-based index).
+    gui.widget.create("dropModes##dd", "dropdown", "ctrlPanel##pn")
+    gui.config.set("dropModes##dd", "dropdown", "pos", {10, 95})
+    gui.config.set("dropModes##dd", "dropdown", "menus", {"Safe Mode", "Turbo Mode", "ECO Mode"})
     gui.config.set("dropModes##dd", "dropdown", "data", 1)
 
-    -- =========================================================================
-    -- 6. Create Progress Bar and Button
-    -- =========================================================================
-    -- Progress bars display completion progress metrics (0-100).
-    gui.widget.create("progStatus##pg", "progress", "panel1##pn")
-    gui.config.set("progStatus##pg", "progress", "pos", {10, 135})
-    gui.config.set("progStatus##pg", "progress", "size", {270, 15})
-    gui.config.set("progStatus##pg", "progress", "data", 35)
+    -- ColorPicker inside left panel
+    gui.widget.create("lblPicker##lb", "label", "ctrlPanel##pn")
+    gui.config.set("lblPicker##lb", "label", "pos", {10, 135})
+    gui.config.set("lblPicker##lb", "label", "label", "Theme Color Picker")
 
-    -- Apply Button to update system status and refresh plots.
-    gui.widget.create("btnUpdate##btn", "button", "panel1##pn")
-    gui.config.set("btnUpdate##btn", "button", "pos", {180, 100})
-    gui.config.set("btnUpdate##btn", "button", "size", {100, 22})
-    gui.config.set("btnUpdate##btn", "button", "label", "Apply Config")
-    
-    -- Handle the onclick action to generate random points and update the chart.
-    gui.config.set("btnUpdate##btn", "button", "onclick", function()
-        -- Increment progress bar data.
-        gui.config.set("progStatus##pg", "progress", "data", 85)
-        
-        -- Refresh 2D plot with random points.
-        local randomPts = {}
-        for i=1,10 do
-            table.insert(randomPts, math.random(10, 90))
+    gui.widget.create("clrPicker##cp", "colorpicker", "ctrlPanel##pn")
+    gui.config.set("clrPicker##cp", "colorpicker", "pos", {10, 155})
+    gui.config.set("clrPicker##cp", "colorpicker", "size", {60, 22})
+
+    -- Dynamically update backgrounds and labels when color is picked
+    gui.config.set("clrPicker##cp", "colorpicker", "onchanged", function(colorTable)
+        if colorTable and type(colorTable) == "table" then
+            local r = colorTable[1] or 255
+            local g = colorTable[2] or 255
+            local b = colorTable[3] or 255
+            local a = colorTable[4] or 255
+            
+            gui.config.set(dlgName, "dialog", "background_color", {r, g, b, a})
+            gui.config.set("lblTitle##lb", "label", "foreground_color", {r, g, b, 255})
+            log.info("Theme color updated to RGB: " .. r .. "," .. g .. "," .. b)
         end
-        gui.config.set("plotGraph##pl", "plot2d", "data", randomPts)
-        log.info("Configuration applied and graph refreshed.")
     end)
 
-    -- =========================================================================
-    -- 7. Create Plot2D Graph
-    -- =========================================================================
-    -- Plot2D renders real-time numeric line charts inside a customized panel box.
-    gui.widget.create("plotGraph##pl", "plot2d", "panel1##pn")
-    gui.config.set("plotGraph##pl", "plot2d", "pos", {10, 160})
-    gui.config.set("plotGraph##pl", "plot2d", "size", {270, 100})
-    gui.config.set("plotGraph##pl", "plot2d", "data", {10, 25, 45, 30, 60, 40, 75, 55, 90, 80})
+    -- Progress bar inside left panel
+    gui.widget.create("progStatus##pg", "progress", "ctrlPanel##pn")
+    gui.config.set("progStatus##pg", "progress", "pos", {10, 195})
+    gui.config.set("progStatus##pg", "progress", "size", {180, 15})
+    gui.config.set("progStatus##pg", "progress", "data", 35)
 
     -- =========================================================================
-    -- 8. Create Plot3D Wireframe Graph
+    -- 5. Right Panel (Visualizations - Plots)
     -- =========================================================================
-    -- Plot3D projects 3D matrix datasets. Pass a nested 2D table grid.
-    -- It draws a projection wireframe using coordinate algorithms.
-    gui.widget.create("plot3dGraph##p3", "plot3d", "panel1##pn")
-    gui.config.set("plot3dGraph##p3", "plot3d", "pos", {300, 40})
-    gui.config.set("plot3dGraph##p3", "plot3d", "size", {240, 220})
+    gui.widget.create("visualPanel##pn", "panel", "panel1##pn")
+    gui.config.set("visualPanel##pn", "panel", "pos", {290, 40})
+    gui.config.set("visualPanel##pn", "panel", "size", {275, 280})
+
+    -- Plot2D
+    gui.widget.create("plotGraph##pl", "plot2d", "visualPanel##pn")
+    gui.config.set("plotGraph##pl", "plot2d", "pos", {10, 10})
+    gui.config.set("plotGraph##pl", "plot2d", "size", {250, 110})
+    gui.config.set("plotGraph##pl", "plot2d", "data", {10, 25, 45, 30, 60, 40, 75, 55, 90, 80})
+
+    -- Plot3D with Right-click Rotate Note
+    gui.widget.create("plot3dGraph##p3", "plot3d", "visualPanel##pn")
+    gui.config.set("plot3dGraph##p3", "plot3d", "pos", {10, 130})
+    gui.config.set("plot3dGraph##p3", "plot3d", "size", {250, 140})
     
-    -- peakGrid represents the Z values of a Gaussian 3D surface peak.
     local peakGrid = {
         {10, 12, 15, 12, 10},
         {12, 20, 35, 20, 12},
@@ -163,36 +136,56 @@ function show_gui(src : table)
     gui.config.set("plot3dGraph##p3", "plot3d", "data", peakGrid)
 
     -- =========================================================================
-    -- 9. Create ColorPicker and Image Box
+    -- 6. Horizontal Button Bar Panel (demonstrating horizontal arrangement!)
     -- =========================================================================
-    -- ColorPicker spawns a dark-themed slider dialog to select RGB values.
-    gui.widget.create("clrPicker##cp", "colorpicker", "panel1##pn")
-    gui.config.set("clrPicker##cp", "colorpicker", "pos", {300, 275})
-    gui.config.set("clrPicker##cp", "colorpicker", "size", {50, 22})
+    gui.widget.create("bottomBar##pn", "panel", "panel1##pn")
+    gui.config.set("bottomBar##pn", "panel", "pos", {15, 335})
+    gui.config.set("bottomBar##pn", "panel", "size", {550, 45})
+    -- Set horizontal layout alignment to true!
+    gui.config.set("bottomBar##pn", "panel", "horizontal", true)
 
-    -- Dynamically update the root dialog and title foreground colors when a new color is picked
-    gui.config.set("clrPicker##cp", "colorpicker", "onchanged", function(colorTable)
-        if colorTable and type(colorTable) == "table" then
-            local r = colorTable[1] or 255
-            local g = colorTable[2] or 255
-            local b = colorTable[3] or 255
-            local a = colorTable[4] or 255
-            
-            -- Apply picked color to the parent dialog background
-            gui.config.set(dlgName, "dialog", "background_color", {r, g, b, a})
-            -- Accentuate the title label color with the same picked RGB color
-            gui.config.set("lblTitle##lb", "label", "foreground_color", {r, g, b, 255})
-            
-            log.info("System dashboard background updated to picked RGB: " .. r .. "," .. g .. "," .. b)
+    -- Add buttons sequentially. Because horizontal is true, they stack left-to-right!
+    gui.widget.create("btnUpdate##btn", "button", "bottomBar##pn")
+    gui.config.set("btnUpdate##btn", "button", "size", {90, 25})
+    gui.config.set("btnUpdate##btn", "button", "label", "Apply Config")
+
+    gui.widget.create("btnReset##btn", "button", "bottomBar##pn")
+    gui.config.set("btnReset##btn", "button", "size", {90, 25})
+    gui.config.set("btnReset##btn", "button", "label", "Reset Stats")
+
+    gui.widget.create("btnHelp##btn", "button", "bottomBar##pn")
+    gui.config.set("btnHelp##btn", "button", "size", {90, 25})
+    gui.config.set("btnHelp##btn", "button", "label", "Show Help")
+
+    -- Setup event listeners for the horizontal layout buttons
+    gui.config.set("btnUpdate##btn", "button", "onclick", function()
+        gui.config.set("progStatus##pg", "progress", "data", 85)
+        local randomPts = {}
+        for i=1,10 do
+            table.insert(randomPts, math.random(10, 90))
         end
+        gui.config.set("plotGraph##pl", "plot2d", "data", randomPts)
+        log.info("System configuration successfully applied.")
     end)
 
-    -- Render an image container if a valid source Mat exists.
-    -- This displays the real-time processed matrix directly inside our canvas layout.
-    if src and not src:empty() then
+    gui.config.set("btnReset##btn", "button", "onclick", function()
+        gui.config.set("progStatus##pg", "progress", "data", 0)
+        gui.config.set("plotGraph##pl", "plot2d", "data", {0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+        log.warn("Statistics reset to baseline.")
+    end)
+
+    gui.config.set("btnHelp##btn", "button", "onclick", function()
+        log.info("Help: Right-click and drag on the 3D Plot to rotate the camera angles!")
+    end)
+
+    -- =========================================================================
+    -- 7. Live Camera Feed Image View (optional input)
+    -- =========================================================================
+    -- Check if src is passed and verify it is a valid userdata (MatWrapper) object
+    if src and type(src) == "userdata" and not src:empty() then
         gui.widget.create("imgView##im", "image", "panel1##pn")
-        gui.config.set("imgView##im", "image", "pos", {10, 275})
-        gui.config.set("imgView##im", "image", "size", {120, 90})
+        gui.config.set("imgView##im", "image", "pos", {15, 390})
+        gui.config.set("imgView##im", "image", "size", {90, 60})
         gui.config.set("imgView##im", "image", "data", src)
     end
 end

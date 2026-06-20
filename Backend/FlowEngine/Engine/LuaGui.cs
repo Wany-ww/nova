@@ -25,6 +25,7 @@ namespace FlowEngine.Engine
         public DynValue? OnHover { get; set; }
         public DynValue? OnChanged { get; set; }
         public DynValue? OnDoubleClick { get; set; }
+        public bool IsHorizontal { get; set; } = false;
     }
 
     public class GuiDialog
@@ -375,6 +376,11 @@ namespace FlowEngine.Engine
                     {
                         parentDialog.Widgets[name] = widget;
                     }
+
+                    if (parentWidget != null && parentWidget.Type == "panel" && parentWidget.IsHorizontal)
+                    {
+                        UpdatePanelLayout(parentWidget);
+                    }
                 }
             });
         }
@@ -442,6 +448,27 @@ namespace FlowEngine.Engine
                                 widget.ContainerCanvas.Height = size.Value.Height;
                             }
                             UpdateParentCanvasSize(widget);
+
+                            if (!string.IsNullOrEmpty(widget.ParentName))
+                            {
+                                GuiWidget? parentWidget;
+                                lock (_lock)
+                                {
+                                    _widgets.TryGetValue(widget.ParentName, out parentWidget);
+                                }
+                                if (parentWidget != null && parentWidget.Type == "panel" && parentWidget.IsHorizontal)
+                                {
+                                    UpdatePanelLayout(parentWidget);
+                                }
+                            }
+                        }
+                        break;
+
+                    case "horizontal":
+                        if (widget.Type == "panel")
+                        {
+                            widget.IsHorizontal = value.CastToBool();
+                            UpdatePanelLayout(widget);
                         }
                         break;
 
@@ -780,6 +807,73 @@ namespace FlowEngine.Engine
             }
         }
 
+        private static void UpdatePanelLayout(GuiWidget panel)
+        {
+            if (panel.Type != "panel" || panel.ContainerCanvas == null) return;
+
+            var children = new List<GuiWidget>();
+            lock (_lock)
+            {
+                foreach (var w in _widgets.Values)
+                {
+                    if (w.ParentName == panel.Name)
+                    {
+                        children.Add(w);
+                    }
+                }
+            }
+
+            var childIndices = children.Select(c => new { Widget = c, Index = panel.ContainerCanvas.Children.IndexOf(c.Element) })
+                                       .Where(x => x.Index >= 0)
+                                       .OrderBy(x => x.Index)
+                                       .Select(x => x.Widget)
+                                       .ToList();
+
+            double currentX = 10;
+            double gap = 10;
+
+            foreach (var child in childIndices)
+            {
+                Canvas.SetLeft(child.Element, currentX);
+                double y = child.Position.Y;
+                if (y == 0) y = 10;
+                Canvas.SetTop(child.Element, y);
+                child.Position = new Point(currentX, y);
+                UpdateParentCanvasSize(child);
+
+                double childWidth = child.Size.Width;
+                if (double.IsNaN(childWidth) || childWidth <= 0)
+                {
+                    childWidth = child.Element.Width;
+                }
+                if (double.IsNaN(childWidth) || childWidth <= 0)
+                {
+                    childWidth = child.Element.ActualWidth;
+                }
+                if (double.IsNaN(childWidth) || childWidth <= 0)
+                {
+                    switch (child.Type.ToLower())
+                    {
+                        case "button": childWidth = 80; break;
+                        case "label": childWidth = 80; break;
+                        case "slider": childWidth = 120; break;
+                        case "checkbox": childWidth = 120; break;
+                        case "dropdown": childWidth = 100; break;
+                        case "textinput": childWidth = 100; break;
+                        case "progress": childWidth = 120; break;
+                        case "colorpicker": childWidth = 40; break;
+                        case "plot2d": childWidth = 200; break;
+                        case "plot3d": childWidth = 200; break;
+                        case "image": childWidth = 120; break;
+                        case "panel": childWidth = 200; break;
+                        default: childWidth = 100; break;
+                    }
+                }
+
+                currentX += childWidth + gap;
+            }
+        }
+
         private static void UpdateParentCanvasSize(GuiWidget widget)
         {
             var parentCanvas = widget.Element.Parent as Canvas;
@@ -959,6 +1053,44 @@ namespace FlowEngine.Engine
             if (double.IsNaN(width) || width <= 0) width = 200;
             if (double.IsNaN(height) || height <= 0) height = 150;
 
+            Plot3DState? state = canvas.Tag as Plot3DState;
+            if (state == null)
+            {
+                state = new Plot3DState();
+                canvas.Tag = state;
+
+                canvas.MouseRightButtonDown += (s, e) =>
+                {
+                    state.IsDragging = true;
+                    state.LastMousePos = e.GetPosition(canvas);
+                    canvas.CaptureMouse();
+                };
+
+                canvas.MouseRightButtonUp += (s, e) =>
+                {
+                    state.IsDragging = false;
+                    canvas.ReleaseMouseCapture();
+                };
+
+                canvas.MouseMove += (s, e) =>
+                {
+                    if (state.IsDragging)
+                    {
+                        var pos = e.GetPosition(canvas);
+                        double dx = pos.X - state.LastMousePos.X;
+                        double dy = pos.Y - state.LastMousePos.Y;
+
+                        state.RotateX += dx * 0.5;
+                        state.RotateY -= dy * 0.5;
+
+                        state.LastMousePos = pos;
+                        RenderPlot3D(canvas, state.GridData);
+                    }
+                };
+            }
+
+            state.GridData = grid;
+
             var bg = new Border
             {
                 Width = width,
@@ -985,18 +1117,28 @@ namespace FlowEngine.Engine
             int rows = grid.Count;
             int cols = grid[0].Count;
 
+            double radX = state.RotateX * Math.PI / 180.0;
+            double radY = state.RotateY * Math.PI / 180.0;
+            double cosX = Math.Cos(radX);
+            double sinX = Math.Sin(radX);
+            double cosY = Math.Cos(radY);
+            double sinY = Math.Sin(radY);
+
             Point Project(int r, int c, double val)
             {
-                double normX = (double)c / Math.Max(1, cols - 1) - 0.5;
-                double normY = (double)r / Math.Max(1, rows - 1) - 0.5;
-                double normZ = (val - minZ) / rangeZ - 0.5;
+                double x = (double)c / Math.Max(1, cols - 1) - 0.5;
+                double y = (double)r / Math.Max(1, rows - 1) - 0.5;
+                double z = (val - minZ) / rangeZ - 0.5;
 
-                double angle = Math.PI / 6;
-                double cos30 = Math.Cos(angle);
-                double sin30 = Math.Sin(angle);
+                double y1 = y * cosY - z * sinY;
+                double z1 = y * sinY + z * cosY;
 
-                double screenX = width / 2.0 + (normX - normY) * cos30 * (width * 0.4);
-                double screenY = height / 2.0 + (normX + normY) * sin30 * (height * 0.4) - normZ * (height * 0.3);
+                double x2 = x * cosX - y1 * sinX;
+                double y2 = x * sinX + y1 * cosX;
+
+                double scale = width * 0.7;
+                double screenX = width / 2.0 + x2 * scale;
+                double screenY = height / 2.0 + y2 * scale - z1 * (scale * 0.5);
 
                 return new Point(screenX, screenY);
             }
@@ -1118,5 +1260,14 @@ namespace FlowEngine.Engine
 
             Content = mainGrid;
         }
+    }
+
+    public class Plot3DState
+    {
+        public double RotateX { get; set; } = 45.0;
+        public double RotateY { get; set; } = 30.0;
+        public Point LastMousePos { get; set; }
+        public bool IsDragging { get; set; }
+        public List<List<double>> GridData { get; set; } = new List<List<double>>();
     }
 }
