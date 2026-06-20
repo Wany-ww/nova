@@ -381,6 +381,10 @@ namespace FlowEngine
 
             if (targetTab != null)
             {
+                if (targetTab.Content is Border border)
+                {
+                    border.Child = null;
+                }
                 ImageTabControl.Items.Remove(targetTab);
                 Engine.GuiManager.HideGuiDialog(title);
 

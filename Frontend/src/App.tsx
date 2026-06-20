@@ -1267,49 +1267,49 @@ const API_DOCS: ApiDoc[] = [
     name: "gui.dialog.create",
     category: "GUI",
     signature: "gui.dialog.create(name: string)",
-    description: "Creates a new custom GUI dialog. The created dialog can be docked just like cv.imshow windows. If a dialog with the same name already exists, this does nothing.",
-    inputs: [{ name: "name", type: "string", desc: "The unique identifier name of the dialog." }],
+    description: "Creates a new custom GUI dialog layout canvas. The created dialog tab is dockable (can be dragged, split, and merged) just like cv.imshow windows. If a dialog with the same unique name already exists, this does nothing.\n\n### Suffix Masking (## Convention)\nIf the dialog name contains '##', the part after '##' serves as a unique identifier key in the backend, while only the part before '##' is displayed as the header title on the tab or floating window. This enables creating multiple separate dialogs with the same visible title.",
+    inputs: [{ name: "name", type: "string", desc: "The unique identifier name of the dialog (e.g. 'Control Panel##dlg1')." }],
     outputs: [],
-    example: "gui.dialog.create(\"MyDashboard##unique\")"
+    example: "-- Create two unique dialogs with the same visible header 'Settings'\ngui.dialog.create(\"Settings##dlg1\")\ngui.dialog.create(\"Settings##dlg2\")"
   },
   {
     name: "gui.dialog.show",
     category: "GUI",
     signature: "gui.dialog.show(name: string, visible: boolean)",
-    description: "Shows or hides the specified GUI dialog.",
+    description: "Shows or hides the specified GUI dialog in the layout workspace. When shown, if the dialog is not currently docked anywhere, it is displayed in a new floating window. If it is already docked, the system shifts focus to its tab header.",
     inputs: [
-      { name: "name", type: "string", desc: "The identifier name of the dialog." },
-      { name: "visible", type: "boolean", desc: "True to show, False to hide." }
+      { name: "name", type: "string", desc: "The unique identifier name of the dialog." },
+      { name: "visible", type: "boolean", desc: "True to show/focus, False to hide/close the dialog." }
     ],
     outputs: [],
-    example: "gui.dialog.show(\"MyDashboard##unique\", true)"
+    example: "local dlg = \"Dashboard##main\"\ngui.dialog.create(dlg)\ngui.dialog.show(dlg, true) -- Show dialog\n\n-- Hide dialog later\ngui.dialog.show(dlg, false)"
   },
   {
     name: "gui.widget.create",
     category: "GUI",
     signature: "gui.widget.create(name: string, type: string, parent: string)",
-    description: "Creates a dynamic widget child element under a parent dialog or panel. Available types: 'panel', 'button', 'label', 'slider', 'checkbox', 'dropdown', 'textinput', 'image', 'plot2d', 'plot3d', 'progress', 'colorpicker'. If parent does not exist, or does not support children, or widget already exists, does nothing.",
+    description: "Creates a dynamic visual widget under a specified parent dialog or parent panel. If the widget name already exists, or the parent does not exist, or the parent cannot host children, this does nothing. Suffix masking ('##' convention) applies to widget names as well (hides the unique suffix in visual text labels).\n\n### Available Widget Types:\n- **panel**: A container box that can host child widgets. Has a border.\n- **button**: An interactive button.\n- **label**: Simple static text block.\n- **slider**: Horizontal slider bar with adjustable ranges.\n- **checkbox**: Standard binary tick checkbox.\n- **dropdown**: Selection box with a list of text options.\n- **textinput**: Single-line text input field.\n- **image**: Displays a static or dynamic matrix image.\n- **plot2d**: Renders a 2D line graph from a list of numbers.\n- **plot3d**: Renders a 3D wireframe mesh from a 2D grid matrix.\n- **progress**: Renders a progress completion bar (0-100).\n- **colorpicker**: Color selection box that opens an RGB dark-themed picker window.",
     inputs: [
-      { name: "name", type: "string", desc: "Unique name of the widget. If contains '##', suffix is hidden in UI." },
-      { name: "type", type: "string", desc: "Type of widget (e.g. 'button', 'slider', 'label')." },
-      { name: "parent", type: "string", desc: "Unique parent dialog or panel widget name." }
+      { name: "name", type: "string", desc: "Unique identifier name of the widget (e.g. 'btnStart##btn')." },
+      { name: "type", type: "string", desc: "One of: 'panel', 'button', 'label', 'slider', 'checkbox', 'dropdown', 'textinput', 'image', 'plot2d', 'plot3d', 'progress', 'colorpicker'." },
+      { name: "parent", type: "string", desc: "Unique name of the parent dialog or parent panel widget." }
     ],
     outputs: [],
-    example: "gui.widget.create(\"btnRun##btn\", \"button\", \"MyDashboard##unique\")"
+    example: "local dlg = \"Monitor##dlg\"\ngui.dialog.create(dlg)\n\n-- Create a panel child under the dialog\ngui.widget.create(\"myPanel##pn\", \"panel\", dlg)\n\n-- Create a button child under the panel container\ngui.widget.create(\"btnRun##btn\", \"button\", \"myPanel##pn\")"
   },
   {
     name: "gui.config.set",
     category: "GUI",
     signature: "gui.config.set(name: string, type: string, key: string, value: any)",
-    description: "Configures widget layout, colors, and event callbacks. Common properties: 'size' {w, h}, 'pos' {x, y}, 'foreground_color' {r, g, b, a}, 'background_color' {r, g, b, a}, 'onclick', 'onhover', 'onchanged', 'ondoubleclick', 'label'. Specific controls: slider 'range' {min, max}, slider 'step', dropdown 'menus' {str1, str2}, textinput/checkbox/slider/progress/dropdown 'data'.",
+    description: "Sets properties, styles, ranges, datasets, and event callbacks for widgets and parent dialogs. If the widget/dialog name and type do not match, this does nothing.\n\n### Common Configurations:\n- **size** (`table`): Widget or dialog dimensions `{width, height}` in pixels. (e.g. `{100, 22}`).\n- **pos** (`table`): Relative position `{x, y}` from the top-left corner of the parent container.\n- **foreground_color** (`table`): Text, border, or foreground color `{r, g, b, a}` (0-255).\n- **background_color** (`table`): Widget background color `{r, g, b, a}`. Can also be applied to **dialog** to style the parent window background.\n- **label** (`string`): Changes display text for button, label, and checkbox widgets.\n\n### Event Callbacks:\n- **onclick** (`function`): Executed on left-click. Receives widget name parameter.\n- **onhover** (`function`): Executed when mouse enters. Receives widget name parameter.\n- **ondoubleclick** (`function`): Executed on double-click. Receives widget name parameter.\n- **onchanged** (`function`): Triggered on value updates. Receives value parameters based on control type:\n  - *slider*: Receives number value.\n  - *checkbox*: Receives boolean value.\n  - *dropdown*: Receives index number (1-based).\n  - *textinput*: Receives text string.\n  - *colorpicker*: Receives table `{r, g, b, a}`.\n\n### Widget-Specific Key Configurations:\n- **range** (`table`): Slider range `{min, max}`.\n- **step** (`number`): Slider snap step frequency.\n- **menus** (`table`): Dropdown options array (e.g. `{'Option 1', 'Option 2'}`).\n- **data** (`any`): Sets active data state depending on the widget type:\n  - *slider / progress*: Value number (e.g. `50`).\n  - *checkbox*: Boolean state (`true`/`false`).\n  - *dropdown*: Current choice index (`1`-based integer).\n  - *textinput*: Text string.\n  - *colorpicker*: Color table `{r, g, b, a}`.\n  - *image*: Takes a cv.Mat matrix wrapper directly (highly recommended for live visual tracking) or raw byte array.\n  - *plot2d*: Takes a 1D array of numbers to plot Y values.\n  - *plot3d*: Takes a 2D grid matrix `{{z11, z12, ...}, {z21, z22, ...}}` representing Y and X dimensions.",
     inputs: [
-      { name: "name", type: "string", desc: "The widget name." },
-      { name: "type", type: "string", desc: "The widget type." },
-      { name: "key", type: "string", desc: "Configuration key (e.g., 'size', 'pos', 'onclick', 'data')." },
-      { name: "value", type: "any", desc: "Value matching key's type (e.g. function, table, number)." }
+      { name: "name", type: "string", desc: "The widget or dialog unique identifier name." },
+      { name: "type", type: "string", desc: "Type of the target (e.g. 'dialog', 'button', 'slider', 'plot3d')." },
+      { name: "key", type: "string", desc: "Property key to modify (e.g., 'size', 'pos', 'onclick', 'data', 'background_color')." },
+      { name: "value", type: "any", desc: "Value matching key requirements (table, function, number, string, boolean, cv.Mat)." }
     ],
     outputs: [],
-    example: "-- Configure button onclick and size\ngui.config.set(\"btnRun##btn\", \"button\", \"size\", {80, 25})\ngui.config.set(\"btnRun##btn\", \"button\", \"pos\", {10, 10})\ngui.config.set(\"btnRun##btn\", \"button\", \"label\", \"Execute Process\")\ngui.config.set(\"btnRun##btn\", \"button\", \"onclick\", function()\n    log.info(\"Button clicked!\")\nend)"
+    example: "-- Configure dialog styling\ngui.config.set(\"Dashboard##dlg1\", \"dialog\", \"size\", {400, 300})\ngui.config.set(\"Dashboard##dlg1\", \"dialog\", \"background_color\", {20, 20, 30, 255})\n\n-- Configure interactive slider with tracking label\ngui.widget.create(\"valSlider##sl\", \"slider\", \"panel1##pn\")\ngui.config.set(\"valSlider##sl\", \"slider\", \"range\", {0, 255})\ngui.config.set(\"valSlider##sl\", \"slider\", \"onchanged\", function(val)\n    gui.config.set(\"lblVal##lb\", \"label\", \"label\", \"Val: \" .. tostring(val))\nend)\n\n-- Live camera feed in Image widget\ngui.config.set(\"imgPreview##im\", \"image\", \"data\", capMat)"
   }
 ];
 

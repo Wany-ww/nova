@@ -571,6 +571,10 @@ namespace FlowEngine
                     }
                     if (oldTab != null)
                     {
+                        if (oldTab.Content is Border oldBorder)
+                        {
+                            oldBorder.Child = null;
+                        }
                         oldTabControl.Items.Remove(oldTab);
                         CleanUpEmptyTabControl(oldTabControl);
                     }
@@ -739,6 +743,10 @@ namespace FlowEngine
 
                 if (targetTab != null)
                 {
+                    if (targetTab.Content is Border border)
+                    {
+                        border.Child = null;
+                    }
                     tabControl.Items.Remove(targetTab);
                     CleanUpEmptyTabControl(tabControl);
                     Engine.GuiManager.HideGuiDialog(title);

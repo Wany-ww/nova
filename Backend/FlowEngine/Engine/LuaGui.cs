@@ -169,6 +169,10 @@ namespace FlowEngine.Engine
                         }
                         if (targetTab != null)
                         {
+                            if (targetTab.Content is Border border)
+                            {
+                                border.Child = null;
+                            }
                             tabControl.Items.Remove(targetTab);
                             mainWin.CleanUpEmptyTabControl(tabControl);
                         }
@@ -359,6 +363,36 @@ namespace FlowEngine.Engine
 
             Application.Current.Dispatcher.Invoke(() =>
             {
+                if (type == "dialog")
+                {
+                    GuiDialog? dialog;
+                    lock (_lock)
+                    {
+                        if (!_dialogs.TryGetValue(name, out dialog)) return;
+                    }
+
+                    switch (key.ToLower())
+                    {
+                        case "background_color":
+                        case "backgroud_color":
+                            var bgBrush = ParseColor(value);
+                            if (bgBrush != null)
+                            {
+                                dialog.RootCanvas.Background = bgBrush;
+                            }
+                            break;
+                        case "size":
+                            var size = ParseSize(value);
+                            if (size != null)
+                            {
+                                dialog.RootCanvas.Width = size.Value.Width;
+                                dialog.RootCanvas.Height = size.Value.Height;
+                            }
+                            break;
+                    }
+                    return;
+                }
+
                 GuiWidget? widget;
                 lock (_lock)
                 {
