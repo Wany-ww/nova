@@ -253,6 +253,144 @@ namespace FlowEngine
             TitleTextBlock.Text = title;
         }
 
+        public void AddGuiTab(string title, FrameworkElement guiContent)
+        {
+            var tabHeader = new Border
+            {
+                Background = Engine.ThemeManager.TitleBarBgBrush,
+                BorderBrush = System.Windows.Media.Brushes.Transparent,
+                BorderThickness = new Thickness(0),
+                CornerRadius = new CornerRadius(0),
+                Padding = new Thickness(8, 4, 8, 4),
+                Margin = new Thickness(0, 0, 1, 0)
+            };
+
+            var headerPanel = new StackPanel { Orientation = Orientation.Horizontal };
+            
+            var titleBlock = new TextBlock 
+            { 
+                Text = Engine.GuiManager.GetDisplayName(title), 
+                Foreground = Engine.ThemeManager.TitleBarFgBrush, 
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, 8, 0),
+                FontSize = 11,
+                FontWeight = FontWeights.SemiBold
+            };
+
+            var undockBtn = new Button 
+            { 
+                Content = "↗", 
+                Width = 14, 
+                Height = 14, 
+                FontSize = 7, 
+                Background = System.Windows.Media.Brushes.Transparent, 
+                Foreground = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#a6adc8")),
+                BorderThickness = new Thickness(0),
+                Cursor = System.Windows.Input.Cursors.Hand,
+                ToolTip = "Undock to separate window",
+                Style = (Style)FindResource("TitleBarButtonStyle")
+            };
+            undockBtn.Click += (s, e) => UndockGuiTab(title);
+
+            var closeBtn = new Button 
+            { 
+                Content = "✕", 
+                Width = 14, 
+                Height = 14, 
+                FontSize = 7, 
+                Background = System.Windows.Media.Brushes.Transparent, 
+                Foreground = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#a6adc8")),
+                BorderThickness = new Thickness(0),
+                Cursor = System.Windows.Input.Cursors.Hand,
+                ToolTip = "Close tab",
+                Style = (Style)FindResource("CloseButtonStyle")
+            };
+            closeBtn.Click += (s, e) => CloseGuiTab(title);
+
+            headerPanel.Children.Add(titleBlock);
+            headerPanel.Children.Add(undockBtn);
+            headerPanel.Children.Add(closeBtn);
+            tabHeader.Child = headerPanel;
+
+            var tabItem = new TabItem 
+            { 
+                Header = tabHeader,
+                Tag = title,
+                Content = new Border 
+                { 
+                    Background = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#11111b")),
+                    Padding = new Thickness(0),
+                    Child = guiContent 
+                }
+            };
+
+            ImageTabControl.Items.Add(tabItem);
+            ImageTabControl.SelectedItem = tabItem;
+
+            // Sync window title bar
+            this.Title = Engine.GuiManager.GetDisplayName(title);
+            TitleTextBlock.Text = Engine.GuiManager.GetDisplayName(title);
+        }
+
+        private void UndockGuiTab(string title)
+        {
+            TabItem? targetTab = null;
+            foreach (TabItem item in ImageTabControl.Items)
+            {
+                if (item.Tag as string == title)
+                {
+                    targetTab = item;
+                    break;
+                }
+            }
+
+            if (targetTab != null)
+            {
+                FrameworkElement? content = null;
+                if (targetTab.Content is Border border)
+                {
+                    content = border.Child as FrameworkElement;
+                    border.Child = null;
+                }
+
+                ImageTabControl.Items.Remove(targetTab);
+
+                if (content != null)
+                {
+                    Engine.GuiManager.ShowFloatingGuiDialog(title, content);
+                }
+
+                if (ImageTabControl.Items.Count == 0)
+                {
+                    this.Close();
+                }
+            }
+        }
+
+        private void CloseGuiTab(string title)
+        {
+            TabItem? targetTab = null;
+            foreach (TabItem item in ImageTabControl.Items)
+            {
+                if (item.Tag as string == title)
+                {
+                    targetTab = item;
+                    break;
+                }
+            }
+
+            if (targetTab != null)
+            {
+                ImageTabControl.Items.Remove(targetTab);
+                Engine.GuiManager.HideGuiDialog(title);
+
+                if (ImageTabControl.Items.Count == 0)
+                {
+                    this.Close();
+                }
+            }
+        }
+
         private void UndockTab(string title)
         {
             TabItem? targetTab = null;

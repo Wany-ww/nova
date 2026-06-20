@@ -230,13 +230,29 @@ namespace FlowEngine
                         {
                             string title = tabItem.Tag as string ?? "";
                             BitmapSource? imgSource = null;
-                            if (tabItem.Content is Border border && border.Child is Image img)
+                            FrameworkElement? guiContent = null;
+                            if (tabItem.Content is Border border)
                             {
-                                imgSource = img.Source as BitmapSource;
+                                if (border.Child is Image img)
+                                {
+                                    imgSource = img.Source as BitmapSource;
+                                }
+                                else
+                                {
+                                    guiContent = border.Child as FrameworkElement;
+                                    border.Child = null;
+                                }
                             }
-                            if (!string.IsNullOrEmpty(title) && imgSource != null)
+                            if (!string.IsNullOrEmpty(title))
                             {
-                                mainWin.AddTabToTabControl(hoverTabCtrl, title, imgSource);
+                                if (imgSource != null)
+                                {
+                                    mainWin.AddTabToTabControl(hoverTabCtrl, title, imgSource);
+                                }
+                                else if (guiContent != null)
+                                {
+                                    mainWin.AddGuiTabToTabControl(hoverTabCtrl, title, guiContent);
+                                }
                             }
                         }
                     }
@@ -255,13 +271,29 @@ namespace FlowEngine
                         {
                             string title = tabItem.Tag as string ?? "";
                             BitmapSource? imgSource = null;
-                            if (tabItem.Content is Border border && border.Child is Image img)
+                            FrameworkElement? guiContent = null;
+                            if (tabItem.Content is Border border)
                             {
-                                imgSource = img.Source as BitmapSource;
+                                if (border.Child is Image img)
+                                {
+                                    imgSource = img.Source as BitmapSource;
+                                }
+                                else
+                                {
+                                    guiContent = border.Child as FrameworkElement;
+                                    border.Child = null;
+                                }
                             }
-                            if (!string.IsNullOrEmpty(title) && imgSource != null)
+                            if (!string.IsNullOrEmpty(title))
                             {
-                                mainWin.AddTabToTabControl(newTabControl, title, imgSource);
+                                if (imgSource != null)
+                                {
+                                    mainWin.AddTabToTabControl(newTabControl, title, imgSource);
+                                }
+                                else if (guiContent != null)
+                                {
+                                    mainWin.AddGuiTabToTabControl(newTabControl, title, guiContent);
+                                }
                             }
                         }
 
@@ -322,13 +354,29 @@ namespace FlowEngine
                     {
                         string title = tabItem.Tag as string ?? "";
                         BitmapSource? imgSource = null;
-                        if (tabItem.Content is Border border && border.Child is Image img)
+                        FrameworkElement? guiContent = null;
+                        if (tabItem.Content is Border border)
                         {
-                            imgSource = img.Source as BitmapSource;
+                            if (border.Child is Image img)
+                            {
+                                imgSource = img.Source as BitmapSource;
+                            }
+                            else
+                            {
+                                guiContent = border.Child as FrameworkElement;
+                                border.Child = null;
+                            }
                         }
-                        if (!string.IsNullOrEmpty(title) && imgSource != null)
+                        if (!string.IsNullOrEmpty(title))
                         {
-                            mainWin.DockImageWindow(title, imgSource, targetDir);
+                            if (imgSource != null)
+                            {
+                                mainWin.DockImageWindow(title, imgSource, targetDir);
+                            }
+                            else if (guiContent != null)
+                            {
+                                mainWin.DockGuiWindow(title, guiContent, targetDir);
+                            }
                         }
                     }
 
@@ -372,14 +420,31 @@ namespace FlowEngine
                 {
                     string title = tabItem.Tag as string ?? "";
                     BitmapSource? imgSource = null;
-                    if (tabItem.Content is Border border && border.Child is Image img)
+                    FrameworkElement? guiContent = null;
+                    if (tabItem.Content is Border border)
                     {
-                        imgSource = img.Source as BitmapSource;
+                        if (border.Child is Image img)
+                        {
+                            imgSource = img.Source as BitmapSource;
+                        }
+                        else
+                        {
+                            guiContent = border.Child as FrameworkElement;
+                            border.Child = null;
+                        }
                     }
-                    if (!string.IsNullOrEmpty(title) && imgSource != null)
+                    if (!string.IsNullOrEmpty(title))
                     {
-                        targetWin.AddImageTab(title, imgSource);
-                        Engine.OpenCvLuaApi.RegisterImageWindow(title, targetWin);
+                        if (imgSource != null)
+                        {
+                            targetWin.AddImageTab(title, imgSource);
+                            Engine.OpenCvLuaApi.RegisterImageWindow(title, targetWin);
+                        }
+                        else if (guiContent != null)
+                        {
+                            targetWin.AddGuiTab(title, guiContent);
+                            Engine.GuiManager.RegisterGuiWindow(title, targetWin);
+                        }
                     }
                 }
 

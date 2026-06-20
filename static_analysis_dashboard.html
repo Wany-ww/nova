@@ -625,7 +625,7 @@
     <header>
         <div>
             <h1>NOVA Static Analysis Dashboard</h1>
-            <div class="timestamp">분석 일시: 2026-06-20 02:24:41</div>
+            <div class="timestamp">분석 일시: 2026-06-20 21:02:24</div>
         </div>
         <div>
             <span style="font-weight: 600; background: rgba(255,255,255,0.06); padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">프로젝트: NOVA (WPF + Lua)</span>
@@ -1005,7 +1005,7 @@
   },
   {
     "file": "ImageWindow.Docking.cs",
-    "line": 288,
+    "line": 320,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '160' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -1014,7 +1014,7 @@
   },
   {
     "file": "ImageWindow.Docking.cs",
-    "line": 290,
+    "line": 322,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '53.33' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -1023,7 +1023,7 @@
   },
   {
     "file": "ImageWindow.Docking.cs",
-    "line": 291,
+    "line": 323,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '53.33' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -1068,25 +1068,52 @@
   },
   {
     "file": "ImageWindow.Docking.cs",
-    "line": 233,
+    "line": 234,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
     "severity": "INFO",
-    "code_snippet": "if (tabItem.Content is Border border && border.Child is Image img)"
+    "code_snippet": "if (tabItem.Content is Border border)"
   },
   {
     "file": "ImageWindow.Docking.cs",
-    "line": 237,
+    "line": 236,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (border.Child is Image img)"
+  },
+  {
+    "file": "ImageWindow.Docking.cs",
+    "line": 246,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
     "severity": "INFO",
-    "code_snippet": "if (!string.IsNullOrEmpty(title) && imgSource != null)"
+    "code_snippet": "if (!string.IsNullOrEmpty(title))"
   },
   {
     "file": "ImageWindow.Docking.cs",
-    "line": 254,
+    "line": 248,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (imgSource != null)"
+  },
+  {
+    "file": "ImageWindow.Docking.cs",
+    "line": 252,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (guiContent != null)"
+  },
+  {
+    "file": "ImageWindow.Docking.cs",
+    "line": 270,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1095,25 +1122,52 @@
   },
   {
     "file": "ImageWindow.Docking.cs",
-    "line": 258,
+    "line": 275,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
     "severity": "INFO",
-    "code_snippet": "if (tabItem.Content is Border border && border.Child is Image img)"
+    "code_snippet": "if (tabItem.Content is Border border)"
   },
   {
     "file": "ImageWindow.Docking.cs",
-    "line": 262,
+    "line": 277,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (border.Child is Image img)"
+  },
+  {
+    "file": "ImageWindow.Docking.cs",
+    "line": 287,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
     "severity": "INFO",
-    "code_snippet": "if (!string.IsNullOrEmpty(title) && imgSource != null)"
+    "code_snippet": "if (!string.IsNullOrEmpty(title))"
   },
   {
     "file": "ImageWindow.Docking.cs",
-    "line": 307,
+    "line": 289,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (imgSource != null)"
+  },
+  {
+    "file": "ImageWindow.Docking.cs",
+    "line": 293,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (guiContent != null)"
+  },
+  {
+    "file": "ImageWindow.Docking.cs",
+    "line": 339,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1122,7 +1176,7 @@
   },
   {
     "file": "ImageWindow.Docking.cs",
-    "line": 310,
+    "line": 342,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1131,21 +1185,75 @@
   },
   {
     "file": "ImageWindow.Docking.cs",
-    "line": 325,
+    "line": 358,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
     "severity": "INFO",
-    "code_snippet": "if (tabItem.Content is Border border && border.Child is Image img)"
+    "code_snippet": "if (tabItem.Content is Border border)"
   },
   {
     "file": "ImageWindow.Docking.cs",
-    "line": 329,
+    "line": 360,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (border.Child is Image img)"
+  },
+  {
+    "file": "ImageWindow.Docking.cs",
+    "line": 370,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
     "severity": "INFO",
-    "code_snippet": "if (!string.IsNullOrEmpty(title) && imgSource != null)"
+    "code_snippet": "if (!string.IsNullOrEmpty(title))"
+  },
+  {
+    "file": "ImageWindow.Docking.cs",
+    "line": 372,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (imgSource != null)"
+  },
+  {
+    "file": "ImageWindow.Docking.cs",
+    "line": 376,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (guiContent != null)"
+  },
+  {
+    "file": "ImageWindow.Docking.cs",
+    "line": 426,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (border.Child is Image img)"
+  },
+  {
+    "file": "ImageWindow.Docking.cs",
+    "line": 438,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (imgSource != null)"
+  },
+  {
+    "file": "ImageWindow.Docking.cs",
+    "line": 443,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (guiContent != null)"
   },
   {
     "file": "ImageWindow.xaml.cs",
@@ -1195,6 +1303,15 @@
   {
     "file": "MainWindow.Docking.cs",
     "line": 549,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '200' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "SetDockDimension(direction, direction == \"Left\" || direction == \"Right\" ? 300 : 200);"
+  },
+  {
+    "file": "MainWindow.Docking.cs",
+    "line": 679,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '200' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -1293,7 +1410,16 @@
   },
   {
     "file": "MainWindow.Docking.cs",
-    "line": 652,
+    "line": 566,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (item.Tag as string == title)"
+  },
+  {
+    "file": "MainWindow.Docking.cs",
+    "line": 845,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1302,7 +1428,7 @@
   },
   {
     "file": "MainWindow.Docking.cs",
-    "line": 654,
+    "line": 847,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1311,7 +1437,7 @@
   },
   {
     "file": "MainWindow.Docking.cs",
-    "line": 675,
+    "line": 868,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1320,7 +1446,7 @@
   },
   {
     "file": "MainWindow.Docking.cs",
-    "line": 677,
+    "line": 870,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1652,6 +1778,492 @@
     "code_snippet": "if (FlowExecutionManager.StopRequested)"
   },
   {
+    "file": "Engine/LuaGui.cs",
+    "line": 711,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "tbl.Set(4, DynValue.NewNumber(picker.SelectedColor.A));"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 739,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '30' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "if (double.IsNaN(h) || h <= 0) h = 30; // fallback"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 817,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "byte a = tbl.Length >= 4 ? (byte)(tbl.Get(4).Number) : (byte)255;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 860,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "for (int i = 1; i < 4; i++)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 928,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '0.5' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "double normX = (double)c / Math.Max(1, cols - 1) - 0.5;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 929,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '0.5' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "double normY = (double)r / Math.Max(1, rows - 1) - 0.5;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 930,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '0.5' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "double normZ = (val - minZ) / rangeZ - 0.5;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 932,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '6' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "double angle = Math.PI / 6;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 138,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "foreach (TabItem item in tabControl.Items)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 140,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (item.Tag as string == name)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 162,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "foreach (TabItem item in tabControl.Items)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 164,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (item.Tag as string == name)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 170,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (targetTab != null)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 372,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (size != null)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 377,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (widget.ContainerCanvas != null)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 388,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (pos != null)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 399,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (fgBrush != null)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 401,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (widget.Element is Control control) control.Foreground = fgBrush;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 402,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (widget.Element is TextBlock tb) tb.Foreground = fgBrush;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 409,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (bgBrush != null)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 411,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (widget.Element is Panel panelControl) panelControl.Background = bgBrush;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 412,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (widget.Element is Border borderControl) borderControl.Background = bgBrush;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 413,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (widget.Element is Control control) control.Background = bgBrush;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 434,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (value.Type == DataType.String)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 437,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (widget.Element is Button btn) btn.Content = displayLabel;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 438,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (widget.Element is TextBlock textBlock) textBlock.Text = displayLabel;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 439,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (widget.Element is CheckBox cb) cb.Content = displayLabel;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 444,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (widget.Element is Slider slider && value.Type == DataType.Table)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 447,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (tbl.Length >= 2)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 456,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (widget.Element is Slider s)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 464,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (widget.Element is ComboBox combo && value.Type == DataType.Table)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 468,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'for' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "for (int i = 1; i <= tbl.Length; i++)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 476,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (widget.Element is Slider sl)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 480,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (widget.Element is CheckBox checkBox)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 484,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (widget.Element is ComboBox com)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 487,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (idx >= 0 && idx < com.Items.Count) com.SelectedIndex = idx;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 489,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (widget.Element is TextBox textBox)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 493,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (widget.Element is Image imgControl)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 495,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (value.UserData?.Object is MatWrapper mat && mat.Mat != null)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 499,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (value.Type == DataType.Table)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 503,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'for' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "for (int i = 0; i < tbl.Length; i++)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 518,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (widget.Element is Canvas plotCanvas && widget.Type == \"plot2d\" && value.Type == DataType.Table)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 522,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'for' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "for (int i = 1; i <= tbl.Length; i++)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 528,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (widget.Element is Canvas plot3dCanvas && widget.Type == \"plot3d\" && value.Type == DataType.Table)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 532,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'for' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "for (int i = 1; i <= tbl.Length; i++)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 535,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (rowVal.Type == DataType.Table)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 538,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'for' is nested 9 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "for (int j = 1; j <= rowVal.Table.Length; j++)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 547,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (widget.Element is ProgressBar pb)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 551,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "else if (widget.Element is Border colorBorder && widget.Type == \"colorpicker\")"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 554,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (brush != null) colorBorder.Background = brush;"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 616,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (widget.OnClick != null && CurrentScript != null)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 691,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (colorBorder.Background is SolidColorBrush scb)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 700,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (picker.ShowDialog() == true)"
+  },
+  {
+    "file": "Engine/LuaGui.cs",
+    "line": 705,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (widget.OnChanged != null && CurrentScript != null)"
+  },
+  {
     "file": "Engine/LuaParser.cs",
     "line": 137,
     "category": "Code Smell",
@@ -1734,7 +2346,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 747,
+    "line": 750,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '1000000' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -1743,7 +2355,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1109,
+    "line": 1112,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '21' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -1752,7 +2364,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1143,
+    "line": 1146,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '21' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -1761,7 +2373,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1192,
+    "line": 1195,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '1024.0' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -1770,7 +2382,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1193,
+    "line": 1196,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '1024.0' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -1779,7 +2391,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1218,
+    "line": 1221,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '1024.0' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -1788,7 +2400,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1449,
+    "line": 1452,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '30' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -1824,7 +2436,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 554,
+    "line": 557,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'for' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1833,7 +2445,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 557,
+    "line": 560,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1842,7 +2454,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 573,
+    "line": 576,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1851,7 +2463,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 574,
+    "line": 577,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'for' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1860,7 +2472,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 610,
+    "line": 613,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1869,7 +2481,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 620,
+    "line": 623,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1878,7 +2490,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 627,
+    "line": 630,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1887,7 +2499,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 665,
+    "line": 668,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1896,7 +2508,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 876,
+    "line": 879,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1905,34 +2517,34 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 879,
+    "line": 882,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
     "severity": "INFO",
     "code_snippet": "if (key != null)"
-  },
-  {
-    "file": "Engine/LuaRunner.cs",
-    "line": 926,
-    "category": "Code Smell",
-    "title": "Deep Control Flow Nesting",
-    "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
-    "severity": "INFO",
-    "code_snippet": "foreach (var pair in headers.Pairs)"
   },
   {
     "file": "Engine/LuaRunner.cs",
     "line": 929,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "foreach (var pair in headers.Pairs)"
+  },
+  {
+    "file": "Engine/LuaRunner.cs",
+    "line": 932,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
     "severity": "INFO",
     "code_snippet": "if (key != null)"
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 931,
+    "line": 934,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1941,7 +2553,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1327,
+    "line": 1330,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1950,7 +2562,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1330,
+    "line": 1333,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'for' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1959,7 +2571,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1392,
+    "line": 1395,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1968,7 +2580,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1403,
+    "line": 1406,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1977,7 +2589,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1405,
+    "line": 1408,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1986,7 +2598,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1408,
+    "line": 1411,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -1995,7 +2607,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1413,
+    "line": 1416,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'for' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -2004,7 +2616,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1417,
+    "line": 1420,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -2013,7 +2625,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1454,
+    "line": 1457,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -2318,6 +2930,15 @@
     "code_snippet": "if (hWnd != IntPtr.Zero)"
   },
   {
+    "file": "nodes/GUI/GuiExample.lua",
+    "line": 78,
+    "category": "Code Smell",
+    "title": "Implicit Global Variable in Function",
+    "description": "Lua variable 'i' is assigned inside a function without the 'local' keyword. In Lua, this implicitly creates or overwrites a global variable.",
+    "severity": "WARNING",
+    "code_snippet": "for i=1,10 do"
+  },
+  {
     "file": "nodes/Logging/Console/LogLevelsExample.lua",
     "line": 4,
     "category": "Code Smell",
@@ -2362,9 +2983,9 @@
   {
     "file": "ImageWindow.Docking.cs",
     "type": "C#",
-    "loc": 423,
-    "code_lines": 328,
-    "cc": 159,
+    "loc": 488,
+    "code_lines": 393,
+    "cc": 167,
     "rating": "Moderate",
     "rating_class": "rating-moderate",
     "loc_rating": "Low",
@@ -2373,24 +2994,24 @@
   {
     "file": "ImageWindow.xaml.cs",
     "type": "C#",
-    "loc": 375,
-    "code_lines": 324,
-    "cc": 41,
-    "rating": "Low",
-    "rating_class": "rating-low",
+    "loc": 513,
+    "code_lines": 444,
+    "cc": 51,
+    "rating": "Moderate",
+    "rating_class": "rating-moderate",
     "loc_rating": "Low",
     "loc_rating_class": "rating-low"
   },
   {
     "file": "MainWindow.Docking.cs",
     "type": "C#",
-    "loc": 688,
-    "code_lines": 586,
-    "cc": 91,
+    "loc": 881,
+    "code_lines": 756,
+    "cc": 111,
     "rating": "Moderate",
     "rating_class": "rating-moderate",
-    "loc_rating": "Low",
-    "loc_rating_class": "rating-low"
+    "loc_rating": "Moderate",
+    "loc_rating_class": "rating-moderate"
   },
   {
     "file": "MainWindow.DockingOverlay.cs",
@@ -2459,6 +3080,17 @@
     "loc_rating_class": "rating-low"
   },
   {
+    "file": "Engine/LuaGui.cs",
+    "type": "C#",
+    "loc": 1060,
+    "code_lines": 936,
+    "cc": 212,
+    "rating": "High",
+    "rating_class": "rating-high",
+    "loc_rating": "High",
+    "loc_rating_class": "rating-high"
+  },
+  {
     "file": "Engine/LuaParser.cs",
     "type": "C#",
     "loc": 149,
@@ -2472,8 +3104,8 @@
   {
     "file": "Engine/LuaRunner.cs",
     "type": "C#",
-    "loc": 1476,
-    "code_lines": 1259,
+    "loc": 1479,
+    "code_lines": 1260,
     "cc": 236,
     "rating": "High",
     "rating_class": "rating-high",
@@ -2527,8 +3159,8 @@
   {
     "file": "Engine/ThemeManager.cs",
     "type": "C#",
-    "loc": 107,
-    "code_lines": 60,
+    "loc": 108,
+    "code_lines": 61,
     "cc": 15,
     "rating": "Low",
     "rating_class": "rating-low",
@@ -2629,6 +3261,17 @@
     "loc": 26,
     "code_lines": 15,
     "cc": 1,
+    "rating": "Low",
+    "rating_class": "rating-low",
+    "loc_rating": "Low",
+    "loc_rating_class": "rating-low"
+  },
+  {
+    "file": "nodes/GUI/GuiExample.lua",
+    "type": "Lua",
+    "loc": 84,
+    "code_lines": 62,
+    "cc": 4,
     "rating": "Low",
     "rating_class": "rating-low",
     "loc_rating": "Low",
@@ -3065,26 +3708,26 @@
   }
 ];
         const stats = {
-  "total_files": 66,
-  "cs_files": 19,
-  "lua_files": 47,
-  "lines_of_code": 7829,
-  "code_lines": 6219,
-  "comment_lines": 783,
-  "blank_lines": 827,
-  "total_cc": 1252,
-  "avg_cc": 19.0,
+  "total_files": 68,
+  "cs_files": 20,
+  "lua_files": 48,
+  "lines_of_code": 9373,
+  "code_lines": 7574,
+  "comment_lines": 797,
+  "blank_lines": 1002,
+  "total_cc": 1506,
+  "avg_cc": 22.1,
   "critical_issues": 0,
-  "warning_issues": 1,
-  "info_issues": 158
+  "warning_issues": 2,
+  "info_issues": 226
 };
         const scores = {
-  "analysis_score": 85.0,
-  "complexity_score": 99.2,
-  "scale_score": 94.8,
-  "documentation_score": 95.0,
-  "overall_score": 92.7,
-  "overall_grade": "A"
+  "analysis_score": 80.0,
+  "complexity_score": 98.9,
+  "scale_score": 94.6,
+  "documentation_score": 85.0,
+  "overall_score": 89.3,
+  "overall_grade": "B"
 };
 
         let currentSeverity = 'ALL';

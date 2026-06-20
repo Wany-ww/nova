@@ -725,7 +725,7 @@ namespace FlowEngine.Engine
             return new Scalar(b, g, r, a);
         }
 
-        private static BitmapSource ConvertMatToBitmapSource(Mat mat)
+        public static BitmapSource ConvertMatToBitmapSource(Mat mat)
         {
             byte[]? buffer = null;
             if (Cv2.ImEncode(".bmp", mat, out buffer))

@@ -377,7 +377,7 @@ namespace FlowEngine
             }
         }
 
-        private async Task SendToHostAsync(object data)
+        public async Task SendToHostAsync(object data)
         {
             await Dispatcher.InvokeAsync(async () =>
             {

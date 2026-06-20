@@ -14,8 +14,7 @@ function contourExample(src : table, thresh_val : float) -> (dst : table, contou
 
     -- 1. 그레이스케일 변환 및 이진화 수행
     local gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
-    local thresh_res = cv.threshold(gray, th, 255.0, cv.THRESH_BINARY)
-    local bin = thresh_res[2]
+    local bin = cv.threshold(gray, th, 255.0, cv.THRESH_BINARY)[2]
 
     -- 2. 외곽선 검출 (RETR_EXTERNAL = 0, CHAIN_APPROX_SIMPLE = 2)
     local contours = cv.findContours(bin, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)

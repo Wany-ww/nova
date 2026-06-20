@@ -345,7 +345,7 @@ namespace FlowEngine
         /// Cleans up empty TabControls recursively, promoting siblings and collapsing grids to keep the tree clean.
         /// </summary>
         /// <param name="tabControl">The empty TabControl that needs removal</param>
-        private void CleanUpEmptyTabControl(TabControl tabControl)
+        public void CleanUpEmptyTabControl(TabControl tabControl)
         {
             if (tabControl.Items.Count > 0) return;
 
@@ -550,6 +550,199 @@ namespace FlowEngine
                 }
 
                 AddTabToTabControl(tabControl, title, imageSource);
+            });
+        }
+
+        public void AddGuiTabToTabControl(TabControl tabControl, string title, FrameworkElement guiContent)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                var oldTabControl = FindTabControlByTitle(title);
+                if (oldTabControl != null)
+                {
+                    TabItem? oldTab = null;
+                    foreach (TabItem item in oldTabControl.Items)
+                    {
+                        if (item.Tag as string == title)
+                        {
+                            oldTab = item;
+                            break;
+                        }
+                    }
+                    if (oldTab != null)
+                    {
+                        oldTabControl.Items.Remove(oldTab);
+                        CleanUpEmptyTabControl(oldTabControl);
+                    }
+                }
+
+                var tabHeader = new Border
+                {
+                    Background = Engine.ThemeManager.TitleBarBgBrush,
+                    BorderBrush = System.Windows.Media.Brushes.Transparent,
+                    BorderThickness = new Thickness(0),
+                    CornerRadius = new CornerRadius(0),
+                    Padding = new Thickness(8, 4, 8, 4),
+                    Margin = new Thickness(0, 0, 1, 0)
+                };
+
+                var headerPanel = new StackPanel { Orientation = Orientation.Horizontal };
+                
+                var titleBlock = new TextBlock 
+                { 
+                    Text = Engine.GuiManager.GetDisplayName(title), 
+                    Foreground = Engine.ThemeManager.TitleBarFgBrush, 
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(0, 0, 8, 0),
+                    FontSize = 11,
+                    FontWeight = FontWeights.SemiBold
+                };
+
+                var rootBorder = FindParentBorder(tabControl);
+                string direction = rootBorder != null ? (GetDockPanelDirection(rootBorder) ?? "Right") : "Right";
+
+                var undockBtn = new Button 
+                { 
+                    Content = "↗", 
+                    Width = 14, 
+                    Height = 14, 
+                    FontSize = 7, 
+                    Background = Brushes.Transparent, 
+                    Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#a6adc8")),
+                    BorderThickness = new Thickness(0),
+                    Cursor = Cursors.Hand,
+                    ToolTip = "Undock to floating window",
+                    Style = (Style)FindResource("TitleBarButtonStyle")
+                };
+                undockBtn.Click += (s, e) => UndockGuiTab(title, direction);
+
+                var closeBtn = new Button 
+                { 
+                    Content = "✕", 
+                    Width = 14, 
+                    Height = 14, 
+                    FontSize = 7, 
+                    Background = Brushes.Transparent, 
+                    Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#a6adc8")),
+                    BorderThickness = new Thickness(0),
+                    Cursor = Cursors.Hand,
+                    ToolTip = "Close window",
+                    Style = (Style)FindResource("CloseButtonStyle")
+                };
+                closeBtn.Click += (s, e) => CloseGuiTab(title, direction);
+
+                headerPanel.Children.Add(titleBlock);
+                headerPanel.Children.Add(undockBtn);
+                headerPanel.Children.Add(closeBtn);
+                tabHeader.Child = headerPanel;
+
+                var tabItem = new TabItem 
+                { 
+                    Header = tabHeader,
+                    Tag = title,
+                    Content = new Border 
+                    { 
+                        Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#11111b")),
+                        Padding = new Thickness(0),
+                        Child = guiContent 
+                    }
+                };
+
+                tabControl.Items.Add(tabItem);
+                tabControl.SelectedItem = tabItem;
+
+                UpdateDockedTabsTheme();
+            });
+        }
+
+        public void DockGuiWindow(string title, FrameworkElement guiContent, string direction)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                var panel = GetPanelBorder(direction);
+                var splitter = GetSplitter(direction);
+                var tabControl = GetOrCreateActiveTabControl(direction);
+
+                panel.Visibility = Visibility.Visible;
+                splitter.Visibility = Visibility.Visible;
+
+                double currentSize = 0;
+                switch (direction)
+                {
+                    case "Left": currentSize = LeftDockCol.Width.Value; break;
+                    case "Right": currentSize = RightDockCol.Width.Value; break;
+                    case "Top": currentSize = TopDockCol.Height.Value; break;
+                    case "Bottom": currentSize = BottomDockCol.Height.Value; break;
+                }
+                if (currentSize <= 0)
+                {
+                    SetDockDimension(direction, direction == "Left" || direction == "Right" ? 300 : 200);
+                }
+
+                AddGuiTabToTabControl(tabControl, title, guiContent);
+            });
+        }
+
+        private void UndockGuiTab(string title, string direction)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                var tabControl = FindTabControlByTitle(title);
+                if (tabControl == null) return;
+                
+                TabItem? targetTab = null;
+                foreach (TabItem item in tabControl.Items)
+                {
+                    if (item.Tag as string == title)
+                    {
+                        targetTab = item;
+                        break;
+                    }
+                }
+
+                if (targetTab != null)
+                {
+                    FrameworkElement? content = null;
+                    if (targetTab.Content is Border border)
+                    {
+                        content = border.Child as FrameworkElement;
+                        border.Child = null;
+                    }
+
+                    tabControl.Items.Remove(targetTab);
+                    CleanUpEmptyTabControl(tabControl);
+
+                    if (content != null)
+                    {
+                        Engine.GuiManager.ShowFloatingGuiDialog(title, content);
+                    }
+                }
+            });
+        }
+
+        private void CloseGuiTab(string title, string direction)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                var tabControl = FindTabControlByTitle(title);
+                if (tabControl == null) return;
+
+                TabItem? targetTab = null;
+                foreach (TabItem item in tabControl.Items)
+                {
+                    if (item.Tag as string == title)
+                    {
+                        targetTab = item;
+                        break;
+                    }
+                }
+
+                if (targetTab != null)
+                {
+                    tabControl.Items.Remove(targetTab);
+                    CleanUpEmptyTabControl(tabControl);
+                    Engine.GuiManager.HideGuiDialog(title);
+                }
             });
         }
 

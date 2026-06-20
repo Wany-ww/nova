@@ -45,6 +45,7 @@ namespace FlowEngine.Engine
         public static Brush DialogHeaderBgBrush { get; private set; } = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#252538"));
         public static Brush DialogHeaderFgBrush { get; private set; } = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#f5e0dc"));
         public static Brush TextMutedBrush { get; private set; } = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#a6adc8"));
+        public static Brush AccentBrush { get; private set; } = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#89b4fa"));
 
                 /// <summary>
         /// Occurs when active theme colors or brushes are changed.

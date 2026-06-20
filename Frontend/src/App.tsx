@@ -1262,6 +1262,54 @@ const API_DOCS: ApiDoc[] = [
     ],
     outputs: [{ type: "boolean", desc: "True if downloading succeeded, otherwise False." }],
     example: "local ok = http.download(\"https://picsum.photos/200/300\", \"save/random.jpg\")\nif ok then\n    log.info(\"Download succeeded and image saved!\")\nend"
+  },
+  {
+    name: "gui.dialog.create",
+    category: "GUI",
+    signature: "gui.dialog.create(name: string)",
+    description: "Creates a new custom GUI dialog. The created dialog can be docked just like cv.imshow windows. If a dialog with the same name already exists, this does nothing.",
+    inputs: [{ name: "name", type: "string", desc: "The unique identifier name of the dialog." }],
+    outputs: [],
+    example: "gui.dialog.create(\"MyDashboard##unique\")"
+  },
+  {
+    name: "gui.dialog.show",
+    category: "GUI",
+    signature: "gui.dialog.show(name: string, visible: boolean)",
+    description: "Shows or hides the specified GUI dialog.",
+    inputs: [
+      { name: "name", type: "string", desc: "The identifier name of the dialog." },
+      { name: "visible", type: "boolean", desc: "True to show, False to hide." }
+    ],
+    outputs: [],
+    example: "gui.dialog.show(\"MyDashboard##unique\", true)"
+  },
+  {
+    name: "gui.widget.create",
+    category: "GUI",
+    signature: "gui.widget.create(name: string, type: string, parent: string)",
+    description: "Creates a dynamic widget child element under a parent dialog or panel. Available types: 'panel', 'button', 'label', 'slider', 'checkbox', 'dropdown', 'textinput', 'image', 'plot2d', 'plot3d', 'progress', 'colorpicker'. If parent does not exist, or does not support children, or widget already exists, does nothing.",
+    inputs: [
+      { name: "name", type: "string", desc: "Unique name of the widget. If contains '##', suffix is hidden in UI." },
+      { name: "type", type: "string", desc: "Type of widget (e.g. 'button', 'slider', 'label')." },
+      { name: "parent", type: "string", desc: "Unique parent dialog or panel widget name." }
+    ],
+    outputs: [],
+    example: "gui.widget.create(\"btnRun##btn\", \"button\", \"MyDashboard##unique\")"
+  },
+  {
+    name: "gui.config.set",
+    category: "GUI",
+    signature: "gui.config.set(name: string, type: string, key: string, value: any)",
+    description: "Configures widget layout, colors, and event callbacks. Common properties: 'size' {w, h}, 'pos' {x, y}, 'foreground_color' {r, g, b, a}, 'background_color' {r, g, b, a}, 'onclick', 'onhover', 'onchanged', 'ondoubleclick', 'label'. Specific controls: slider 'range' {min, max}, slider 'step', dropdown 'menus' {str1, str2}, textinput/checkbox/slider/progress/dropdown 'data'.",
+    inputs: [
+      { name: "name", type: "string", desc: "The widget name." },
+      { name: "type", type: "string", desc: "The widget type." },
+      { name: "key", type: "string", desc: "Configuration key (e.g., 'size', 'pos', 'onclick', 'data')." },
+      { name: "value", type: "any", desc: "Value matching key's type (e.g. function, table, number)." }
+    ],
+    outputs: [],
+    example: "-- Configure button onclick and size\ngui.config.set(\"btnRun##btn\", \"button\", \"size\", {80, 25})\ngui.config.set(\"btnRun##btn\", \"button\", \"pos\", {10, 10})\ngui.config.set(\"btnRun##btn\", \"button\", \"label\", \"Execute Process\")\ngui.config.set(\"btnRun##btn\", \"button\", \"onclick\", function()\n    log.info(\"Button clicked!\")\nend)"
   }
 ];
 
@@ -2633,7 +2681,7 @@ export default function App() {
                 minHeight: 0
               }}>
                 <div style={{ padding: '0 16px 8px 16px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Categories</div>
-                {['All', 'Logging', 'Time', 'Global Memory', 'Filesystem', 'Network', 'HTTP', 'JSON', 'System', 'FTP', 'Input', 'Cryptography', 'CSV', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper'].map(cat => (
+                {['All', 'Logging', 'Time', 'Global Memory', 'Filesystem', 'Network', 'HTTP', 'JSON', 'System', 'FTP', 'Input', 'Cryptography', 'CSV', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper', 'GUI'].map(cat => (
                   <button
                     key={cat}
                     onClick={() => setSelectedApiCategory(cat)}

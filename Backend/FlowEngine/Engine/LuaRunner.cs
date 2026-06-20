@@ -368,6 +368,9 @@ namespace FlowEngine.Engine
                 });
                 script.Globals["filesystem"] = fsTable;
 
+                // Register global GUI API
+                Engine.GuiManager.RegisterGuiApis(script);
+
                 // Register global http API
                 var httpTable = new Table(script);
                 httpTable["get"] = (Func<string, Table?, Table>)((url, headers) =>
