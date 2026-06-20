@@ -33,6 +33,7 @@ namespace FlowEngine.Engine
         public ScrollViewer ScrollViewer { get; }
         public Canvas RootCanvas { get; }
         public Dictionary<string, GuiWidget> Widgets { get; } = new Dictionary<string, GuiWidget>();
+        public Brush? CustomBackground { get; set; }
 
         public GuiDialog(string name)
         {
@@ -55,7 +56,16 @@ namespace FlowEngine.Engine
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    RootCanvas.Background = ThemeManager.PanelBgBrush;
+                    if (CustomBackground != null)
+                    {
+                        RootCanvas.Background = CustomBackground;
+                        ScrollViewer.Background = CustomBackground;
+                    }
+                    else
+                    {
+                        RootCanvas.Background = ThemeManager.PanelBgBrush;
+                        ScrollViewer.Background = Brushes.Transparent;
+                    }
                 });
             };
         }
@@ -67,6 +77,18 @@ namespace FlowEngine.Engine
         private static readonly Dictionary<string, GuiWidget> _widgets = new Dictionary<string, GuiWidget>();
         private static readonly Dictionary<string, ImageWindow> _activeGuiWindows = new Dictionary<string, ImageWindow>();
         private static readonly object _lock = new object();
+
+        public static Brush? TryGetDialogBackground(string name)
+        {
+            lock (_lock)
+            {
+                if (_dialogs.TryGetValue(name, out var dialog))
+                {
+                    return dialog.CustomBackground;
+                }
+            }
+            return null;
+        }
 
         public static Script? CurrentScript { get; private set; }
 
@@ -378,7 +400,13 @@ namespace FlowEngine.Engine
                             var bgBrush = ParseColor(value);
                             if (bgBrush != null)
                             {
+                                dialog.CustomBackground = bgBrush;
                                 dialog.RootCanvas.Background = bgBrush;
+                                dialog.ScrollViewer.Background = bgBrush;
+                                if (dialog.ScrollViewer.Parent is Border parentBorder)
+                                {
+                                    parentBorder.Background = bgBrush;
+                                }
                             }
                             break;
                         case "size":

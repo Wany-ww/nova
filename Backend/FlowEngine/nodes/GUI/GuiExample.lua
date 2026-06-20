@@ -77,6 +77,15 @@ function show_gui(src : table)
         log.info("System speed value changed to: " .. tostring(val))
     end)
 
+    -- Bidirectional syncing: when user updates text input, sync back to slider.
+    gui.config.set("txtSliderVal##txt", "textinput", "onchanged", function(val)
+        local num = tonumber(val)
+        if num and num >= 0 and num <= 100 then
+            gui.config.set("sliderValue##sl", "slider", "data", num)
+            log.info("Slider value updated from textinput to: " .. tostring(num))
+        end
+    end)
+
     -- =========================================================================
     -- 5. Create Checkbox and Dropdown Choice Menu
     -- =========================================================================
@@ -160,6 +169,23 @@ function show_gui(src : table)
     gui.widget.create("clrPicker##cp", "colorpicker", "panel1##pn")
     gui.config.set("clrPicker##cp", "colorpicker", "pos", {300, 275})
     gui.config.set("clrPicker##cp", "colorpicker", "size", {50, 22})
+
+    -- Dynamically update the root dialog and title foreground colors when a new color is picked
+    gui.config.set("clrPicker##cp", "colorpicker", "onchanged", function(colorTable)
+        if colorTable and type(colorTable) == "table" then
+            local r = colorTable[1] or 255
+            local g = colorTable[2] or 255
+            local b = colorTable[3] or 255
+            local a = colorTable[4] or 255
+            
+            -- Apply picked color to the parent dialog background
+            gui.config.set(dlgName, "dialog", "background_color", {r, g, b, a})
+            -- Accentuate the title label color with the same picked RGB color
+            gui.config.set("lblTitle##lb", "label", "foreground_color", {r, g, b, 255})
+            
+            log.info("System dashboard background updated to picked RGB: " .. r .. "," .. g .. "," .. b)
+        end
+    end)
 
     -- Render an image container if a valid source Mat exists.
     -- This displays the real-time processed matrix directly inside our canvas layout.

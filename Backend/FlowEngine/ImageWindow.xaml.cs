@@ -312,13 +312,20 @@ namespace FlowEngine
             headerPanel.Children.Add(closeBtn);
             tabHeader.Child = headerPanel;
 
+            System.Windows.Media.Brush borderBg = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#11111b"));
+            var customBg = Engine.GuiManager.TryGetDialogBackground(title);
+            if (customBg != null)
+            {
+                borderBg = customBg;
+            }
+
             var tabItem = new TabItem 
             { 
                 Header = tabHeader,
                 Tag = title,
                 Content = new Border 
                 { 
-                    Background = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#11111b")),
+                    Background = borderBg,
                     Padding = new Thickness(0),
                     Child = guiContent 
                 }

@@ -640,13 +640,20 @@ namespace FlowEngine
                 headerPanel.Children.Add(closeBtn);
                 tabHeader.Child = headerPanel;
 
+                Brush borderBg = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#11111b"));
+                var customBg = Engine.GuiManager.TryGetDialogBackground(title);
+                if (customBg != null)
+                {
+                    borderBg = customBg;
+                }
+
                 var tabItem = new TabItem 
                 { 
                     Header = tabHeader,
                     Tag = title,
                     Content = new Border 
                     { 
-                        Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#11111b")),
+                        Background = borderBg,
                         Padding = new Thickness(0),
                         Child = guiContent 
                     }
