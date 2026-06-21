@@ -1276,7 +1276,7 @@ namespace FlowEngine.Engine
                 {
                     var lineWidget = lines[idx];
                     datasets.Add(lineWidget.Plot2DData);
-                    legends.Add(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : GetDisplayName(lineWidget.Name));
+                    legends.Add(GetDisplayName(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : lineWidget.Name));
                     colors.Add(lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length]);
                     plotTypes.Add(lineWidget.PlotType);
                 }
@@ -1286,7 +1286,7 @@ namespace FlowEngine.Engine
                 if (canvas.Tag is Plot2DState plotState && plotState.Data.Count > 0)
                 {
                     datasets.Add(plotState.Data);
-                    legends.Add(plotState.Legend);
+                    legends.Add(GetDisplayName(plotState.Legend));
                     colors.Add(ThemeManager.AccentBrush);
                     plotTypes.Add("line");
                 }
@@ -1529,7 +1529,7 @@ namespace FlowEngine.Engine
                 {
                     var lineWidget = lines[idx];
                     datasets.Add(lineWidget.Plot3DData);
-                    legends.Add(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : GetDisplayName(lineWidget.Name));
+                    legends.Add(GetDisplayName(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : lineWidget.Name));
                     colors.Add(lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length]);
                 }
             }
@@ -1538,7 +1538,7 @@ namespace FlowEngine.Engine
                 if (state.GridData.Count > 0 && state.GridData[0].Count > 0)
                 {
                     datasets.Add(state.GridData);
-                    legends.Add(state.Legend);
+                    legends.Add(GetDisplayName(state.Legend));
                     colors.Add(ThemeManager.AccentBrush);
                 }
             }
