@@ -86,16 +86,23 @@ namespace FlowEngine.Engine
         private static readonly Dictionary<string, ImageWindow> _activeGuiWindows = new Dictionary<string, ImageWindow>();
         private static readonly object _lock = new object();
 
+        private static Brush CreateFrozenBrush(string hex)
+        {
+            var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex));
+            brush.Freeze();
+            return brush;
+        }
+
         private static readonly Brush[] SeriesColors = new Brush[]
         {
             ThemeManager.AccentBrush,
-            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#f5c2e7")), // Pink
-            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#a6e3a1")), // Green
-            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#fab387")), // Peach
-            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#b4befe")), // Lavender
-            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#f38ba8")), // Red
-            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#f9e2af")), // Yellow
-            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#94e2d5"))  // Teal
+            CreateFrozenBrush("#f5c2e7"), // Pink
+            CreateFrozenBrush("#a6e3a1"), // Green
+            CreateFrozenBrush("#fab387"), // Peach
+            CreateFrozenBrush("#b4befe"), // Lavender
+            CreateFrozenBrush("#f38ba8"), // Red
+            CreateFrozenBrush("#f9e2af"), // Yellow
+            CreateFrozenBrush("#94e2d5")  // Teal
         };
 
         public static Brush? TryGetDialogBackground(string name)
@@ -1191,7 +1198,9 @@ namespace FlowEngine.Engine
             byte b = (byte)(tbl.Get(3).Number);
             byte a = tbl.Length >= 4 ? (byte)(tbl.Get(4).Number) : (byte)255;
 
-            return new SolidColorBrush(Color.FromArgb(a, r, g, b));
+            var brush = new SolidColorBrush(Color.FromArgb(a, r, g, b));
+            brush.Freeze();
+            return brush;
         }
 
         private static void PrintLog(string level, string message)

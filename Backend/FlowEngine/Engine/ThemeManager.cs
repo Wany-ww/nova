@@ -38,21 +38,28 @@ namespace FlowEngine.Engine
         /// </summary>
         public static string TextMuted { get; private set; } = "#a6adc8";
 
-        public static Brush TitleBarBgBrush { get; private set; } = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1e1e2e"));
-        public static Brush TitleBarFgBrush { get; private set; } = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#cdd6f4"));
-        public static Brush BorderBrush { get; private set; } = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#313244"));
-        public static Brush PanelBgBrush { get; private set; } = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#11111b"));
-        public static Brush DialogHeaderBgBrush { get; private set; } = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#252538"));
-        public static Brush DialogHeaderFgBrush { get; private set; } = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#f5e0dc"));
-        public static Brush TextMutedBrush { get; private set; } = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#a6adc8"));
-        public static Brush AccentBrush { get; private set; } = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#89b4fa"));
+        private static Brush CreateFrozenBrush(string hex)
+        {
+            var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex));
+            brush.Freeze();
+            return brush;
+        }
 
-                /// <summary>
+        public static Brush TitleBarBgBrush { get; private set; } = CreateFrozenBrush("#1e1e2e");
+        public static Brush TitleBarFgBrush { get; private set; } = CreateFrozenBrush("#cdd6f4");
+        public static Brush BorderBrush { get; private set; } = CreateFrozenBrush("#313244");
+        public static Brush PanelBgBrush { get; private set; } = CreateFrozenBrush("#11111b");
+        public static Brush DialogHeaderBgBrush { get; private set; } = CreateFrozenBrush("#252538");
+        public static Brush DialogHeaderFgBrush { get; private set; } = CreateFrozenBrush("#f5e0dc");
+        public static Brush TextMutedBrush { get; private set; } = CreateFrozenBrush("#a6adc8");
+        public static Brush AccentBrush { get; private set; } = CreateFrozenBrush("#89b4fa");
+
+        /// <summary>
         /// Occurs when active theme colors or brushes are changed.
         /// </summary>
         public static event Action? ThemeChanged;
 
-                /// <summary>
+        /// <summary>
         /// Parses new hex color schemes and updates TitleBar and Panel Brushes, triggering ThemeChanged.
         /// </summary>
         /// <param name="bgHex">New background hex color</param>
@@ -73,12 +80,19 @@ namespace FlowEngine.Engine
 
                 var converter = new BrushConverter();
                 var bg = (Brush)converter.ConvertFromString(bgHex)!;
+                bg.Freeze();
                 var fg = (Brush)converter.ConvertFromString(fgHex)!;
+                fg.Freeze();
                 var border = (Brush)converter.ConvertFromString(borderHex)!;
+                border.Freeze();
                 var pbg = (Brush)converter.ConvertFromString(panelBgHex)!;
+                pbg.Freeze();
                 var dbg = (Brush)converter.ConvertFromString(dialogBgHex)!;
+                dbg.Freeze();
                 var dfg = (Brush)converter.ConvertFromString(dialogFgHex)!;
+                dfg.Freeze();
                 var tm = (Brush)converter.ConvertFromString(textMutedHex)!;
+                tm.Freeze();
 
                 TitleBarBg = bgHex;
                 TitleBarFg = fgHex;
