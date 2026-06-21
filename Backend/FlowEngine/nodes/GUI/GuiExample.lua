@@ -201,6 +201,7 @@ function show_gui(src : table)
     gui.widget.create("plotGraph##pl", "plot2d", "visualPanel##pn")
     gui.config.set("plotGraph##pl", "plot2d", "pos", {10, 30})
     gui.config.set("plotGraph##pl", "plot2d", "size", {475, 160})
+    gui.config.set("plotGraph##pl", "plot2d", "legend_text_color", {249, 226, 175, 255})
 
     gui.widget.create("Sensor A##ln", "plotline", "plotGraph##pl")
     gui.config.set("Sensor A##ln", "plotline", "foreground_color", {137, 180, 250, 255})
@@ -219,6 +220,7 @@ function show_gui(src : table)
     gui.widget.create("plot3dGraph##p3", "plot3d", "visualPanel##pn")
     gui.config.set("plot3dGraph##p3", "plot3d", "pos", {10, 230})
     gui.config.set("plot3dGraph##p3", "plot3d", "size", {475, 190})
+    gui.config.set("plot3dGraph##p3", "plot3d", "legend_text_color", {249, 226, 175, 255})
     
     local peakGrid1 = {
         {10, 12, 15, 12, 10},

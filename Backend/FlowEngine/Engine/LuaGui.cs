@@ -584,6 +584,29 @@ namespace FlowEngine.Engine
                         }
                         break;
 
+                    case "legend_text_color":
+                        if (widget.Type == "plot2d" && widget.Element is Canvas plotCanvasColor2d)
+                        {
+                            if (!(plotCanvasColor2d.Tag is Plot2DState state2d))
+                            {
+                                state2d = new Plot2DState();
+                                plotCanvasColor2d.Tag = state2d;
+                            }
+                            state2d.LegendTextColor = ParseColor(value);
+                            RenderPlot2D(plotCanvasColor2d);
+                        }
+                        else if (widget.Type == "plot3d" && widget.Element is Canvas plotCanvasColor3d)
+                        {
+                            if (!(plotCanvasColor3d.Tag is Plot3DState state3d))
+                            {
+                                state3d = new Plot3DState();
+                                plotCanvasColor3d.Tag = state3d;
+                            }
+                            state3d.LegendTextColor = ParseColor(value);
+                            RenderPlot3D(plotCanvasColor3d);
+                        }
+                        break;
+
                     case "plot_type":
                         if (widget.Type == "plotline")
                         {
@@ -1221,6 +1244,12 @@ namespace FlowEngine.Engine
             canvas.ClipToBounds = true;
             canvas.Children.Clear();
 
+            if (!(canvas.Tag is Plot2DState plotState))
+            {
+                plotState = new Plot2DState();
+                canvas.Tag = plotState;
+            }
+
             double width = canvas.Width;
             double height = canvas.Height;
             if (double.IsNaN(width) || width <= 0) width = 200;
@@ -1283,7 +1312,7 @@ namespace FlowEngine.Engine
             }
             else
             {
-                if (canvas.Tag is Plot2DState plotState && plotState.Data.Count > 0)
+                if (plotState.Data.Count > 0)
                 {
                     datasets.Add(plotState.Data);
                     legends.Add(GetDisplayName(plotState.Legend));
@@ -1297,8 +1326,14 @@ namespace FlowEngine.Engine
             double min = double.MaxValue;
             double max = double.MinValue;
             bool hasData = false;
-            foreach (var dataset in datasets)
+            for (int d = 0; d < datasets.Count; d++)
             {
+                string seriesName = legends[d];
+                if (plotState.DisabledSeries.Contains(seriesName))
+                {
+                    continue;
+                }
+                var dataset = datasets[d];
                 if (dataset.Count == 0) continue;
                 hasData = true;
                 foreach (var val in dataset)
@@ -1317,6 +1352,11 @@ namespace FlowEngine.Engine
 
             for (int d = 0; d < datasets.Count; d++)
             {
+                string seriesName = legends[d];
+                if (plotState.DisabledSeries.Contains(seriesName))
+                {
+                    continue;
+                }
                 var dataset = datasets[d];
                 var brush = colors[d];
                 string type = plotTypes[d];
@@ -1392,6 +1432,7 @@ namespace FlowEngine.Engine
                     string legText = legends[d];
                     if (string.IsNullOrEmpty(legText)) continue;
 
+                    bool isDisabled = plotState.DisabledSeries.Contains(legText);
                     var itemPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 1, 0, 1) };
                     
                     var accentLine = new Line
@@ -1403,18 +1444,44 @@ namespace FlowEngine.Engine
                         Stroke = colors[d],
                         StrokeThickness = 2,
                         VerticalAlignment = VerticalAlignment.Center,
-                        Margin = new Thickness(0, 0, 6, 0)
+                        Margin = new Thickness(0, 0, 6, 0),
+                        Opacity = isDisabled ? 0.25 : 1.0
                     };
                     itemPanel.Children.Add(accentLine);
+
+                    Brush textBrush = plotState.LegendTextColor ?? ThemeManager.TitleBarFgBrush;
+                    if (isDisabled)
+                    {
+                        var mutedBrush = new SolidColorBrush(Color.FromArgb(80, 205, 214, 244));
+                        mutedBrush.Freeze();
+                        textBrush = mutedBrush;
+                    }
 
                     var legendLabel = new TextBlock
                     {
                         Text = legText,
-                        Foreground = ThemeManager.TitleBarFgBrush,
+                        Foreground = textBrush,
                         FontSize = 9,
                         VerticalAlignment = VerticalAlignment.Center
                     };
                     itemPanel.Children.Add(legendLabel);
+
+                    itemPanel.Cursor = Cursors.Hand;
+                    itemPanel.Background = Brushes.Transparent;
+                    string seriesName = legText;
+                    itemPanel.MouseDown += (s, e) =>
+                    {
+                        if (plotState.DisabledSeries.Contains(seriesName))
+                        {
+                            plotState.DisabledSeries.Remove(seriesName);
+                        }
+                        else
+                        {
+                            plotState.DisabledSeries.Add(seriesName);
+                        }
+                        RenderPlot2D(canvas);
+                    };
+
                     legendPanel.Children.Add(itemPanel);
                 }
 
@@ -1548,8 +1615,14 @@ namespace FlowEngine.Engine
             double minZ = double.MaxValue;
             double maxZ = double.MinValue;
             bool hasData = false;
-            foreach (var grid in datasets)
+            for (int d = 0; d < datasets.Count; d++)
             {
+                string seriesName = legends[d];
+                if (state.DisabledSeries.Contains(seriesName))
+                {
+                    continue;
+                }
+                var grid = datasets[d];
                 if (grid.Count == 0 || grid[0].Count == 0) continue;
                 hasData = true;
                 foreach (var row in grid)
@@ -1578,6 +1651,11 @@ namespace FlowEngine.Engine
 
             for (int d = 0; d < datasets.Count; d++)
             {
+                string seriesName = legends[d];
+                if (state.DisabledSeries.Contains(seriesName))
+                {
+                    continue;
+                }
                 var grid = datasets[d];
                 var strokeBrush = colors[d];
 
@@ -1654,6 +1732,7 @@ namespace FlowEngine.Engine
                     string legText = legends[d];
                     if (string.IsNullOrEmpty(legText)) continue;
 
+                    bool isDisabled = state.DisabledSeries.Contains(legText);
                     var itemPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 1, 0, 1) };
                     
                     var accentMarker = new Rectangle
@@ -1662,18 +1741,44 @@ namespace FlowEngine.Engine
                         Height = 8,
                         Fill = colors[d],
                         VerticalAlignment = VerticalAlignment.Center,
-                        Margin = new Thickness(0, 0, 6, 0)
+                        Margin = new Thickness(0, 0, 6, 0),
+                        Opacity = isDisabled ? 0.25 : 1.0
                     };
                     itemPanel.Children.Add(accentMarker);
+
+                    Brush textBrush = state.LegendTextColor ?? ThemeManager.TitleBarFgBrush;
+                    if (isDisabled)
+                    {
+                        var mutedBrush = new SolidColorBrush(Color.FromArgb(80, 205, 214, 244));
+                        mutedBrush.Freeze();
+                        textBrush = mutedBrush;
+                    }
 
                     var legendLabel = new TextBlock
                     {
                         Text = legText,
-                        Foreground = ThemeManager.TitleBarFgBrush,
+                        Foreground = textBrush,
                         FontSize = 9,
                         VerticalAlignment = VerticalAlignment.Center
                     };
                     itemPanel.Children.Add(legendLabel);
+
+                    itemPanel.Cursor = Cursors.Hand;
+                    itemPanel.Background = Brushes.Transparent;
+                    string seriesName = legText;
+                    itemPanel.MouseDown += (s, e) =>
+                    {
+                        if (state.DisabledSeries.Contains(seriesName))
+                        {
+                            state.DisabledSeries.Remove(seriesName);
+                        }
+                        else
+                        {
+                            state.DisabledSeries.Add(seriesName);
+                        }
+                        RenderPlot3D(canvas);
+                    };
+
                     legendPanel.Children.Add(itemPanel);
                 }
 
@@ -1777,6 +1882,8 @@ namespace FlowEngine.Engine
     {
         public List<double> Data { get; set; } = new List<double>();
         public string Legend { get; set; } = string.Empty;
+        public Brush? LegendTextColor { get; set; }
+        public HashSet<string> DisabledSeries { get; } = new HashSet<string>();
     }
 
     public class Plot3DState
@@ -1788,5 +1895,7 @@ namespace FlowEngine.Engine
         public List<List<double>> GridData { get; set; } = new List<List<double>>();
         public double Zoom { get; set; } = 1.0;
         public string Legend { get; set; } = string.Empty;
+        public Brush? LegendTextColor { get; set; }
+        public HashSet<string> DisabledSeries { get; } = new HashSet<string>();
     }
 }
