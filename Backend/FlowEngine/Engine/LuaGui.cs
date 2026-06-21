@@ -108,7 +108,6 @@ namespace FlowEngine.Engine
         private static readonly Dictionary<string, ImageWindow> _activeGuiWindows = new Dictionary<string, ImageWindow>();
         private static readonly object _lock = new object();
 
-        private static readonly ControlTemplate SimpleButtonTemplate = CreateSimpleButtonTemplate();
 
         private static ControlTemplate CreateSimpleButtonTemplate()
         {
@@ -1250,7 +1249,7 @@ namespace FlowEngine.Engine
 
                 if (inner is Button btn)
                 {
-                    btn.Template = SimpleButtonTemplate;
+                    btn.Template = CreateSimpleButtonTemplate();
                 }
 
                 // If wrapped, the wrapper border handles background and border
