@@ -2026,8 +2026,8 @@ export default function App() {
       return;
     }
 
-    // 2. 만약 연결하고자 하는 출력핀과 입력 핀의 타입이 다른 경우 연결 안됨
-    if (outPin.type !== inPin.type) {
+    // 2. 만약 연결하고자 하는 출력핀과 입력 핀의 타입이 다른 경우 연결 안됨 (단, 어느 한 쪽이 'any' 이면 연결 허용)
+    if (outPin.type !== inPin.type && outPin.type !== 'any' && inPin.type !== 'any') {
       addSystemLog('ERROR', `Connection failed: Pin types mismatch. Cannot connect output type '${outPin.type}' to input type '${inPin.type}'.`);
       return;
     }
