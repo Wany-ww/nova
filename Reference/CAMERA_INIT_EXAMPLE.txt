@@ -1,0 +1,88 @@
+# ==============================================================================
+# NOVA Camera Registration & Configuration script example
+# This script illustrates PMU power setup, resets, I2C, and sensor configuration.
+# Section indexing starts at 1.
+# ==============================================================================
+
+[SECTION_1_PMU_POWER_ON]
+# 1. Initialize PMU power management unit
+set_pmu_init
+
+# 2. Turn on ground switch
+set_pmu_gnd 1
+
+# 3. Configure power rails (channel, voltage, current limit in Amperes)
+# Channel 0: Core Power (1.2V, 0.5A)
+set_pmu_pwr 0 1.2 0.5
+# Channel 1: Analog Power (2.8V, 0.3A)
+set_pmu_pwr 1 2.8 0.3
+# Channel 2: I/O Power (1.8V, 0.3A)
+set_pmu_pwr 2 1.8 0.3
+
+# 4. Enable power switches (channel, state: 1=on, 0=off)
+set_pmu_sw 0 1
+set_pmu_sw 1 1
+set_pmu_sw 2 1
+
+# 5. Start Power Monitoring (state: 1=on, flags)
+set_pmu_mon 1 0x07
+
+# Wait 100ms for power rails to stabilize
+delay 100
+
+[SECTION_2_SENSOR_RESET_AND_CLOCK]
+# 1. Reset ISM IO configurations (dglib specific)
+set_ism_default
+
+# 2. Set I/O Voltage (1.8V)
+set_ism_volt 1.8
+
+# 3. Set Master Clock Frequency (channel 0, 24.0 MHz)
+set_ism_freq 0 24.0
+
+# 4. Toggle Hardware Reset pin (state: 0=reset active, 1=inactive)
+set_ism_reset 0
+delay 10
+set_ism_reset 1
+delay 20
+
+[SECTION_3_SENSOR_I2C_REGISTERS]
+# 1. Set I2C Communication Frequency (400 kHz)
+set_i2c_freq 400.0
+
+# 2. Write register commands (start_flag, last_flag, slave_addr, reg_high, reg_low, value)
+# Slave Address: 0x3C
+# Format: set_i2c <start> <last> <slave_addr> <reg_addr_bytes...> <data_bytes...>
+# Write 0x01 to Software Reset register (0x0100)
+set_i2c 1 1 0x3C 0x01 0x00 0x01
+delay 10
+
+# Write PLL configurations (e.g. Multiplier)
+set_i2c 1 1 0x3C 0x03 0x00 0x04
+set_i2c 1 1 0x3C 0x03 0x01 0x50
+
+# Set output format to RAW10
+set_i2c 1 1 0x3C 0x04 0x01 0x0A
+
+[SECTION_4_MIPI_INTERFACE_AND_OPEN]
+# 1. Set MIPI Default Virtual Channel & Data Type (e.g., 0x2B for RAW10)
+set_mipi_default 0x2B
+
+# 2. Enable test pattern generation on the sensor side (if needed)
+set_test_cam 0
+
+# 3. Open Grabber Board Channel (height, pitch, frames, bit_depth)
+# Height: 1080, Pitch: 2400 (for RAW10, Pitch = Width * 1.25 = 1920 * 1.25)
+open 1080 2400 16 10
+
+[SECTION_5_POWER_OFF]
+# Disable power monitoring
+set_pmu_mon 0 0
+
+# Turn off power rails
+set_pmu_sw 0 0
+set_pmu_sw 1 0
+set_pmu_sw 2 0
+
+# Terminate PMU connection
+set_pmu_end
