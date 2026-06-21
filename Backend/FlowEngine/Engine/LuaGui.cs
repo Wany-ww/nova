@@ -49,6 +49,12 @@ namespace FlowEngine.Engine
         public Brush? BarColor { get; set; }
         public double BarWidthValue { get; set; } = -1.0;
         public string BarStyle { get; set; } = "solid"; // "solid", "gradient"
+
+        // Wrapping and hover customization
+        public FrameworkElement InnerElement { get; set; } = null!;
+        public double BorderRadius { get; set; } = 0.0;
+        public Brush? HoverColor { get; set; }
+        public Brush? OriginalBackground { get; set; }
     }
 
     public class GuiDialog
@@ -101,6 +107,25 @@ namespace FlowEngine.Engine
         private static readonly Dictionary<string, GuiWidget> _widgets = new Dictionary<string, GuiWidget>();
         private static readonly Dictionary<string, ImageWindow> _activeGuiWindows = new Dictionary<string, ImageWindow>();
         private static readonly object _lock = new object();
+
+        private static readonly ControlTemplate SimpleButtonTemplate = CreateSimpleButtonTemplate();
+
+        private static ControlTemplate CreateSimpleButtonTemplate()
+        {
+            var template = new ControlTemplate(typeof(Button));
+            var borderFactory = new FrameworkElementFactory(typeof(Border));
+            borderFactory.SetValue(Border.BackgroundProperty, new TemplateBindingExtension(Button.BackgroundProperty));
+            borderFactory.SetValue(Border.BorderBrushProperty, new TemplateBindingExtension(Button.BorderBrushProperty));
+            borderFactory.SetValue(Border.BorderThicknessProperty, new TemplateBindingExtension(Button.BorderThicknessProperty));
+            
+            var cpFactory = new FrameworkElementFactory(typeof(ContentPresenter));
+            cpFactory.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+            cpFactory.SetValue(ContentPresenter.VerticalAlignmentProperty, VerticalAlignment.Center);
+            
+            borderFactory.AppendChild(cpFactory);
+            template.VisualTree = borderFactory;
+            return template;
+        }
 
         private static Brush CreateFrozenBrush(string hex)
         {
@@ -336,13 +361,14 @@ namespace FlowEngine.Engine
                         }
                         else
                         {
-                            parentCanvas = parentWidget.Element as Canvas;
+                            parentCanvas = parentWidget.InnerElement as Canvas;
                         }
                     }
 
                     if (parentCanvas == null) return;
 
                     FrameworkElement? element = null;
+                    FrameworkElement? innerElement = null;
                     Canvas? containerCanvas = null;
 
                     string displayName = GetDisplayName(name);
@@ -358,48 +384,10 @@ namespace FlowEngine.Engine
                                 Background = new SolidColorBrush(Color.FromArgb(10, 255, 255, 255)),
                                 BorderBrush = ThemeManager.BorderBrush,
                                 BorderThickness = new Thickness(1),
-                                Child = containerCanvas
+                                Child = containerCanvas,
+                                CornerRadius = new CornerRadius(0)
                             };
-                            break;
-
-                        case "button":
-                            element = new Button { Content = displayName, Width = 80, Height = 22 };
-                            break;
-
-                        case "label":
-                            element = new TextBlock { Text = displayName };
-                            break;
-
-                        case "slider":
-                            element = new Slider { Minimum = 0, Maximum = 100, Value = 0, Width = 120, Height = 22 };
-                            break;
-
-                        case "checkbox":
-                            element = new CheckBox { Content = displayName };
-                            break;
-
-                        case "dropdown":
-                            element = new ComboBox { Width = 100, Height = 22 };
-                            break;
-
-                        case "textinput":
-                            element = new TextBox { Width = 100, Height = 22 };
-                            break;
-
-                        case "image":
-                            element = new Image { Stretch = Stretch.Uniform, Width = 150, Height = 150 };
-                            break;
-
-                        case "plot2d":
-                            element = new Canvas { Width = 200, Height = 150 };
-                            break;
-
-                        case "plot3d":
-                            element = new Canvas { Width = 200, Height = 150 };
-                            break;
-
-                        case "progress":
-                            element = new ProgressBar { Minimum = 0, Maximum = 100, Value = 0, Width = 120, Height = 15 };
+                            innerElement = element;
                             break;
 
                         case "colorpicker":
@@ -409,34 +397,102 @@ namespace FlowEngine.Engine
                                 Height = 22,
                                 Background = Brushes.Red,
                                 BorderThickness = new Thickness(1),
-                                BorderBrush = ThemeManager.BorderBrush
+                                BorderBrush = ThemeManager.BorderBrush,
+                                CornerRadius = new CornerRadius(0)
                             };
+                            innerElement = element;
                             break;
 
                         case "plotline":
                             element = new FrameworkElement();
-                            break;
-
-                        case "radiobutton":
-                            element = new RadioButton { Content = displayName, GroupName = parent };
-                            break;
-
-                        case "textarea":
-                            element = new TextBox
-                            {
-                                AcceptsReturn = true,
-                                TextWrapping = TextWrapping.Wrap,
-                                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                                Width = 150,
-                                Height = 60
-                            };
+                            innerElement = element;
                             break;
 
                         default:
-                            return;
-                    }
+                            FrameworkElement control = null!;
+                            switch (type)
+                            {
+                                case "button":
+                                    control = new Button { Content = displayName, Width = 80, Height = 22 };
+                                    break;
+                                case "label":
+                                    control = new TextBlock { Text = displayName };
+                                    break;
+                                case "slider":
+                                    control = new Slider { Minimum = 0, Maximum = 100, Value = 0, Width = 120, Height = 22 };
+                                    break;
+                                case "checkbox":
+                                    control = new CheckBox { Content = displayName };
+                                    break;
+                                case "dropdown":
+                                    control = new ComboBox { Width = 100, Height = 22 };
+                                    break;
+                                case "textinput":
+                                    control = new TextBox { Width = 100, Height = 22 };
+                                    break;
+                                case "image":
+                                    control = new Image { Stretch = Stretch.Uniform, Width = 150, Height = 150 };
+                                    break;
+                                case "plot2d":
+                                    control = new Canvas { Width = 200, Height = 150 };
+                                    break;
+                                case "plot3d":
+                                    control = new Canvas { Width = 200, Height = 150 };
+                                    break;
+                                case "progress":
+                                    control = new ProgressBar { Minimum = 0, Maximum = 100, Value = 0, Width = 120, Height = 15 };
+                                    break;
+                                case "radiobutton":
+                                    control = new RadioButton { Content = displayName, GroupName = parent };
+                                    break;
+                                case "textarea":
+                                    control = new TextBox
+                                    {
+                                        AcceptsReturn = true,
+                                        TextWrapping = TextWrapping.Wrap,
+                                        VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                                        Width = 150,
+                                        Height = 60
+                                    };
+                                    break;
+                                default:
+                                    return;
+                            }
 
-                    ApplyNovaStyle(element);
+                            // Wrap in a border wrapper
+                            var borderWrapper = new Border
+                            {
+                                Background = Brushes.Transparent,
+                                BorderBrush = Brushes.Transparent,
+                                BorderThickness = new Thickness(0),
+                                CornerRadius = new CornerRadius(0),
+                                Child = control
+                            };
+
+                            // Move sizes from control to wrapper
+                            if (!double.IsNaN(control.Width) && control.Width > 0)
+                            {
+                                borderWrapper.Width = control.Width;
+                                if (!(control is Canvas) && !(control is Image))
+                                {
+                                    control.Width = double.NaN;
+                                    control.HorizontalAlignment = HorizontalAlignment.Stretch;
+                                }
+                            }
+                            if (!double.IsNaN(control.Height) && control.Height > 0)
+                            {
+                                borderWrapper.Height = control.Height;
+                                if (!(control is Canvas) && !(control is Image))
+                                {
+                                    control.Height = double.NaN;
+                                    control.VerticalAlignment = VerticalAlignment.Stretch;
+                                }
+                            }
+
+                            element = borderWrapper;
+                            innerElement = control;
+                            break;
+                    }
 
                     parentCanvas.Children.Add(element);
                     Canvas.SetLeft(element, 0);
@@ -448,11 +504,14 @@ namespace FlowEngine.Engine
                         Type = type,
                         ParentName = parent,
                         Element = element,
+                        InnerElement = innerElement,
                         ContainerCanvas = containerCanvas,
                         Position = new Point(0, 0),
                         Size = new Size(double.IsNaN(element.Width) ? double.NaN : element.Width, double.IsNaN(element.Height) ? double.NaN : element.Height),
                         Legend = GetDisplayName(name)
                     };
+
+                    ApplyNovaStyle(widget);
 
                     HookWidgetEvents(widget);
 
@@ -532,6 +591,11 @@ namespace FlowEngine.Engine
                         {
                             widget.Element.Width = size.Value.Width;
                             widget.Element.Height = size.Value.Height;
+                            if (widget.InnerElement != widget.Element)
+                            {
+                                widget.InnerElement.Width = size.Value.Width;
+                                widget.InnerElement.Height = size.Value.Height;
+                            }
                             widget.Size = size.Value;
                             if (widget.ContainerCanvas != null)
                             {
@@ -555,6 +619,18 @@ namespace FlowEngine.Engine
                         }
                         break;
 
+                    case "border_radius":
+                        widget.BorderRadius = value.Number;
+                        if (widget.Element is Border border)
+                        {
+                            border.CornerRadius = new CornerRadius(widget.BorderRadius);
+                        }
+                        break;
+
+                    case "hover_color":
+                        widget.HoverColor = ParseColor(value);
+                        break;
+
                     case "horizontal":
                         if (widget.Type == "panel")
                         {
@@ -564,7 +640,7 @@ namespace FlowEngine.Engine
                         break;
 
                     case "legend":
-                        if (widget.Type == "plot2d" && widget.Element is Canvas plotCanvas2d)
+                        if (widget.Type == "plot2d" && widget.InnerElement is Canvas plotCanvas2d)
                         {
                             if (!(plotCanvas2d.Tag is Plot2DState state2d))
                             {
@@ -574,7 +650,7 @@ namespace FlowEngine.Engine
                             state2d.Legend = value.CastToString() ?? string.Empty;
                             RenderPlot2D(plotCanvas2d);
                         }
-                        else if (widget.Type == "plot3d" && widget.Element is Canvas plotCanvas3d)
+                        else if (widget.Type == "plot3d" && widget.InnerElement is Canvas plotCanvas3d)
                         {
                             if (!(plotCanvas3d.Tag is Plot3DState state3d))
                             {
@@ -592,7 +668,7 @@ namespace FlowEngine.Engine
                             {
                                 _widgets.TryGetValue(widget.ParentName, out parentWidget);
                             }
-                            if (parentWidget != null && parentWidget.Element is Canvas parentCanvas)
+                            if (parentWidget != null && parentWidget.InnerElement is Canvas parentCanvas)
                             {
                                 if (parentWidget.Type == "plot2d") RenderPlot2D(parentCanvas);
                                 else if (parentWidget.Type == "plot3d") RenderPlot3D(parentCanvas);
@@ -601,7 +677,7 @@ namespace FlowEngine.Engine
                         break;
 
                     case "legend_text_color":
-                        if (widget.Type == "plot2d" && widget.Element is Canvas plotCanvasColor2d)
+                        if (widget.Type == "plot2d" && widget.InnerElement is Canvas plotCanvasColor2d)
                         {
                             if (!(plotCanvasColor2d.Tag is Plot2DState state2d))
                             {
@@ -611,7 +687,7 @@ namespace FlowEngine.Engine
                             state2d.LegendTextColor = ParseColor(value);
                             RenderPlot2D(plotCanvasColor2d);
                         }
-                        else if (widget.Type == "plot3d" && widget.Element is Canvas plotCanvasColor3d)
+                        else if (widget.Type == "plot3d" && widget.InnerElement is Canvas plotCanvasColor3d)
                         {
                             if (!(plotCanvasColor3d.Tag is Plot3DState state3d))
                             {
@@ -628,7 +704,7 @@ namespace FlowEngine.Engine
                     case "title_color":
                     case "title_background_color":
                     case "title_visible":
-                        if (widget.Type == "plot2d" && widget.Element is Canvas c2dTitle)
+                        if (widget.Type == "plot2d" && widget.InnerElement is Canvas c2dTitle)
                         {
                             if (!(c2dTitle.Tag is Plot2DState s2t)) { s2t = new Plot2DState(); c2dTitle.Tag = s2t; }
                             var k = key.ToLower();
@@ -639,7 +715,7 @@ namespace FlowEngine.Engine
                             else if (k == "title_visible") s2t.TitleVisible = value.CastToBool();
                             RenderPlot2D(c2dTitle);
                         }
-                        else if (widget.Type == "plot3d" && widget.Element is Canvas c3dTitle)
+                        else if (widget.Type == "plot3d" && widget.InnerElement is Canvas c3dTitle)
                         {
                             if (!(c3dTitle.Tag is Plot3DState s3t)) { s3t = new Plot3DState(); c3dTitle.Tag = s3t; }
                             var k = key.ToLower();
@@ -664,7 +740,7 @@ namespace FlowEngine.Engine
                     case "grid_thickness_x":
                     case "grid_thickness_y":
                     case "grid_thickness_z":
-                        if (widget.Type == "plot2d" && widget.Element is Canvas g2d)
+                        if (widget.Type == "plot2d" && widget.InnerElement is Canvas g2d)
                         {
                             if (!(g2d.Tag is Plot2DState s2g)) { s2g = new Plot2DState(); g2d.Tag = s2g; }
                             var k = key.ToLower();
@@ -678,7 +754,7 @@ namespace FlowEngine.Engine
                             else if (k == "grid_thickness_y") s2g.GridThicknessY = value.Number;
                             RenderPlot2D(g2d);
                         }
-                        else if (widget.Type == "plot3d" && widget.Element is Canvas g3d)
+                        else if (widget.Type == "plot3d" && widget.InnerElement is Canvas g3d)
                         {
                             if (!(g3d.Tag is Plot3DState s3g)) { s3g = new Plot3DState(); g3d.Tag = s3g; }
                             var k = key.ToLower();
@@ -710,7 +786,7 @@ namespace FlowEngine.Engine
                     case "tick_interval_x":
                     case "tick_interval_y":
                     case "tick_interval_z":
-                        if (widget.Type == "plot2d" && widget.Element is Canvas r2d)
+                        if (widget.Type == "plot2d" && widget.InnerElement is Canvas r2d)
                         {
                             if (!(r2d.Tag is Plot2DState s2r)) { s2r = new Plot2DState(); r2d.Tag = s2r; }
                             var k = key.ToLower();
@@ -732,7 +808,7 @@ namespace FlowEngine.Engine
                             else if (k == "tick_interval_y") s2r.TickIntervalY = value.Type == DataType.Nil ? (double?)null : value.Number;
                             RenderPlot2D(r2d);
                         }
-                        else if (widget.Type == "plot3d" && widget.Element is Canvas r3d)
+                        else if (widget.Type == "plot3d" && widget.InnerElement is Canvas r3d)
                         {
                             if (!(r3d.Tag is Plot3DState s3r)) { s3r = new Plot3DState(); r3d.Tag = s3r; }
                             var k = key.ToLower();
@@ -794,7 +870,7 @@ namespace FlowEngine.Engine
                             {
                                 _widgets.TryGetValue(widget.ParentName, out parentWidget);
                             }
-                            if (parentWidget != null && parentWidget.Element is Canvas parentCanvas)
+                            if (parentWidget != null && parentWidget.InnerElement is Canvas parentCanvas)
                             {
                                 if (parentWidget.Type == "plot2d") RenderPlot2D(parentCanvas);
                                 else if (parentWidget.Type == "plot3d") RenderPlot3D(parentCanvas);
@@ -821,7 +897,7 @@ namespace FlowEngine.Engine
                             {
                                 _widgets.TryGetValue(widget.ParentName, out parentWidget);
                             }
-                            if (parentWidget != null && parentWidget.Element is Canvas parentCanvas)
+                            if (parentWidget != null && parentWidget.InnerElement is Canvas parentCanvas)
                             {
                                 if (parentWidget.Type == "plot2d") RenderPlot2D(parentCanvas);
                                 else if (parentWidget.Type == "plot3d") RenderPlot3D(parentCanvas);
@@ -838,7 +914,7 @@ namespace FlowEngine.Engine
                             {
                                 _widgets.TryGetValue(widget.ParentName, out parentWidget);
                             }
-                            if (parentWidget != null && parentWidget.Element is Canvas parentCanvas)
+                            if (parentWidget != null && parentWidget.InnerElement is Canvas parentCanvas)
                             {
                                 if (parentWidget.Type == "plot2d") RenderPlot2D(parentCanvas);
                             }
@@ -860,8 +936,8 @@ namespace FlowEngine.Engine
                         var fgBrush = ParseColor(value);
                         if (fgBrush != null)
                         {
-                            if (widget.Element is Control control) control.Foreground = fgBrush;
-                            else if (widget.Element is TextBlock tb) tb.Foreground = fgBrush;
+                            if (widget.InnerElement is Control control) control.Foreground = fgBrush;
+                            else if (widget.InnerElement is TextBlock tb) tb.Foreground = fgBrush;
                             else if (widget.Type == "plotline")
                             {
                                 widget.CustomColor = fgBrush;
@@ -870,7 +946,7 @@ namespace FlowEngine.Engine
                                 {
                                     _widgets.TryGetValue(widget.ParentName, out parentWidget);
                                 }
-                                if (parentWidget != null && parentWidget.Element is Canvas parentCanvas)
+                                if (parentWidget != null && parentWidget.InnerElement is Canvas parentCanvas)
                                 {
                                     if (parentWidget.Type == "plot2d") RenderPlot2D(parentCanvas);
                                     else if (parentWidget.Type == "plot3d") RenderPlot3D(parentCanvas);
@@ -884,9 +960,10 @@ namespace FlowEngine.Engine
                         var bgBrush = ParseColor(value);
                         if (bgBrush != null)
                         {
-                            if (widget.Element is Panel panelControl) panelControl.Background = bgBrush;
-                            else if (widget.Element is Border borderControl) borderControl.Background = bgBrush;
-                            else if (widget.Element is Control control) control.Background = bgBrush;
+                            widget.OriginalBackground = bgBrush;
+                            if (widget.Element is Border borderWrapper) borderWrapper.Background = bgBrush;
+                            else if (widget.Element is Panel panelControl) panelControl.Background = bgBrush;
+                            else if (widget.InnerElement is Control control) control.Background = bgBrush;
                         }
                         break;
 
@@ -910,10 +987,10 @@ namespace FlowEngine.Engine
                         if (value.Type == DataType.String)
                         {
                             string displayLabel = GetDisplayName(value.String);
-                            if (widget.Element is Button btn) btn.Content = displayLabel;
-                            else if (widget.Element is TextBlock textBlock) textBlock.Text = displayLabel;
-                            else if (widget.Element is CheckBox cb) cb.Content = displayLabel;
-                            else if (widget.Element is RadioButton rb) rb.Content = displayLabel;
+                            if (widget.InnerElement is Button btn) btn.Content = displayLabel;
+                            else if (widget.InnerElement is TextBlock textBlock) textBlock.Text = displayLabel;
+                            else if (widget.InnerElement is CheckBox cb) cb.Content = displayLabel;
+                            else if (widget.InnerElement is RadioButton rb) rb.Content = displayLabel;
                         }
                         break;
 
@@ -938,7 +1015,7 @@ namespace FlowEngine.Engine
                         break;
 
                     case "menus":
-                        if (widget.Element is ComboBox combo && value.Type == DataType.Table)
+                        if (widget.InnerElement is ComboBox combo && value.Type == DataType.Table)
                         {
                             combo.Items.Clear();
                             var tbl = value.Table;
@@ -954,24 +1031,24 @@ namespace FlowEngine.Engine
                         {
                             sl.Value = value.Number;
                         }
-                        else if (widget.Element is CheckBox checkBox)
+                        else if (widget.InnerElement is CheckBox checkBox)
                         {
                             checkBox.IsChecked = value.Boolean;
                         }
-                        else if (widget.Element is RadioButton rbVal)
+                        else if (widget.InnerElement is RadioButton rbVal)
                         {
                             rbVal.IsChecked = value.Boolean;
                         }
-                        else if (widget.Element is ComboBox com)
+                        else if (widget.InnerElement is ComboBox com)
                         {
                             int idx = (int)value.Number - 1;
                             if (idx >= 0 && idx < com.Items.Count) com.SelectedIndex = idx;
                         }
-                        else if (widget.Element is TextBox textBox)
+                        else if (widget.InnerElement is TextBox textBox)
                         {
                             textBox.Text = value.String;
                         }
-                        else if (widget.Element is Image imgControl)
+                        else if (widget.InnerElement is Image imgControl)
                         {
                             if (value.UserData?.Object is MatWrapper mat && mat.Mat != null)
                             {
@@ -996,7 +1073,7 @@ namespace FlowEngine.Engine
                                 imgControl.Source = bitmap;
                             }
                         }
-                        else if (widget.Element is Canvas plotCanvas && widget.Type == "plot2d" && value.Type == DataType.Table)
+                        else if (widget.InnerElement is Canvas plotCanvas && widget.Type == "plot2d" && value.Type == DataType.Table)
                         {
                             var tbl = value.Table;
                             List<double> pts = new List<double>();
@@ -1012,7 +1089,7 @@ namespace FlowEngine.Engine
                             state.Data = pts;
                             RenderPlot2D(plotCanvas);
                         }
-                        else if (widget.Element is Canvas plot3dCanvas && widget.Type == "plot3d" && value.Type == DataType.Table)
+                        else if (widget.InnerElement is Canvas plot3dCanvas && widget.Type == "plot3d" && value.Type == DataType.Table)
                         {
                             var tbl = value.Table;
                             List<List<double>> grid = new List<List<double>>();
@@ -1105,17 +1182,17 @@ namespace FlowEngine.Engine
                             {
                                 _widgets.TryGetValue(widget.ParentName, out pWidget);
                             }
-                            if (pWidget != null && pWidget.Element is Canvas pCanvas)
+                            if (pWidget != null && pWidget.InnerElement is Canvas pCanvas)
                             {
                                 if (pWidget.Type == "plot2d") RenderPlot2D(pCanvas);
                                 else if (pWidget.Type == "plot3d") RenderPlot3D(pCanvas);
                             }
                         }
-                        else if (widget.Element is ProgressBar pb)
+                        else if (widget.InnerElement is ProgressBar pb)
                         {
                             pb.Value = value.Number;
                         }
-                        else if (widget.Element is Border colorBorder && widget.Type == "colorpicker")
+                        else if (widget.InnerElement is Border colorBorder && widget.Type == "colorpicker")
                         {
                             var brush = ParseColor(value);
                             if (brush != null) colorBorder.Background = brush;
@@ -1134,35 +1211,108 @@ namespace FlowEngine.Engine
             return fullName;
         }
 
-        private static void ApplyNovaStyle(FrameworkElement element)
+        private static void ApplyNovaStyle(GuiWidget widget)
         {
-            if (element is Control control)
+            var element = widget.Element;
+            var inner = widget.InnerElement;
+
+            widget.OriginalBackground = ThemeManager.TitleBarBgBrush;
+
+            if (inner is Control control)
             {
                 control.FontFamily = new FontFamily("Inter, Segoe UI");
                 control.FontSize = 11;
-                control.Background = ThemeManager.TitleBarBgBrush;
                 control.Foreground = ThemeManager.TitleBarFgBrush;
-                control.BorderBrush = ThemeManager.BorderBrush;
-                control.BorderThickness = new Thickness(1);
+
+                if (inner is Button btn)
+                {
+                    btn.Template = SimpleButtonTemplate;
+                }
+
+                // If wrapped, the wrapper border handles background and border
+                if (element is Border wrapper && wrapper != inner)
+                {
+                    wrapper.Background = ThemeManager.TitleBarBgBrush;
+                    wrapper.BorderBrush = ThemeManager.BorderBrush;
+                    wrapper.BorderThickness = new Thickness(1);
+
+                    if (inner is Button || inner is TextBox || inner is ComboBox || inner is ProgressBar)
+                    {
+                        control.Background = Brushes.Transparent;
+                        control.BorderBrush = Brushes.Transparent;
+                        control.BorderThickness = new Thickness(0);
+                    }
+                }
+                else
+                {
+                    control.Background = ThemeManager.TitleBarBgBrush;
+                    control.BorderBrush = ThemeManager.BorderBrush;
+                    control.BorderThickness = new Thickness(1);
+                }
             }
-            else if (element is TextBlock tb)
+            else if (inner is TextBlock tb)
             {
                 tb.FontFamily = new FontFamily("Inter, Segoe UI");
                 tb.FontSize = 11;
                 tb.Foreground = ThemeManager.TitleBarFgBrush;
+            }
+
+            // If the outer element is a Border (like panel or colorpicker)
+            if (element is Border border && border == inner)
+            {
+                border.Background = ThemeManager.TitleBarBgBrush;
+                border.BorderBrush = ThemeManager.BorderBrush;
+                border.BorderThickness = new Thickness(1);
             }
         }
 
         private static void HookWidgetEvents(GuiWidget widget)
         {
             var element = widget.Element;
+            var inner = widget.InnerElement;
 
             element.MouseEnter += (s, e) =>
             {
+                if (widget.HoverColor != null)
+                {
+                    if (element is Border border)
+                    {
+                        border.Background = widget.HoverColor;
+                    }
+                    else if (element is Panel panelControl)
+                    {
+                        panelControl.Background = widget.HoverColor;
+                    }
+                    else if (element is Control control)
+                    {
+                        control.Background = widget.HoverColor;
+                    }
+                }
+
                 if (widget.OnHover != null && CurrentScript != null)
                 {
                     PrintLog("INFO", $"[GUI] Hovered: {widget.Name}");
                     CurrentScript.Call(widget.OnHover, DynValue.NewString(widget.Name));
+                }
+            };
+
+            element.MouseLeave += (s, e) =>
+            {
+                if (widget.HoverColor != null)
+                {
+                    var bg = widget.OriginalBackground ?? ThemeManager.TitleBarBgBrush;
+                    if (element is Border border)
+                    {
+                        border.Background = bg;
+                    }
+                    else if (element is Panel panelControl)
+                    {
+                        panelControl.Background = bg;
+                    }
+                    else if (element is Control control)
+                    {
+                        control.Background = bg;
+                    }
                 }
             };
 
@@ -1178,7 +1328,7 @@ namespace FlowEngine.Engine
                 }
                 else
                 {
-                    if (!(element is Button) && !(element is Border && widget.Type == "colorpicker"))
+                    if (!(inner is Button) && !(inner is Border && widget.Type == "colorpicker"))
                     {
                         if (widget.OnClick != null && CurrentScript != null)
                         {
@@ -1189,7 +1339,7 @@ namespace FlowEngine.Engine
                 }
             };
 
-            if (element is Button btn)
+            if (inner is Button btn)
             {
                 btn.Click += (s, e) =>
                 {
@@ -1200,7 +1350,7 @@ namespace FlowEngine.Engine
                     }
                 };
             }
-            else if (element is Slider slider)
+            else if (inner is Slider slider)
             {
                 slider.ValueChanged += (s, e) =>
                 {
@@ -1210,7 +1360,7 @@ namespace FlowEngine.Engine
                     }
                 };
             }
-            else if (element is CheckBox cb)
+            else if (inner is CheckBox cb)
             {
                 cb.Checked += (s, e) =>
                 {
@@ -1227,7 +1377,7 @@ namespace FlowEngine.Engine
                     }
                 };
             }
-            else if (element is RadioButton rb)
+            else if (inner is RadioButton rb)
             {
                 rb.Checked += (s, e) =>
                 {
@@ -1244,7 +1394,7 @@ namespace FlowEngine.Engine
                     }
                 };
             }
-            else if (element is ComboBox combo)
+            else if (inner is ComboBox combo)
             {
                 combo.SelectionChanged += (s, e) =>
                 {
@@ -1255,7 +1405,7 @@ namespace FlowEngine.Engine
                     }
                 };
             }
-            else if (element is TextBox tb)
+            else if (inner is TextBox tb)
             {
                 tb.TextChanged += (s, e) =>
                 {
@@ -1265,7 +1415,7 @@ namespace FlowEngine.Engine
                     }
                 };
             }
-            else if (element is Border colorBorder && widget.Type == "colorpicker")
+            else if (inner is Border colorBorder && widget.Type == "colorpicker")
             {
                 colorBorder.MouseDown += (s, e) =>
                 {
@@ -1530,8 +1680,25 @@ namespace FlowEngine.Engine
                 canvas.Children.Add(titleBorder);
             }
 
+            string plotName = string.Empty;
+            GuiWidget? plotWidget = null;
+            lock (_lock)
+            {
+                foreach (var pair in _widgets)
+                {
+                    if (pair.Value.Element == canvas || pair.Value.InnerElement == canvas)
+                    {
+                        plotName = pair.Key;
+                        plotWidget = pair.Value;
+                        break;
+                    }
+                }
+            }
+
             double plotHeight = height - topMargin;
             if (plotHeight <= 0) plotHeight = 1;
+
+            double borderRadius = plotWidget?.BorderRadius ?? 0.0;
 
             var bg = new Border
             {
@@ -1539,24 +1706,12 @@ namespace FlowEngine.Engine
                 Height = plotHeight,
                 Background = new SolidColorBrush(Color.FromArgb(20, 255, 255, 255)),
                 BorderBrush = ThemeManager.BorderBrush,
-                BorderThickness = new Thickness(1)
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(borderRadius)
             };
             Canvas.SetLeft(bg, 0);
             Canvas.SetTop(bg, topMargin);
             canvas.Children.Add(bg);
-
-            string plotName = string.Empty;
-            lock (_lock)
-            {
-                foreach (var pair in _widgets)
-                {
-                    if (pair.Value.Element == canvas)
-                    {
-                        plotName = pair.Key;
-                        break;
-                    }
-                }
-            }
 
             var lines = GetChildPlotLines(plotName);
             var activeSeries = new List<SeriesPoints>();
@@ -2056,8 +2211,25 @@ namespace FlowEngine.Engine
                 canvas.Children.Add(titleBorder);
             }
 
+            string plotName = string.Empty;
+            GuiWidget? plotWidget = null;
+            lock (_lock)
+            {
+                foreach (var pair in _widgets)
+                {
+                    if (pair.Value.Element == canvas || pair.Value.InnerElement == canvas)
+                    {
+                        plotName = pair.Key;
+                        plotWidget = pair.Value;
+                        break;
+                    }
+                }
+            }
+
             double plotHeight = height - topMargin;
             if (plotHeight <= 0) plotHeight = 1;
+
+            double borderRadius = plotWidget?.BorderRadius ?? 0.0;
 
             var bg = new Border
             {
@@ -2065,24 +2237,12 @@ namespace FlowEngine.Engine
                 Height = plotHeight,
                 Background = new SolidColorBrush(Color.FromArgb(20, 255, 255, 255)),
                 BorderBrush = ThemeManager.BorderBrush,
-                BorderThickness = new Thickness(1)
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(borderRadius)
             };
             Canvas.SetLeft(bg, 0);
             Canvas.SetTop(bg, topMargin);
             canvas.Children.Add(bg);
-
-            string plotName = string.Empty;
-            lock (_lock)
-            {
-                foreach (var pair in _widgets)
-                {
-                    if (pair.Value.Element == canvas)
-                    {
-                        plotName = pair.Key;
-                        break;
-                    }
-                }
-            }
 
             var lines = GetChildPlotLines(plotName);
             var activeSeries3D = new List<SeriesPoints3D>();
