@@ -119,6 +119,57 @@ function show_gui(src : table)
     gui.config.set("progStatus##pg", "progress", "size", {210, 18})
     gui.config.set("progStatus##pg", "progress", "data", 35)
 
+    -- RadioButton Controls (Mutually exclusive plot styling)
+    gui.widget.create("lblStyle##lb", "label", "ctrlPanel##pn")
+    gui.config.set("lblStyle##lb", "label", "pos", {10, 285})
+    gui.config.set("lblStyle##lb", "label", "label", "Select Series Plot Style:")
+
+    gui.widget.create("Line Style##rb", "radiobutton", "ctrlPanel##pn")
+    gui.config.set("Line Style##rb", "radiobutton", "pos", {10, 305})
+    gui.config.set("Line Style##rb", "radiobutton", "data", true)
+
+    gui.widget.create("Scatter Style##rb", "radiobutton", "ctrlPanel##pn")
+    gui.config.set("Scatter Style##rb", "radiobutton", "pos", {110, 305})
+
+    gui.widget.create("Bar Style##rb", "radiobutton", "ctrlPanel##pn")
+    gui.config.set("Bar Style##rb", "radiobutton", "pos", {10, 327})
+
+    -- Style selection callbacks
+    gui.config.set("Line Style##rb", "radiobutton", "onchanged", function(checked)
+        if checked then
+            gui.config.set("Sensor A##ln", "plotline", "plot_type", "line")
+            gui.config.set("Threshold##ln", "plotline", "plot_type", "line")
+            log.info("Plot style: Line")
+        end
+    end)
+    gui.config.set("Scatter Style##rb", "radiobutton", "onchanged", function(checked)
+        if checked then
+            gui.config.set("Sensor A##ln", "plotline", "plot_type", "scatter")
+            gui.config.set("Threshold##ln", "plotline", "plot_type", "scatter")
+            log.info("Plot style: Scatter")
+        end
+    end)
+    gui.config.set("Bar Style##rb", "radiobutton", "onchanged", function(checked)
+        if checked then
+            gui.config.set("Sensor A##ln", "plotline", "plot_type", "bar")
+            gui.config.set("Threshold##ln", "plotline", "plot_type", "bar")
+            log.info("Plot style: Bar Chart")
+        end
+    end)
+
+    -- TextArea Control (Multi-line input log notes)
+    gui.widget.create("lblNotes##lb", "label", "ctrlPanel##pn")
+    gui.config.set("lblNotes##lb", "label", "pos", {10, 357})
+    gui.config.set("lblNotes##lb", "label", "label", "Telemetry Notes:")
+
+    gui.widget.create("notesArea##txt", "textarea", "ctrlPanel##pn")
+    gui.config.set("notesArea##txt", "textarea", "pos", {10, 377})
+    gui.config.set("notesArea##txt", "textarea", "size", {210, 45})
+    gui.config.set("notesArea##txt", "textarea", "data", "Enter dashboard notes here...\n[Session Initialized]")
+    gui.config.set("notesArea##txt", "textarea", "onchanged", function(text)
+        log.info("User notes updated: " .. text)
+    end)
+
     -- =========================================================================
     -- 5. Right Visualizations Panel (Plots column - width 495, height 430)
     -- =========================================================================

@@ -32,6 +32,7 @@ namespace FlowEngine.Engine
         public List<List<double>> Plot3DData { get; set; } = new List<List<double>>();
         public string Legend { get; set; } = string.Empty;
         public Brush? CustomColor { get; set; }
+        public string PlotType { get; set; } = "line";
     }
 
     public class GuiDialog
@@ -393,6 +394,21 @@ namespace FlowEngine.Engine
                             element = new FrameworkElement();
                             break;
 
+                        case "radiobutton":
+                            element = new RadioButton { Content = displayName, GroupName = parent };
+                            break;
+
+                        case "textarea":
+                            element = new TextBox
+                            {
+                                AcceptsReturn = true,
+                                TextWrapping = TextWrapping.Wrap,
+                                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                                Width = 150,
+                                Height = 60
+                            };
+                            break;
+
                         default:
                             return;
                     }
@@ -421,6 +437,12 @@ namespace FlowEngine.Engine
                     if (parentDialog != null)
                     {
                         parentDialog.Widgets[name] = widget;
+                    }
+
+                    if (widget.Type == "plotline" && parentWidget != null)
+                    {
+                        if (parentWidget.Type == "plot2d" && parentCanvas is Canvas canvas2d) RenderPlot2D(canvas2d);
+                        else if (parentWidget.Type == "plot3d" && parentCanvas is Canvas canvas3d) RenderPlot3D(canvas3d);
                     }
 
                     if (parentWidget != null && parentWidget.Type == "panel" && parentWidget.IsHorizontal)
@@ -555,6 +577,22 @@ namespace FlowEngine.Engine
                         }
                         break;
 
+                    case "plot_type":
+                        if (widget.Type == "plotline")
+                        {
+                            widget.PlotType = value.CastToString() ?? "line";
+                            GuiWidget? parentWidget = null;
+                            lock (_lock)
+                            {
+                                _widgets.TryGetValue(widget.ParentName, out parentWidget);
+                            }
+                            if (parentWidget != null && parentWidget.Element is Canvas parentCanvas)
+                            {
+                                if (parentWidget.Type == "plot2d") RenderPlot2D(parentCanvas);
+                            }
+                        }
+                        break;
+
                     case "pos":
                         var pos = ParsePos(value);
                         if (pos != null)
@@ -623,6 +661,7 @@ namespace FlowEngine.Engine
                             if (widget.Element is Button btn) btn.Content = displayLabel;
                             else if (widget.Element is TextBlock textBlock) textBlock.Text = displayLabel;
                             else if (widget.Element is CheckBox cb) cb.Content = displayLabel;
+                            else if (widget.Element is RadioButton rb) rb.Content = displayLabel;
                         }
                         break;
 
@@ -666,6 +705,10 @@ namespace FlowEngine.Engine
                         else if (widget.Element is CheckBox checkBox)
                         {
                             checkBox.IsChecked = value.Boolean;
+                        }
+                        else if (widget.Element is RadioButton rbVal)
+                        {
+                            rbVal.IsChecked = value.Boolean;
                         }
                         else if (widget.Element is ComboBox com)
                         {
@@ -906,6 +949,23 @@ namespace FlowEngine.Engine
                     }
                 };
             }
+            else if (element is RadioButton rb)
+            {
+                rb.Checked += (s, e) =>
+                {
+                    if (widget.OnChanged != null && CurrentScript != null)
+                    {
+                        CurrentScript.Call(widget.OnChanged, DynValue.NewBoolean(true));
+                    }
+                };
+                rb.Unchecked += (s, e) =>
+                {
+                    if (widget.OnChanged != null && CurrentScript != null)
+                    {
+                        CurrentScript.Call(widget.OnChanged, DynValue.NewBoolean(false));
+                    }
+                };
+            }
             else if (element is ComboBox combo)
             {
                 combo.SelectionChanged += (s, e) =>
@@ -1019,6 +1079,8 @@ namespace FlowEngine.Engine
                         case "textinput": childWidth = 100; break;
                         case "progress": childWidth = 120; break;
                         case "colorpicker": childWidth = 40; break;
+                        case "radiobutton": childWidth = 120; break;
+                        case "textarea": childWidth = 150; break;
                         case "plot2d": childWidth = 200; break;
                         case "plot3d": childWidth = 200; break;
                         case "image": childWidth = 120; break;
@@ -1197,18 +1259,17 @@ namespace FlowEngine.Engine
             List<List<double>> datasets = new List<List<double>>();
             List<string> legends = new List<string>();
             List<Brush> colors = new List<Brush>();
+            List<string> plotTypes = new List<string>();
 
             if (lines.Count > 0)
             {
                 for (int idx = 0; idx < lines.Count; idx++)
                 {
                     var lineWidget = lines[idx];
-                    if (lineWidget.Plot2DData.Count > 0)
-                    {
-                        datasets.Add(lineWidget.Plot2DData);
-                        legends.Add(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : GetDisplayName(lineWidget.Name));
-                        colors.Add(lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length]);
-                    }
+                    datasets.Add(lineWidget.Plot2DData);
+                    legends.Add(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : GetDisplayName(lineWidget.Name));
+                    colors.Add(lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length]);
+                    plotTypes.Add(lineWidget.PlotType);
                 }
             }
             else
@@ -1218,6 +1279,7 @@ namespace FlowEngine.Engine
                     datasets.Add(plotState.Data);
                     legends.Add(plotState.Legend);
                     colors.Add(ThemeManager.AccentBrush);
+                    plotTypes.Add("line");
                 }
             }
 
@@ -1225,13 +1287,21 @@ namespace FlowEngine.Engine
 
             double min = double.MaxValue;
             double max = double.MinValue;
+            bool hasData = false;
             foreach (var dataset in datasets)
             {
+                if (dataset.Count == 0) continue;
+                hasData = true;
                 foreach (var val in dataset)
                 {
                     if (val < min) min = val;
                     if (val > max) max = val;
                 }
+            }
+            if (!hasData)
+            {
+                min = 0;
+                max = 1;
             }
             double range = max - min;
             if (range == 0) range = 1;
@@ -1240,21 +1310,67 @@ namespace FlowEngine.Engine
             {
                 var dataset = datasets[d];
                 var brush = colors[d];
+                string type = plotTypes[d];
 
-                var polyline = new Polyline
-                {
-                    Stroke = brush,
-                    StrokeThickness = 2
-                };
+                if (dataset.Count == 0) continue;
 
-                for (int i = 0; i < dataset.Count; i++)
+                if (type == "scatter")
                 {
-                    double x = width * i / Math.Max(1, dataset.Count - 1);
-                    double y = height - (height * (dataset[i] - min) / range);
-                    polyline.Points.Add(new Point(x, y));
+                    for (int i = 0; i < dataset.Count; i++)
+                    {
+                        double x = width * i / Math.Max(1, dataset.Count - 1);
+                        double y = height - (height * (dataset[i] - min) / range);
+                        
+                        var dot = new System.Windows.Shapes.Ellipse
+                        {
+                            Width = 6,
+                            Height = 6,
+                            Fill = brush,
+                            Margin = new Thickness(x - 3, y - 3, 0, 0)
+                        };
+                        canvas.Children.Add(dot);
+                    }
                 }
+                else if (type == "bar")
+                {
+                    double barWidth = (width / Math.Max(1, dataset.Count)) * 0.6;
+                    for (int i = 0; i < dataset.Count; i++)
+                    {
+                        double x = width * i / Math.Max(1, dataset.Count - 1) - barWidth / 2.0;
+                        if (x < 0) x = 0;
+                        double valY = height - (height * (dataset[i] - min) / range);
+                        double barHeight = height - valY;
+                        if (barHeight <= 0) barHeight = 1;
 
-                canvas.Children.Add(polyline);
+                        var rect = new System.Windows.Shapes.Rectangle
+                        {
+                            Width = barWidth,
+                            Height = barHeight,
+                            Fill = brush,
+                            Opacity = 0.85
+                        };
+                        Canvas.SetLeft(rect, x);
+                        Canvas.SetTop(rect, valY);
+                        canvas.Children.Add(rect);
+                    }
+                }
+                else
+                {
+                    var polyline = new Polyline
+                    {
+                        Stroke = brush,
+                        StrokeThickness = 2
+                    };
+
+                    for (int i = 0; i < dataset.Count; i++)
+                    {
+                        double x = width * i / Math.Max(1, dataset.Count - 1);
+                        double y = height - (height * (dataset[i] - min) / range);
+                        polyline.Points.Add(new Point(x, y));
+                    }
+
+                    canvas.Children.Add(polyline);
+                }
             }
 
             bool hasAnyLegend = legends.Any(l => !string.IsNullOrEmpty(l));
@@ -1403,12 +1519,9 @@ namespace FlowEngine.Engine
                 for (int idx = 0; idx < lines.Count; idx++)
                 {
                     var lineWidget = lines[idx];
-                    if (lineWidget.Plot3DData.Count > 0 && lineWidget.Plot3DData[0].Count > 0)
-                    {
-                        datasets.Add(lineWidget.Plot3DData);
-                        legends.Add(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : GetDisplayName(lineWidget.Name));
-                        colors.Add(lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length]);
-                    }
+                    datasets.Add(lineWidget.Plot3DData);
+                    legends.Add(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : GetDisplayName(lineWidget.Name));
+                    colors.Add(lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length]);
                 }
             }
             else
@@ -1425,8 +1538,11 @@ namespace FlowEngine.Engine
 
             double minZ = double.MaxValue;
             double maxZ = double.MinValue;
+            bool hasData = false;
             foreach (var grid in datasets)
             {
+                if (grid.Count == 0 || grid[0].Count == 0) continue;
+                hasData = true;
                 foreach (var row in grid)
                 {
                     foreach (var val in row)
@@ -1435,6 +1551,11 @@ namespace FlowEngine.Engine
                         if (val > maxZ) maxZ = val;
                     }
                 }
+            }
+            if (!hasData)
+            {
+                minZ = 0;
+                maxZ = 1;
             }
             double rangeZ = maxZ - minZ;
             if (rangeZ == 0) rangeZ = 1;
@@ -1450,6 +1571,9 @@ namespace FlowEngine.Engine
             {
                 var grid = datasets[d];
                 var strokeBrush = colors[d];
+
+                if (grid.Count == 0 || grid[0].Count == 0) continue;
+
                 int rows = grid.Count;
                 int cols = grid[0].Count;
 
