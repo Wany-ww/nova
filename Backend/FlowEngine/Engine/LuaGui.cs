@@ -809,6 +809,9 @@ namespace FlowEngine.Engine
                     case "tick_interval_x":
                     case "tick_interval_y":
                     case "tick_interval_z":
+                    case "snaps_orientation":
+                    case "snaps_text_color":
+                    case "snaps_background_color":
                         if (widget.Type == "plot2d" && widget.InnerElement is Canvas r2d)
                         {
                             if (!(r2d.Tag is Plot2DState s2r)) { s2r = new Plot2DState(); r2d.Tag = s2r; }
