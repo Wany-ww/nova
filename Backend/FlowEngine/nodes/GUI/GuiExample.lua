@@ -258,6 +258,10 @@ function show_gui(src : table)
     gui.config.set("plot3dGraph##p3", "plot3d", "tick_interval_x", 1.0)
     gui.config.set("plot3dGraph##p3", "plot3d", "tick_interval_y", 1.0)
     gui.config.set("plot3dGraph##p3", "plot3d", "tick_interval_z", 25.0)
+    gui.config.set("plot3dGraph##p3", "plot3d", "snaps_orientation", "vertical")
+    gui.config.set("plot3dGraph##p3", "plot3d", "snaps_text_color", {137, 180, 250, 255})
+    gui.config.set("plot3dGraph##p3", "plot3d", "snaps_background_color", {45, 45, 70, 200})
+
     
     local peakGrid1 = {
         {10, 12, 15, 12, 10},

@@ -760,6 +760,9 @@ namespace FlowEngine.Engine
                             else if (k == "tick_interval_x") s3r.TickIntervalX = value.Type == DataType.Nil ? (double?)null : value.Number;
                             else if (k == "tick_interval_y") s3r.TickIntervalY = value.Type == DataType.Nil ? (double?)null : value.Number;
                             else if (k == "tick_interval_z") s3r.TickIntervalZ = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "snaps_orientation") s3r.SnapsOrientation = value.CastToString() ?? "horizontal";
+                            else if (k == "snaps_text_color") s3r.SnapsTextColor = ParseColor(value);
+                            else if (k == "snaps_background_color") s3r.SnapsBgColor = ParseColor(value);
                             RenderPlot3D(r3d);
                         }
                         break;
@@ -2220,6 +2223,19 @@ namespace FlowEngine.Engine
             double cosY = Math.Cos(radY);
             double sinY = Math.Sin(radY);
 
+            // Create a nested canvas container specifically for the 3D plot graph elements
+            // which clips all graph items precisely to the visual plot area (excluding title)
+            var graphContainer = new Canvas
+            {
+                Width = width,
+                Height = plotHeight,
+                ClipToBounds = true,
+                Clip = new RectangleGeometry(new Rect(0, 0, width, plotHeight))
+            };
+            Canvas.SetLeft(graphContainer, 0);
+            Canvas.SetTop(graphContainer, topMargin);
+            canvas.Children.Add(graphContainer);
+
             Point ProjectCoord(double xVal, double yVal, double zVal)
             {
                 double x = (xVal - minX) / rangeX - 0.5;
@@ -2234,7 +2250,7 @@ namespace FlowEngine.Engine
 
                 double scale = width * 0.7 * state.Zoom;
                 double screenX = width / 2.0 + x2 * scale;
-                double centerY = topMargin + plotHeight / 2.0;
+                double centerY = plotHeight / 2.0; // center relative to graphContainer
                 double screenY = centerY + y2 * scale - z1 * (scale * 0.5);
 
                 return new Point(screenX, screenY);
@@ -2258,7 +2274,7 @@ namespace FlowEngine.Engine
                             Stroke = state.GridColorX ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
                             StrokeThickness = state.GridThicknessX
                         };
-                        canvas.Children.Add(gridLine);
+                        graphContainer.Children.Add(gridLine);
                     }
                 }
                 else if (state.GridIntervalX > 0)
@@ -2276,7 +2292,7 @@ namespace FlowEngine.Engine
                             Stroke = state.GridColorX ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
                             StrokeThickness = state.GridThicknessX
                         };
-                        canvas.Children.Add(gridLine);
+                        graphContainer.Children.Add(gridLine);
                     }
                 }
             }
@@ -2299,7 +2315,7 @@ namespace FlowEngine.Engine
                             Stroke = state.GridColorY ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
                             StrokeThickness = state.GridThicknessY
                         };
-                        canvas.Children.Add(gridLine);
+                        graphContainer.Children.Add(gridLine);
                     }
                 }
                 else if (state.GridIntervalY > 0)
@@ -2317,7 +2333,7 @@ namespace FlowEngine.Engine
                             Stroke = state.GridColorY ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
                             StrokeThickness = state.GridThicknessY
                         };
-                        canvas.Children.Add(gridLine);
+                        graphContainer.Children.Add(gridLine);
                     }
                 }
             }
@@ -2344,7 +2360,7 @@ namespace FlowEngine.Engine
                         Stroke = state.GridColorZ ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
                         StrokeThickness = state.GridThicknessZ
                     };
-                    canvas.Children.Add(gridLine);
+                    graphContainer.Children.Add(gridLine);
                 }
 
                 var cageColor = state.GridColorZ ?? new SolidColorBrush(Color.FromArgb(30, 255, 255, 255));
@@ -2360,10 +2376,10 @@ namespace FlowEngine.Engine
                         var p3 = ProjectCoord(maxX, maxY, val);
                         var p4 = ProjectCoord(minX, maxY, val);
 
-                        canvas.Children.Add(new Line { X1 = p1.X, Y1 = p1.Y, X2 = p2.X, Y2 = p2.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
-                        canvas.Children.Add(new Line { X1 = p2.X, Y1 = p2.Y, X2 = p3.X, Y2 = p3.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
-                        canvas.Children.Add(new Line { X1 = p3.X, Y1 = p3.Y, X2 = p4.X, Y2 = p4.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
-                        canvas.Children.Add(new Line { X1 = p4.X, Y1 = p4.Y, X2 = p1.X, Y2 = p1.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        graphContainer.Children.Add(new Line { X1 = p1.X, Y1 = p1.Y, X2 = p2.X, Y2 = p2.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        graphContainer.Children.Add(new Line { X1 = p2.X, Y1 = p2.Y, X2 = p3.X, Y2 = p3.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        graphContainer.Children.Add(new Line { X1 = p3.X, Y1 = p3.Y, X2 = p4.X, Y2 = p4.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        graphContainer.Children.Add(new Line { X1 = p4.X, Y1 = p4.Y, X2 = p1.X, Y2 = p1.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
                     }
                 }
                 else if (state.GridIntervalZ > 0)
@@ -2377,10 +2393,10 @@ namespace FlowEngine.Engine
                         var p3 = ProjectCoord(maxX, maxY, zVal);
                         var p4 = ProjectCoord(minX, maxY, zVal);
 
-                        canvas.Children.Add(new Line { X1 = p1.X, Y1 = p1.Y, X2 = p2.X, Y2 = p2.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
-                        canvas.Children.Add(new Line { X1 = p2.X, Y1 = p2.Y, X2 = p3.X, Y2 = p3.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
-                        canvas.Children.Add(new Line { X1 = p3.X, Y1 = p3.Y, X2 = p4.X, Y2 = p4.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
-                        canvas.Children.Add(new Line { X1 = p4.X, Y1 = p4.Y, X2 = p1.X, Y2 = p1.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        graphContainer.Children.Add(new Line { X1 = p1.X, Y1 = p1.Y, X2 = p2.X, Y2 = p2.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        graphContainer.Children.Add(new Line { X1 = p2.X, Y1 = p2.Y, X2 = p3.X, Y2 = p3.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        graphContainer.Children.Add(new Line { X1 = p3.X, Y1 = p3.Y, X2 = p4.X, Y2 = p4.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        graphContainer.Children.Add(new Line { X1 = p4.X, Y1 = p4.Y, X2 = p1.X, Y2 = p1.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
                     }
                 }
             }
@@ -2408,7 +2424,7 @@ namespace FlowEngine.Engine
                                     Fill = markerColor,
                                     Margin = new Thickness(pt.X - r, pt.Y - r, 0, 0)
                                 };
-                                canvas.Children.Add(sq);
+                                graphContainer.Children.Add(sq);
                             }
                             else if (markerStyle == "triangle")
                             {
@@ -2422,7 +2438,7 @@ namespace FlowEngine.Engine
                                     },
                                     Fill = markerColor
                                 };
-                                canvas.Children.Add(tri);
+                                graphContainer.Children.Add(tri);
                             }
                             else
                             {
@@ -2432,7 +2448,7 @@ namespace FlowEngine.Engine
                                     Fill = markerColor,
                                     Margin = new Thickness(pt.X - r, pt.Y - r, 0, 0)
                                 };
-                                canvas.Children.Add(dot);
+                                graphContainer.Children.Add(dot);
                             }
                         }
                     }
@@ -2459,7 +2475,7 @@ namespace FlowEngine.Engine
                                 StrokeThickness = thickness,
                                 StrokeDashArray = dashArray
                             };
-                            canvas.Children.Add(line);
+                            graphContainer.Children.Add(line);
                         }
                     }
                 }
@@ -2481,7 +2497,7 @@ namespace FlowEngine.Engine
                                 Stroke = s.Brush,
                                 StrokeThickness = 1
                             };
-                            canvas.Children.Add(line);
+                            graphContainer.Children.Add(line);
                         }
                     }
 
@@ -2498,7 +2514,7 @@ namespace FlowEngine.Engine
                                 Stroke = s.Brush,
                                 StrokeThickness = 1
                             };
-                            canvas.Children.Add(line);
+                            graphContainer.Children.Add(line);
                         }
                     }
                 }
@@ -2601,7 +2617,12 @@ namespace FlowEngine.Engine
             }
 
             // Create view-snapping buttons overlay at the bottom-left of the plot3d canvas
-            var snapPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0) };
+            var snapsIsVertical = state.SnapsOrientation.ToLower() == "vertical";
+            var snapPanel = new StackPanel
+            {
+                Orientation = snapsIsVertical ? Orientation.Vertical : Orientation.Horizontal,
+                Margin = new Thickness(0)
+            };
             string[] views = { "Top", "Bottom", "Front", "Back", "Left", "Right" };
             double[] rotXs = { 0, 0, 0, 180, 90, -90 };
             double[] rotYs = { 90, -90, 0, 0, 0, 0 };
@@ -2614,12 +2635,12 @@ namespace FlowEngine.Engine
 
                 var btnBorder = new Border
                 {
-                    Background = new SolidColorBrush(Color.FromArgb(200, 30, 30, 46)),
+                    Background = state.SnapsBgColor ?? new SolidColorBrush(Color.FromArgb(200, 30, 30, 46)),
                     BorderBrush = ThemeManager.BorderBrush,
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(2),
                     Padding = new Thickness(5, 2, 5, 2),
-                    Margin = new Thickness(2, 0, 2, 0),
+                    Margin = snapsIsVertical ? new Thickness(0, 2, 0, 2) : new Thickness(2, 0, 2, 0),
                     Cursor = Cursors.Hand
                 };
 
@@ -2627,7 +2648,7 @@ namespace FlowEngine.Engine
                 {
                     Text = viewName,
                     FontSize = 9,
-                    Foreground = ThemeManager.TitleBarFgBrush,
+                    Foreground = state.SnapsTextColor ?? ThemeManager.TitleBarFgBrush,
                     FontFamily = new FontFamily("Inter, Segoe UI"),
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center
@@ -2641,8 +2662,8 @@ namespace FlowEngine.Engine
                 };
                 btnBorder.MouseLeave += (s, e) =>
                 {
-                    btnBorder.Background = new SolidColorBrush(Color.FromArgb(200, 30, 30, 46));
-                    btnText.Foreground = ThemeManager.TitleBarFgBrush;
+                    btnBorder.Background = state.SnapsBgColor ?? new SolidColorBrush(Color.FromArgb(200, 30, 30, 46));
+                    btnText.Foreground = state.SnapsTextColor ?? ThemeManager.TitleBarFgBrush;
                 };
 
                 btnBorder.MouseDown += (s, e) =>
@@ -2833,6 +2854,11 @@ namespace FlowEngine.Engine
         public double? TickIntervalX { get; set; }
         public double? TickIntervalY { get; set; }
         public double? TickIntervalZ { get; set; }
+
+        // Snap buttons styling properties
+        public string SnapsOrientation { get; set; } = "horizontal";
+        public Brush? SnapsTextColor { get; set; }
+        public Brush? SnapsBgColor { get; set; }
     }
 
     public class SeriesPoints
