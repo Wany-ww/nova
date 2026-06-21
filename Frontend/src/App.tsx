@@ -1310,6 +1310,111 @@ const API_DOCS: ApiDoc[] = [
     ],
     outputs: [],
     example: "-- 1. Create and customize a dialog with custom background\nlocal dlg = \"MyDashboard##1\"\ngui.dialog.create(dlg)\ngui.config.set(dlg, \"dialog\", \"size\", {500, 400})\ngui.config.set(dlg, \"dialog\", \"background_color\", {30, 30, 46, 255})\ngui.dialog.show(dlg, true)\n\n-- 2. Create parent panel\ngui.widget.create(\"panel1##pn\", \"panel\", dlg)\ngui.config.set(\"panel1##pn\", \"panel\", \"pos\", {10, 10})\ngui.config.set(\"panel1##pn\", \"panel\", \"size\", {480, 380})\n\n-- 3. Setup bidirectional slider & textinput sync\ngui.widget.create(\"mySlider##sl\", \"slider\", \"panel1##pn\")\ngui.config.set(\"mySlider##sl\", \"slider\", \"pos\", {10, 40})\ngui.config.set(\"mySlider##sl\", \"slider\", \"range\", {0, 100})\ngui.config.set(\"mySlider##sl\", \"slider\", \"data\", 50)\n\ngui.widget.create(\"myInput##txt\", \"textinput\", \"panel1##pn\")\ngui.config.set(\"myInput##txt\", \"textinput\", \"pos\", {150, 40})\ngui.config.set(\"myInput##txt\", \"textinput\", \"data\", \"50\")\n\ngui.config.set(\"mySlider##sl\", \"slider\", \"onchanged\", function(val)\n    gui.config.set(\"myInput##txt\", \"textinput\", \"data\", tostring(val))\nend)\n\ngui.config.set(\"myInput##txt\", \"textinput\", \"onchanged\", function(val)\n    local num = tonumber(val)\n    if num and num >= 0 and num <= 100 then\n        gui.config.set(\"mySlider##sl\", \"slider\", \"data\", num)\n    end\nend)\n\n-- 4. ColorPicker changing dialog background in real-time\ngui.widget.create(\"myPicker##cp\", \"colorpicker\", \"panel1##pn\")\ngui.config.set(\"myPicker##cp\", \"colorpicker\", \"pos\", {10, 80})\ngui.config.set(\"myPicker##cp\", \"colorpicker\", \"onchanged\", function(color)\n    gui.config.set(dlg, \"dialog\", \"background_color\", color)\nend)"
+  },
+  {
+    name: "camera.create",
+    category: "Camera",
+    signature: "camera.create(name: string, type: string, index: number): CameraObject",
+    description: "Creates and returns a Camera control instance for hardware grabbers or image simulators.",
+    inputs: [
+      { name: "name", type: "string", desc: "Camera driver name ('dc' for dclib, 'dg' for dglib, 'usb' for USB, 'sim' for simulator)." },
+      { name: "type", type: "string", desc: "Hardware interface type (e.g. 'pci', 'usb'). Only applies to dglib." },
+      { name: "index", type: "number", desc: "Camera board index or USB device index (0-based)." }
+    ],
+    outputs: [{ type: "CameraObject", desc: "The camera control instance." }],
+    example: "-- Create and initialize a simulated camera\nlocal cam = camera.create(\"sim\", \"\", 0)\ncam:init()"
+  },
+  {
+    name: "cam:init",
+    category: "Camera",
+    signature: "cam:init()",
+    description: "Initializes the camera hardware or opens the target device connection.",
+    inputs: [],
+    outputs: [],
+    example: "local cam = camera.create(\"sim\", \"\", 0)\ncam:init()"
+  },
+  {
+    name: "cam:load_script",
+    category: "Camera",
+    signature: "cam:load_script(filename: string, section: number): boolean",
+    description: "Loads a text configuration script and executes register commands matching a specific section (1-based index). Only applies to 'dc' and 'dg' cameras.",
+    inputs: [
+      { name: "filename", type: "string", desc: "Name of the script file inside the 'Reference/' folder." },
+      { name: "section", type: "number", desc: "The target section index to run (1-based)." }
+    ],
+    outputs: [{ type: "boolean", desc: "True if script loaded and executed successfully; otherwise false." }],
+    example: "local cam = camera.create(\"dg\", \"pci\", 0)\ncam:init()\nlocal ok = cam:load_script(\"CAMERA_INIT_EXAMPLE.txt\", 1)"
+  },
+  {
+    name: "cam:load_image",
+    category: "Camera",
+    signature: "cam:load_image(path: string, width: number, height: number, bit_depth: number): boolean",
+    description: "Loads a static image or a directory of frames for the image simulator.",
+    inputs: [
+      { name: "path", type: "string", desc: "Image file or directory path (relative to Reference/)." },
+      { name: "width", type: "number", desc: "Frame width in pixels." },
+      { name: "height", type: "number", desc: "Frame height in pixels." },
+      { name: "bit_depth", type: "number", desc: "Color bit depth (e.g. 8 for 8-bit, 10 for 10-bit)." }
+    ],
+    outputs: [{ type: "boolean", desc: "True if image loaded successfully; otherwise false." }],
+    example: "local cam = camera.create(\"sim\", \"\", 0)\ncam:init()\nlocal ok = cam:load_image(\"test.jpg\", 640, 480, 8)"
+  },
+  {
+    name: "cam:set_bayer",
+    category: "Camera",
+    signature: "cam:set_bayer(bayer_code: number)",
+    description: "Configures the Bayer demosaicing pattern code for color conversion.",
+    inputs: [{ name: "bayer_code", type: "number", desc: "Bayer code: 0=BayerBG2RGB, 1=BayerGB2RGB, 2=BayerGR2RGB, 3=BayerRG2RGB." }],
+    outputs: [],
+    example: "local cam = camera.create(\"sim\", \"\", 0)\ncam:set_bayer(1)"
+  },
+  {
+    name: "cam:get_bayer",
+    category: "Camera",
+    signature: "cam:get_bayer(): number",
+    description: "Gets the current Bayer demosaicing pattern code.",
+    inputs: [],
+    outputs: [{ type: "number", desc: "The current Bayer pattern code (0-3)." }],
+    example: "local cam = camera.create(\"sim\", \"\", 0)\nlocal bayer = cam:get_bayer()"
+  },
+  {
+    name: "cam:run",
+    category: "Camera",
+    signature: "cam:run()",
+    description: "Starts the real-time frame acquisition thread and opens the floating viewer window.",
+    inputs: [],
+    outputs: [],
+    example: "local cam = camera.create(\"sim\", \"\", 0)\ncam:init()\ncam:load_image(\"test.jpg\", 640, 480, 8)\ncam:run()"
+  },
+  {
+    name: "cam:get_frame",
+    category: "Camera",
+    signature: "cam:get_frame(type: string, count: number): table",
+    description: "Retrieves the last enqueued captured frames as a table of `cv.Mat` objects.",
+    inputs: [
+      { name: "type", type: "string", desc: "Frame type ('rgb', 'raw8', 'raw16'). Defaults to 'rgb'." },
+      { name: "count", type: "number", desc: "Maximum number of frames to retrieve." }
+    ],
+    outputs: [{ type: "table", desc: "1-based array of cv.Mat wrapper objects." }],
+    example: "local cam = camera.create(\"sim\", \"\", 0)\ncam:init()\ncam:load_image(\"test.jpg\", 640, 480, 8)\ncam:run()\ntime.sleep.ms(100)\nlocal frames = cam:get_frame(\"rgb\", 1)\nif #frames > 0 then\n    log.info(\"Width: \" .. tostring(frames[1].width))\nend"
+  },
+  {
+    name: "cam:stop",
+    category: "Camera",
+    signature: "cam:stop()",
+    description: "Halts the real-time frame acquisition and closes the floating viewer window.",
+    inputs: [],
+    outputs: [],
+    example: "cam:stop()"
+  },
+  {
+    name: "cam:close",
+    category: "Camera",
+    signature: "cam:close()",
+    description: "Closes the camera device connection completely and disposes of all buffers/memory queues.",
+    inputs: [],
+    outputs: [],
+    example: "cam:close()"
   }
 ];
 
@@ -2785,7 +2890,7 @@ export default function App() {
                 minHeight: 0
               }}>
                 <div style={{ padding: '0 16px 8px 16px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Categories</div>
-                {['All', 'Logging', 'Time', 'Global Memory', 'Filesystem', 'Network', 'HTTP', 'JSON', 'System', 'FTP', 'Input', 'Cryptography', 'CSV', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper', 'GUI'].map(cat => (
+                {['All', 'Logging', 'Time', 'Global Memory', 'Filesystem', 'Network', 'HTTP', 'JSON', 'System', 'FTP', 'Input', 'Cryptography', 'CSV', 'OpenCV Core', 'OpenCV Processing', 'OpenCV Drawing', 'Mat Wrapper', 'GUI', 'Camera'].map(cat => (
                   <button
                     key={cat}
                     onClick={() => setSelectedApiCategory(cat)}
