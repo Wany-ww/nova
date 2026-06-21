@@ -699,6 +699,30 @@ namespace FlowEngine.Engine
                         }
                         break;
 
+                    case "legend_background_color":
+                    case "legend_bg_color":
+                        if (widget.Type == "plot2d" && widget.InnerElement is Canvas plotCanvasBg2d)
+                        {
+                            if (!(plotCanvasBg2d.Tag is Plot2DState state2d))
+                            {
+                                state2d = new Plot2DState();
+                                plotCanvasBg2d.Tag = state2d;
+                            }
+                            state2d.LegendBgColor = ParseColor(value);
+                            RenderPlot2D(plotCanvasBg2d);
+                        }
+                        else if (widget.Type == "plot3d" && widget.InnerElement is Canvas plotCanvasBg3d)
+                        {
+                            if (!(plotCanvasBg3d.Tag is Plot3DState state3d))
+                            {
+                                state3d = new Plot3DState();
+                                plotCanvasBg3d.Tag = state3d;
+                            }
+                            state3d.LegendBgColor = ParseColor(value);
+                            RenderPlot3D(plotCanvasBg3d);
+                        }
+                        break;
+
                     case "title":
                     case "title_font_size":
                     case "title_color":
@@ -2106,7 +2130,7 @@ namespace FlowEngine.Engine
 
                 var legendBorder = new Border
                 {
-                    Background = new SolidColorBrush(Color.FromArgb(200, 17, 17, 27)),
+                    Background = plotState.LegendBgColor ?? new SolidColorBrush(Color.FromArgb(200, 17, 17, 27)),
                     BorderBrush = ThemeManager.BorderBrush,
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(3),
@@ -2763,7 +2787,7 @@ namespace FlowEngine.Engine
 
                 var legendBorder = new Border
                 {
-                    Background = new SolidColorBrush(Color.FromArgb(200, 17, 17, 27)),
+                    Background = state.LegendBgColor ?? new SolidColorBrush(Color.FromArgb(200, 17, 17, 27)),
                     BorderBrush = ThemeManager.BorderBrush,
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(3),
@@ -2940,6 +2964,7 @@ namespace FlowEngine.Engine
         public List<double> Data { get; set; } = new List<double>();
         public string Legend { get; set; } = string.Empty;
         public Brush? LegendTextColor { get; set; }
+        public Brush? LegendBgColor { get; set; }
         public HashSet<string> DisabledSeries { get; } = new HashSet<string>();
 
         // Custom Title properties
@@ -2978,6 +3003,7 @@ namespace FlowEngine.Engine
         public double Zoom { get; set; } = 1.0;
         public string Legend { get; set; } = string.Empty;
         public Brush? LegendTextColor { get; set; }
+        public Brush? LegendBgColor { get; set; }
         public HashSet<string> DisabledSeries { get; } = new HashSet<string>();
 
         // Restores dragging/zoom events register check
