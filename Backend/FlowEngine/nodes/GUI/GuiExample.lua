@@ -135,15 +135,13 @@ function show_gui(src : table)
     gui.config.set("plotGraph##pl", "plot2d", "pos", {10, 30})
     gui.config.set("plotGraph##pl", "plot2d", "size", {475, 160})
 
-    gui.widget.create("lineTelemetry##ln", "plotline", "plotGraph##pl")
-    gui.config.set("lineTelemetry##ln", "plotline", "legend", "Sensor A (Active)")
-    gui.config.set("lineTelemetry##ln", "plotline", "foreground_color", {137, 180, 250, 255})
-    gui.config.set("lineTelemetry##ln", "plotline", "data", {10, 25, 45, 30, 60, 40, 75, 55, 90, 80})
+    gui.widget.create("Sensor A##ln", "plotline", "plotGraph##pl")
+    gui.config.set("Sensor A##ln", "plotline", "foreground_color", {137, 180, 250, 255})
+    gui.config.set("Sensor A##ln", "plotline", "data", {10, 25, 45, 30, 60, 40, 75, 55, 90, 80})
 
-    gui.widget.create("linePrediction##ln", "plotline", "plotGraph##pl")
-    gui.config.set("linePrediction##ln", "plotline", "legend", "Threshold (Predicted)")
-    gui.config.set("linePrediction##ln", "plotline", "foreground_color", {245, 194, 231, 255})
-    gui.config.set("linePrediction##ln", "plotline", "data", {15, 20, 35, 45, 50, 60, 65, 70, 75, 85})
+    gui.widget.create("Threshold##ln", "plotline", "plotGraph##pl")
+    gui.config.set("Threshold##ln", "plotline", "foreground_color", {245, 194, 231, 255})
+    gui.config.set("Threshold##ln", "plotline", "data", {15, 20, 35, 45, 50, 60, 65, 70, 75, 85})
 
     -- Plot3D Control with Legend Config (and Camera rotation + scroll zoom)
     gui.widget.create("lblPlot3d##lb", "label", "visualPanel##pn")
@@ -161,10 +159,9 @@ function show_gui(src : table)
         {12, 20, 35, 20, 12},
         {10, 12, 15, 12, 10}
     }
-    gui.widget.create("surface1##ln", "plotline", "plot3dGraph##p3")
-    gui.config.set("surface1##ln", "plotline", "legend", "Channel Alpha")
-    gui.config.set("surface1##ln", "plotline", "foreground_color", {137, 180, 250, 255})
-    gui.config.set("surface1##ln", "plotline", "data", peakGrid1)
+    gui.widget.create("Channel Alpha##ln", "plotline", "plot3dGraph##p3")
+    gui.config.set("Channel Alpha##ln", "plotline", "foreground_color", {137, 180, 250, 255})
+    gui.config.set("Channel Alpha##ln", "plotline", "data", peakGrid1)
 
     local peakGrid2 = {
         {20, 18, 15, 18, 20},
@@ -173,10 +170,9 @@ function show_gui(src : table)
         {18, 25, 30, 25, 18},
         {20, 18, 15, 18, 20}
     }
-    gui.widget.create("surface2##ln", "plotline", "plot3dGraph##p3")
-    gui.config.set("surface2##ln", "plotline", "legend", "Channel Beta")
-    gui.config.set("surface2##ln", "plotline", "foreground_color", {166, 227, 161, 255})
-    gui.config.set("surface2##ln", "plotline", "data", peakGrid2)
+    gui.widget.create("Channel Beta##ln", "plotline", "plot3dGraph##p3")
+    gui.config.set("Channel Beta##ln", "plotline", "foreground_color", {166, 227, 161, 255})
+    gui.config.set("Channel Beta##ln", "plotline", "data", peakGrid2)
 
     -- =========================================================================
     -- 6. Horizontal Button Bar Panel (demonstrating horizontal arrangement!)
@@ -208,8 +204,8 @@ function show_gui(src : table)
             table.insert(randomPts1, math.random(10, 90))
             table.insert(randomPts2, math.random(15, 85))
         end
-        gui.config.set("lineTelemetry##ln", "plotline", "data", randomPts1)
-        gui.config.set("linePrediction##ln", "plotline", "data", randomPts2)
+        gui.config.set("Sensor A##ln", "plotline", "data", randomPts1)
+        gui.config.set("Threshold##ln", "plotline", "data", randomPts2)
 
         local newGrid1 = {}
         local newGrid2 = {}
@@ -223,16 +219,16 @@ function show_gui(src : table)
             table.insert(newGrid1, row1)
             table.insert(newGrid2, row2)
         end
-        gui.config.set("surface1##ln", "plotline", "data", newGrid1)
-        gui.config.set("surface2##ln", "plotline", "data", newGrid2)
+        gui.config.set("Channel Alpha##ln", "plotline", "data", newGrid1)
+        gui.config.set("Channel Beta##ln", "plotline", "data", newGrid2)
 
         log.info("System configuration successfully applied.")
     end)
 
     gui.config.set("btnReset##btn", "button", "onclick", function()
         gui.config.set("progStatus##pg", "progress", "data", 0)
-        gui.config.set("lineTelemetry##ln", "plotline", "data", {0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
-        gui.config.set("linePrediction##ln", "plotline", "data", {0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+        gui.config.set("Sensor A##ln", "plotline", "data", {0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+        gui.config.set("Threshold##ln", "plotline", "data", {0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
 
         local zeroGrid = {
             {0, 0, 0, 0, 0},
@@ -241,8 +237,8 @@ function show_gui(src : table)
             {0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0}
         }
-        gui.config.set("surface1##ln", "plotline", "data", zeroGrid)
-        gui.config.set("surface2##ln", "plotline", "data", zeroGrid)
+        gui.config.set("Channel Alpha##ln", "plotline", "data", zeroGrid)
+        gui.config.set("Channel Beta##ln", "plotline", "data", zeroGrid)
         log.warn("Statistics reset to baseline.")
     end)
 

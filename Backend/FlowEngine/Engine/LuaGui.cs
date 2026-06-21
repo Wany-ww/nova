@@ -411,7 +411,8 @@ namespace FlowEngine.Engine
                         Element = element,
                         ContainerCanvas = containerCanvas,
                         Position = new Point(0, 0),
-                        Size = new Size(double.IsNaN(element.Width) ? double.NaN : element.Width, double.IsNaN(element.Height) ? double.NaN : element.Height)
+                        Size = new Size(double.IsNaN(element.Width) ? double.NaN : element.Width, double.IsNaN(element.Height) ? double.NaN : element.Height),
+                        Legend = GetDisplayName(name)
                     };
 
                     HookWidgetEvents(widget);
