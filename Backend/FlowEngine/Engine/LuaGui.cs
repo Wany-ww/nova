@@ -698,6 +698,72 @@ namespace FlowEngine.Engine
                         }
                         break;
 
+                    case "range_x":
+                    case "range_y":
+                    case "range_z":
+                    case "range_min_x":
+                    case "range_max_x":
+                    case "range_min_y":
+                    case "range_max_y":
+                    case "range_min_z":
+                    case "range_max_z":
+                    case "tick_interval_x":
+                    case "tick_interval_y":
+                    case "tick_interval_z":
+                        if (widget.Type == "plot2d" && widget.Element is Canvas r2d)
+                        {
+                            if (!(r2d.Tag is Plot2DState s2r)) { s2r = new Plot2DState(); r2d.Tag = s2r; }
+                            var k = key.ToLower();
+                            if (k == "range_x" && value.Type == DataType.Table && value.Table.Length >= 2)
+                            {
+                                s2r.RangeMinX = value.Table.Get(1).Number;
+                                s2r.RangeMaxX = value.Table.Get(2).Number;
+                            }
+                            else if (k == "range_y" && value.Type == DataType.Table && value.Table.Length >= 2)
+                            {
+                                s2r.RangeMinY = value.Table.Get(1).Number;
+                                s2r.RangeMaxY = value.Table.Get(2).Number;
+                            }
+                            else if (k == "range_min_x") s2r.RangeMinX = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "range_max_x") s2r.RangeMaxX = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "range_min_y") s2r.RangeMinY = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "range_max_y") s2r.RangeMaxY = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "tick_interval_x") s2r.TickIntervalX = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "tick_interval_y") s2r.TickIntervalY = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            RenderPlot2D(r2d);
+                        }
+                        else if (widget.Type == "plot3d" && widget.Element is Canvas r3d)
+                        {
+                            if (!(r3d.Tag is Plot3DState s3r)) { s3r = new Plot3DState(); r3d.Tag = s3r; }
+                            var k = key.ToLower();
+                            if (k == "range_x" && value.Type == DataType.Table && value.Table.Length >= 2)
+                            {
+                                s3r.RangeMinX = value.Table.Get(1).Number;
+                                s3r.RangeMaxX = value.Table.Get(2).Number;
+                            }
+                            else if (k == "range_y" && value.Type == DataType.Table && value.Table.Length >= 2)
+                            {
+                                s3r.RangeMinY = value.Table.Get(1).Number;
+                                s3r.RangeMaxY = value.Table.Get(2).Number;
+                            }
+                            else if (k == "range_z" && value.Type == DataType.Table && value.Table.Length >= 2)
+                            {
+                                s3r.RangeMinZ = value.Table.Get(1).Number;
+                                s3r.RangeMaxZ = value.Table.Get(2).Number;
+                            }
+                            else if (k == "range_min_x") s3r.RangeMinX = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "range_max_x") s3r.RangeMaxX = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "range_min_y") s3r.RangeMinY = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "range_max_y") s3r.RangeMaxY = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "range_min_z") s3r.RangeMinZ = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "range_max_z") s3r.RangeMaxZ = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "tick_interval_x") s3r.TickIntervalX = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "tick_interval_y") s3r.TickIntervalY = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            else if (k == "tick_interval_z") s3r.TickIntervalZ = value.Type == DataType.Nil ? (double?)null : value.Number;
+                            RenderPlot3D(r3d);
+                        }
+                        break;
+
                     case "line_color":
                     case "line_thickness":
                     case "line_style":
@@ -1420,7 +1486,13 @@ namespace FlowEngine.Engine
 
         private static void RenderPlot2D(Canvas canvas)
         {
+            double width = canvas.Width;
+            double height = canvas.Height;
+            if (double.IsNaN(width) || width <= 0) width = 200;
+            if (double.IsNaN(height) || height <= 0) height = 150;
+
             canvas.ClipToBounds = true;
+            canvas.Clip = new RectangleGeometry(new Rect(0, 0, width, height));
             canvas.Children.Clear();
 
             if (!(canvas.Tag is Plot2DState plotState))
@@ -1428,11 +1500,6 @@ namespace FlowEngine.Engine
                 plotState = new Plot2DState();
                 canvas.Tag = plotState;
             }
-
-            double width = canvas.Width;
-            double height = canvas.Height;
-            if (double.IsNaN(width) || width <= 0) width = 200;
-            if (double.IsNaN(height) || height <= 0) height = 150;
 
             // Determine topMargin
             double topMargin = 0;
@@ -1474,45 +1541,6 @@ namespace FlowEngine.Engine
             Canvas.SetLeft(bg, 0);
             Canvas.SetTop(bg, topMargin);
             canvas.Children.Add(bg);
-
-            // Draw grid lines
-            if (plotState.GridVisibleY && plotState.GridIntervalY > 0)
-            {
-                int countY = (int)Math.Max(1, plotState.GridIntervalY);
-                for (int i = 1; i < countY; i++)
-                {
-                    double y = topMargin + plotHeight * i / (double)countY;
-                    var gridLine = new Line
-                    {
-                        X1 = 0,
-                        Y1 = y,
-                        X2 = width,
-                        Y2 = y,
-                        Stroke = plotState.GridColorY ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
-                        StrokeThickness = plotState.GridThicknessY
-                    };
-                    canvas.Children.Add(gridLine);
-                }
-            }
-
-            if (plotState.GridVisibleX && plotState.GridIntervalX > 0)
-            {
-                int countX = (int)Math.Max(1, plotState.GridIntervalX);
-                for (int i = 1; i < countX; i++)
-                {
-                    double x = width * i / (double)countX;
-                    var gridLine = new Line
-                    {
-                        X1 = x,
-                        Y1 = topMargin,
-                        X2 = x,
-                        Y2 = topMargin + plotHeight,
-                        Stroke = plotState.GridColorX ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
-                        StrokeThickness = plotState.GridThicknessX
-                    };
-                    canvas.Children.Add(gridLine);
-                }
-            }
 
             string plotName = string.Empty;
             lock (_lock)
@@ -1615,10 +1643,101 @@ namespace FlowEngine.Engine
                 minY = 0; maxY = 1;
             }
 
+            // Override with custom range configurations if provided
+            if (plotState.RangeMinX.HasValue) minX = plotState.RangeMinX.Value;
+            if (plotState.RangeMaxX.HasValue) maxX = plotState.RangeMaxX.Value;
+            if (plotState.RangeMinY.HasValue) minY = plotState.RangeMinY.Value;
+            if (plotState.RangeMaxY.HasValue) maxY = plotState.RangeMaxY.Value;
+
             double rangeX = maxX - minX;
             if (rangeX == 0) rangeX = 1;
             double rangeY = maxY - minY;
             if (rangeY == 0) rangeY = 1;
+
+            // Draw grid lines based on range and tick spacing
+            if (plotState.GridVisibleY)
+            {
+                if (plotState.TickIntervalY.HasValue && plotState.TickIntervalY.Value > 0)
+                {
+                    double interval = plotState.TickIntervalY.Value;
+                    double start = Math.Ceiling(minY / interval) * interval;
+                    for (double val = start; val <= maxY; val += interval)
+                    {
+                        if (val == minY || val == maxY) continue;
+                        double sy = topMargin + plotHeight - (plotHeight * (val - minY) / rangeY);
+                        var gridLine = new Line
+                        {
+                            X1 = 0,
+                            Y1 = sy,
+                            X2 = width,
+                            Y2 = sy,
+                            Stroke = plotState.GridColorY ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                            StrokeThickness = plotState.GridThicknessY
+                        };
+                        canvas.Children.Add(gridLine);
+                    }
+                }
+                else if (plotState.GridIntervalY > 0)
+                {
+                    int countY = (int)Math.Max(1, plotState.GridIntervalY);
+                    for (int i = 1; i < countY; i++)
+                    {
+                        double y = topMargin + plotHeight * i / (double)countY;
+                        var gridLine = new Line
+                        {
+                            X1 = 0,
+                            Y1 = y,
+                            X2 = width,
+                            Y2 = y,
+                            Stroke = plotState.GridColorY ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                            StrokeThickness = plotState.GridThicknessY
+                        };
+                        canvas.Children.Add(gridLine);
+                    }
+                }
+            }
+
+            if (plotState.GridVisibleX)
+            {
+                if (plotState.TickIntervalX.HasValue && plotState.TickIntervalX.Value > 0)
+                {
+                    double interval = plotState.TickIntervalX.Value;
+                    double start = Math.Ceiling(minX / interval) * interval;
+                    for (double val = start; val <= maxX; val += interval)
+                    {
+                        if (val == minX || val == maxX) continue;
+                        double sx = width * (val - minX) / rangeX;
+                        var gridLine = new Line
+                        {
+                            X1 = sx,
+                            Y1 = topMargin,
+                            X2 = sx,
+                            Y2 = topMargin + plotHeight,
+                            Stroke = plotState.GridColorX ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                            StrokeThickness = plotState.GridThicknessX
+                        };
+                        canvas.Children.Add(gridLine);
+                    }
+                }
+                else if (plotState.GridIntervalX > 0)
+                {
+                    int countX = (int)Math.Max(1, plotState.GridIntervalX);
+                    for (int i = 1; i < countX; i++)
+                    {
+                        double x = width * i / (double)countX;
+                        var gridLine = new Line
+                        {
+                            X1 = x,
+                            Y1 = topMargin,
+                            X2 = x,
+                            Y2 = topMargin + plotHeight,
+                            Stroke = plotState.GridColorX ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                            StrokeThickness = plotState.GridThicknessX
+                        };
+                        canvas.Children.Add(gridLine);
+                    }
+                }
+            }
 
             // Render series
             foreach (var s in activeSeries)
@@ -1845,13 +1964,14 @@ namespace FlowEngine.Engine
 
         private static void RenderPlot3D(Canvas canvas)
         {
-            canvas.ClipToBounds = true;
-            canvas.Children.Clear();
-
             double width = canvas.Width;
             double height = canvas.Height;
             if (double.IsNaN(width) || width <= 0) width = 200;
             if (double.IsNaN(height) || height <= 0) height = 150;
+
+            canvas.ClipToBounds = true;
+            canvas.Clip = new RectangleGeometry(new Rect(0, 0, width, height));
+            canvas.Children.Clear();
 
             Plot3DState? state = canvas.Tag as Plot3DState;
             if (state == null)
@@ -2081,6 +2201,14 @@ namespace FlowEngine.Engine
                 minZ = 0; maxZ = 1;
             }
 
+            // Override with custom range configurations if provided
+            if (state.RangeMinX.HasValue) minX = state.RangeMinX.Value;
+            if (state.RangeMaxX.HasValue) maxX = state.RangeMaxX.Value;
+            if (state.RangeMinY.HasValue) minY = state.RangeMinY.Value;
+            if (state.RangeMaxY.HasValue) maxY = state.RangeMaxY.Value;
+            if (state.RangeMinZ.HasValue) minZ = state.RangeMinZ.Value;
+            if (state.RangeMaxZ.HasValue) maxZ = state.RangeMaxZ.Value;
+
             double rangeX = maxX - minX; if (rangeX == 0) rangeX = 1;
             double rangeY = maxY - minY; if (rangeY == 0) rangeY = 1;
             double rangeZ = maxZ - minZ; if (rangeZ == 0) rangeZ = 1;
@@ -2113,47 +2241,89 @@ namespace FlowEngine.Engine
             }
 
             // Draw X grid lines
-            if (state.GridVisibleX && state.GridIntervalX > 0)
+            if (state.GridVisibleX)
             {
-                int countX = (int)Math.Max(1, state.GridIntervalX);
-                for (int i = 0; i <= countX; i++)
+                if (state.TickIntervalX.HasValue && state.TickIntervalX.Value > 0)
                 {
-                    double xVal = minX + rangeX * i / (double)countX;
-                    var pt1 = ProjectCoord(xVal, minY, minZ);
-                    var pt2 = ProjectCoord(xVal, maxY, minZ);
-                    var gridLine = new Line
+                    double interval = state.TickIntervalX.Value;
+                    double start = Math.Ceiling(minX / interval) * interval;
+                    for (double val = start; val <= maxX; val += interval)
                     {
-                        X1 = pt1.X, Y1 = pt1.Y,
-                        X2 = pt2.X, Y2 = pt2.Y,
-                        Stroke = state.GridColorX ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
-                        StrokeThickness = state.GridThicknessX
-                    };
-                    canvas.Children.Add(gridLine);
+                        var pt1 = ProjectCoord(val, minY, minZ);
+                        var pt2 = ProjectCoord(val, maxY, minZ);
+                        var gridLine = new Line
+                        {
+                            X1 = pt1.X, Y1 = pt1.Y,
+                            X2 = pt2.X, Y2 = pt2.Y,
+                            Stroke = state.GridColorX ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                            StrokeThickness = state.GridThicknessX
+                        };
+                        canvas.Children.Add(gridLine);
+                    }
+                }
+                else if (state.GridIntervalX > 0)
+                {
+                    int countX = (int)Math.Max(1, state.GridIntervalX);
+                    for (int i = 0; i <= countX; i++)
+                    {
+                        double xVal = minX + rangeX * i / (double)countX;
+                        var pt1 = ProjectCoord(xVal, minY, minZ);
+                        var pt2 = ProjectCoord(xVal, maxY, minZ);
+                        var gridLine = new Line
+                        {
+                            X1 = pt1.X, Y1 = pt1.Y,
+                            X2 = pt2.X, Y2 = pt2.Y,
+                            Stroke = state.GridColorX ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                            StrokeThickness = state.GridThicknessX
+                        };
+                        canvas.Children.Add(gridLine);
+                    }
                 }
             }
 
             // Draw Y grid lines
-            if (state.GridVisibleY && state.GridIntervalY > 0)
+            if (state.GridVisibleY)
             {
-                int countY = (int)Math.Max(1, state.GridIntervalY);
-                for (int i = 0; i <= countY; i++)
+                if (state.TickIntervalY.HasValue && state.TickIntervalY.Value > 0)
                 {
-                    double yVal = minY + rangeY * i / (double)countY;
-                    var pt1 = ProjectCoord(minX, yVal, minZ);
-                    var pt2 = ProjectCoord(maxX, yVal, minZ);
-                    var gridLine = new Line
+                    double interval = state.TickIntervalY.Value;
+                    double start = Math.Ceiling(minY / interval) * interval;
+                    for (double val = start; val <= maxY; val += interval)
                     {
-                        X1 = pt1.X, Y1 = pt1.Y,
-                        X2 = pt2.X, Y2 = pt2.Y,
-                        Stroke = state.GridColorY ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
-                        StrokeThickness = state.GridThicknessY
-                    };
-                    canvas.Children.Add(gridLine);
+                        var pt1 = ProjectCoord(minX, val, minZ);
+                        var pt2 = ProjectCoord(maxX, val, minZ);
+                        var gridLine = new Line
+                        {
+                            X1 = pt1.X, Y1 = pt1.Y,
+                            X2 = pt2.X, Y2 = pt2.Y,
+                            Stroke = state.GridColorY ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                            StrokeThickness = state.GridThicknessY
+                        };
+                        canvas.Children.Add(gridLine);
+                    }
+                }
+                else if (state.GridIntervalY > 0)
+                {
+                    int countY = (int)Math.Max(1, state.GridIntervalY);
+                    for (int i = 0; i <= countY; i++)
+                    {
+                        double yVal = minY + rangeY * i / (double)countY;
+                        var pt1 = ProjectCoord(minX, yVal, minZ);
+                        var pt2 = ProjectCoord(maxX, yVal, minZ);
+                        var gridLine = new Line
+                        {
+                            X1 = pt1.X, Y1 = pt1.Y,
+                            X2 = pt2.X, Y2 = pt2.Y,
+                            Stroke = state.GridColorY ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                            StrokeThickness = state.GridThicknessY
+                        };
+                        canvas.Children.Add(gridLine);
+                    }
                 }
             }
 
             // Draw Z grid cage lines
-            if (state.GridVisibleZ && state.GridIntervalZ > 0)
+            if (state.GridVisibleZ)
             {
                 var corners = new[]
                 {
@@ -2177,21 +2347,41 @@ namespace FlowEngine.Engine
                     canvas.Children.Add(gridLine);
                 }
 
-                int countZ = (int)Math.Max(1, state.GridIntervalZ);
-                for (int i = 1; i <= countZ; i++)
+                var cageColor = state.GridColorZ ?? new SolidColorBrush(Color.FromArgb(30, 255, 255, 255));
+
+                if (state.TickIntervalZ.HasValue && state.TickIntervalZ.Value > 0)
                 {
-                    double zVal = minZ + rangeZ * i / (double)countZ;
-                    var p1 = ProjectCoord(minX, minY, zVal);
-                    var p2 = ProjectCoord(maxX, minY, zVal);
-                    var p3 = ProjectCoord(maxX, maxY, zVal);
-                    var p4 = ProjectCoord(minX, maxY, zVal);
+                    double interval = state.TickIntervalZ.Value;
+                    double start = Math.Ceiling(minZ / interval) * interval;
+                    for (double val = start; val <= maxZ; val += interval)
+                    {
+                        var p1 = ProjectCoord(minX, minY, val);
+                        var p2 = ProjectCoord(maxX, minY, val);
+                        var p3 = ProjectCoord(maxX, maxY, val);
+                        var p4 = ProjectCoord(minX, maxY, val);
 
-                    var cageColor = state.GridColorZ ?? new SolidColorBrush(Color.FromArgb(30, 255, 255, 255));
+                        canvas.Children.Add(new Line { X1 = p1.X, Y1 = p1.Y, X2 = p2.X, Y2 = p2.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        canvas.Children.Add(new Line { X1 = p2.X, Y1 = p2.Y, X2 = p3.X, Y2 = p3.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        canvas.Children.Add(new Line { X1 = p3.X, Y1 = p3.Y, X2 = p4.X, Y2 = p4.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        canvas.Children.Add(new Line { X1 = p4.X, Y1 = p4.Y, X2 = p1.X, Y2 = p1.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                    }
+                }
+                else if (state.GridIntervalZ > 0)
+                {
+                    int countZ = (int)Math.Max(1, state.GridIntervalZ);
+                    for (int i = 1; i <= countZ; i++)
+                    {
+                        double zVal = minZ + rangeZ * i / (double)countZ;
+                        var p1 = ProjectCoord(minX, minY, zVal);
+                        var p2 = ProjectCoord(maxX, minY, zVal);
+                        var p3 = ProjectCoord(maxX, maxY, zVal);
+                        var p4 = ProjectCoord(minX, maxY, zVal);
 
-                    canvas.Children.Add(new Line { X1 = p1.X, Y1 = p1.Y, X2 = p2.X, Y2 = p2.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
-                    canvas.Children.Add(new Line { X1 = p2.X, Y1 = p2.Y, X2 = p3.X, Y2 = p3.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
-                    canvas.Children.Add(new Line { X1 = p3.X, Y1 = p3.Y, X2 = p4.X, Y2 = p4.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
-                    canvas.Children.Add(new Line { X1 = p4.X, Y1 = p4.Y, X2 = p1.X, Y2 = p1.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        canvas.Children.Add(new Line { X1 = p1.X, Y1 = p1.Y, X2 = p2.X, Y2 = p2.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        canvas.Children.Add(new Line { X1 = p2.X, Y1 = p2.Y, X2 = p3.X, Y2 = p3.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        canvas.Children.Add(new Line { X1 = p3.X, Y1 = p3.Y, X2 = p4.X, Y2 = p4.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                        canvas.Children.Add(new Line { X1 = p4.X, Y1 = p4.Y, X2 = p1.X, Y2 = p1.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                    }
                 }
             }
 
@@ -2409,6 +2599,79 @@ namespace FlowEngine.Engine
                 Canvas.SetRight(legendBorder, 6);
                 canvas.Children.Add(legendBorder);
             }
+
+            // Create view-snapping buttons overlay at the bottom-left of the plot3d canvas
+            var snapPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0) };
+            string[] views = { "Top", "Bottom", "Front", "Back", "Left", "Right" };
+            double[] rotXs = { 0, 0, 0, 180, 90, -90 };
+            double[] rotYs = { 90, -90, 0, 0, 0, 0 };
+
+            for (int v = 0; v < views.Length; v++)
+            {
+                string viewName = views[v];
+                double targetX = rotXs[v];
+                double targetY = rotYs[v];
+
+                var btnBorder = new Border
+                {
+                    Background = new SolidColorBrush(Color.FromArgb(200, 30, 30, 46)),
+                    BorderBrush = ThemeManager.BorderBrush,
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(2),
+                    Padding = new Thickness(5, 2, 5, 2),
+                    Margin = new Thickness(2, 0, 2, 0),
+                    Cursor = Cursors.Hand
+                };
+
+                var btnText = new TextBlock
+                {
+                    Text = viewName,
+                    FontSize = 9,
+                    Foreground = ThemeManager.TitleBarFgBrush,
+                    FontFamily = new FontFamily("Inter, Segoe UI"),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
+                btnBorder.Child = btnText;
+
+                btnBorder.MouseEnter += (s, e) =>
+                {
+                    btnBorder.Background = ThemeManager.AccentBrush;
+                    btnText.Foreground = new SolidColorBrush(Color.FromRgb(17, 17, 27));
+                };
+                btnBorder.MouseLeave += (s, e) =>
+                {
+                    btnBorder.Background = new SolidColorBrush(Color.FromArgb(200, 30, 30, 46));
+                    btnText.Foreground = ThemeManager.TitleBarFgBrush;
+                };
+
+                btnBorder.MouseDown += (s, e) =>
+                {
+                    if (e.LeftButton == MouseButtonState.Pressed)
+                    {
+                        state.RotateX = targetX;
+                        state.RotateY = targetY;
+                        RenderPlot3D(canvas);
+                        e.Handled = true;
+                    }
+                };
+
+                snapPanel.Children.Add(btnBorder);
+            }
+
+            var snapBorder = new Border
+            {
+                Background = new SolidColorBrush(Color.FromArgb(180, 17, 17, 27)),
+                BorderBrush = ThemeManager.BorderBrush,
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(3),
+                Padding = new Thickness(4),
+                Child = snapPanel
+            };
+
+            Canvas.SetBottom(snapBorder, 6);
+            Canvas.SetLeft(snapBorder, 6);
+            canvas.Children.Add(snapBorder);
         }
     }
 
@@ -2514,6 +2777,14 @@ namespace FlowEngine.Engine
         public Brush? GridColorY { get; set; }
         public double GridThicknessX { get; set; } = 0.5;
         public double GridThicknessY { get; set; } = 0.5;
+
+        // Custom Range & Tick properties
+        public double? RangeMinX { get; set; }
+        public double? RangeMaxX { get; set; }
+        public double? RangeMinY { get; set; }
+        public double? RangeMaxY { get; set; }
+        public double? TickIntervalX { get; set; }
+        public double? TickIntervalY { get; set; }
     }
 
     public class Plot3DState
@@ -2551,6 +2822,17 @@ namespace FlowEngine.Engine
         public double GridThicknessX { get; set; } = 0.5;
         public double GridThicknessY { get; set; } = 0.5;
         public double GridThicknessZ { get; set; } = 0.5;
+
+        // Custom Range & Tick properties
+        public double? RangeMinX { get; set; }
+        public double? RangeMaxX { get; set; }
+        public double? RangeMinY { get; set; }
+        public double? RangeMaxY { get; set; }
+        public double? RangeMinZ { get; set; }
+        public double? RangeMaxZ { get; set; }
+        public double? TickIntervalX { get; set; }
+        public double? TickIntervalY { get; set; }
+        public double? TickIntervalZ { get; set; }
     }
 
     public class SeriesPoints
