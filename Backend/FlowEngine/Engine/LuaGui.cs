@@ -1650,7 +1650,7 @@ namespace FlowEngine.Engine
             return brush;
         }
 
-        private static void PrintLog(string level, string message)
+        public static void PrintLog(string level, string message)
         {
             var mainWin = Application.Current.Dispatcher.Invoke(() => Application.Current.MainWindow as MainWindow);
             if (mainWin != null)

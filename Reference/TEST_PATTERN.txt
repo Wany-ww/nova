@@ -1,0 +1,33 @@
+#
+# Script for Camera Module Configuration
+#
+# (C)opyright 2016 EnvyLogic Co., Ltd.
+#
+#  ** Script Synctax **
+#  
+
+[TEST FG 4000x3000]
+
+// open 4000x3000 YUV8
+open 3000, 8000, 16
+set_test_cam 1
+set_mipi_test_cam 0
+
+// MIPI & Frame 
+set_mipi_default 0x1e
+//set_mipi_input 4, 0
+//set_mipi_info 0, 0x1e, 0, 0, 0
+//set_mipi_dsi 0, 0, 0, 0
+
+[TEST MIPI 4000x3000]
+
+// open 4000x3000 YUV8
+open 3000, 8000, 16
+set_test_cam 0
+set_mipi_test_cam 1
+
+// MIPI & Frame 
+set_mipi_default 0x1e
+//set_mipi_input 4, 0
+//set_mipi_info 0, 0x1e, 0, 0, 0
+//set_mipi_dsi 0, 0, 0, 0

@@ -275,9 +275,9 @@ function show_gui(src : table)
     gui.config.set("plot3dGraph##p3", "plot3d", "tick_interval_x", 1.0)
     gui.config.set("plot3dGraph##p3", "plot3d", "tick_interval_y", 1.0)
     gui.config.set("plot3dGraph##p3", "plot3d", "tick_interval_z", 25.0)
-    gui.config.set("plot3dGraph##p3", "plot3d", "snaps_orientation", "horizontal")
-    gui.config.set("plot3dGraph##p3", "plot3d", "snaps_text_color", {205, 214, 244, 255})
-    gui.config.set("plot3dGraph##p3", "plot3d", "snaps_background_color", {30, 30, 46, 200})
+    gui.config.set("plot3dGraph##p3", "plot3d", "snaps_orientation", "vertical")
+    gui.config.set("plot3dGraph##p3", "plot3d", "snaps_text_color", {30, 30, 46, 200})
+    gui.config.set("plot3dGraph##p3", "plot3d", "snaps_background_color", {205, 214, 244, 255})
 
     
     local peakGrid1 = {

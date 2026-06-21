@@ -371,6 +371,9 @@ namespace FlowEngine.Engine
                 // Register global GUI API
                 Engine.GuiManager.RegisterGuiApis(script);
 
+                // Register global Camera API
+                Engine.LuaCamera.RegisterCameraApis(script);
+
                 // Register global http API
                 var httpTable = new Table(script);
                 httpTable["get"] = (Func<string, Table?, Table>)((url, headers) =>

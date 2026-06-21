@@ -14,6 +14,11 @@ namespace FlowEngine.Engine
             Mat = mat;
         }
 
+        public static MatWrapper Create(Mat mat)
+        {
+            return new MatWrapper(mat);
+        }
+
         public MatWrapper(int rows, int cols, int type)
         {
             Mat = new Mat(rows, cols, (MatType)type);

@@ -625,7 +625,7 @@
     <header>
         <div>
             <h1>NOVA Static Analysis Dashboard</h1>
-            <div class="timestamp">분석 일시: 2026-06-21 22:25:00</div>
+            <div class="timestamp">분석 일시: 2026-06-22 00:01:58</div>
         </div>
         <div>
             <span style="font-weight: 600; background: rgba(255,255,255,0.06); padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">프로젝트: NOVA (WPF + Lua)</span>
@@ -1785,6 +1785,357 @@
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
     "severity": "INFO",
     "code_snippet": "if (FlowExecutionManager.StopRequested)"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 447,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '1000' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "_captureThread?.Join(1000);"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 575,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '256' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "gray.ConvertTo(gray16, MatType.CV_16U, 256);"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 632,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '0.01' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "if (Math.Abs(ratio - 1.0) < 0.01) // RAW8"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 638,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '8' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "raw16Data[i] = (short)(val << 8);"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 641,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '1.25' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "else if (Math.Abs(ratio - 1.25) < 0.01) // RAW10"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 646,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "if (outIdx + 4 > w * h) break;"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 651,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "byte b4 = inputBytes[i + 4];"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 655,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "short p2 = (short)((b2 << 2) | ((b4 >> 4) & 0x03));"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 656,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '6' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "short p3 = (short)((b3 << 2) | ((b4 >> 6) & 0x03));"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 668,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "outIdx = outIdx + 4;"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 671,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '1.5' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "else if (Math.Abs(ratio - 1.5) < 0.01) // RAW12"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 681,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "short p0 = (short)((b0 << 4) | (b2 & 0x0F));"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 682,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "short p1 = (short)((b1 << 4) | ((b2 >> 4) & 0x0F));"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 687,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "raw8Data[outIdx] = (byte)(p0 >> 4);"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 688,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "raw8Data[outIdx + 1] = (byte)(p1 >> 4);"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 698,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '8' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "short val = (short)(inputBytes[i * 2] | (inputBytes[i * 2 + 1] << 8));"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 713,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '8' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "if (BitDepth == 8)"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 720,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '256' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "raw8Mat.ConvertTo(raw16Mat, MatType.CV_16U, 256);"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 758,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '256.0' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "raw16Mat.ConvertTo(raw8Mat, MatType.CV_8U, 1.0 / 256.0);"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 799,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '256' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "raw8Mat.ConvertTo(raw16Mat, MatType.CV_16U, 256);"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 853,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "if (cmd == \"open\" && tokens.Length >= 4)"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 889,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "else if (cmd == \"set_ism_io\" && tokens.Length >= 4)"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 924,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "int dataLen = tokens.Length - 4;"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 929,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "buf[i + 1] = ParseByte(tokens[i + 4]);"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 945,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "else if (cmd == \"set_pmu_pwr\" && tokens.Length >= 4)"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 984,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '16' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "return Convert.ToInt32(token, 16);"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 993,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '16' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "return Convert.ToByte(token, 16);"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 1002,
+    "category": "Code Smell",
+    "title": "Magic Number",
+    "description": "Magic number literal '16' used in calculation or comparison. Consider extracting to a named constant or config variable.",
+    "severity": "INFO",
+    "code_snippet": "return Convert.ToUInt32(token, 16);"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 518,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (ret == 0 && bufPtr != IntPtr.Zero)"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 530,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'switch' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "ColorConversionCodes code = Bayer switch"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 567,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (_usbCap.Read(frame) && !frame.Empty())"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 600,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (_rgbQueue.Count > 0)"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 603,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'foreach' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "foreach (var m in _rgbQueue)"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 607,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (lastMat != null)"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 715,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (data.Length < Width * Height) return false;"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 723,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'switch' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "ColorConversionCodes code = Bayer switch"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 750,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (data.Length < Width * Height * 2) return false;"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 761,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'switch' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "ColorConversionCodes code = Bayer switch"
+  },
+  {
+    "file": "Engine/LuaCamera.cs",
+    "line": 791,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "if (img.Empty()) return false;"
   },
   {
     "file": "Engine/LuaGui.cs",
@@ -4047,7 +4398,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 750,
+    "line": 753,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '1000000' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -4056,7 +4407,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1112,
+    "line": 1115,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '21' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -4065,7 +4416,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1146,
+    "line": 1149,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '21' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -4074,7 +4425,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1195,
+    "line": 1198,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '1024.0' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -4083,7 +4434,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1196,
+    "line": 1199,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '1024.0' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -4092,7 +4443,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1221,
+    "line": 1224,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '1024.0' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -4101,7 +4452,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1452,
+    "line": 1455,
     "category": "Code Smell",
     "title": "Magic Number",
     "description": "Magic number literal '30' used in calculation or comparison. Consider extracting to a named constant or config variable.",
@@ -4137,7 +4488,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 557,
+    "line": 560,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'for' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4146,7 +4497,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 560,
+    "line": 563,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4155,7 +4506,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 576,
+    "line": 579,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4164,7 +4515,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 577,
+    "line": 580,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'for' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4173,7 +4524,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 613,
+    "line": 616,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4182,7 +4533,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 623,
+    "line": 626,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4191,7 +4542,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 630,
+    "line": 633,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4200,7 +4551,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 668,
+    "line": 671,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4209,7 +4560,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 879,
+    "line": 882,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4218,34 +4569,34 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 882,
+    "line": 885,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
     "severity": "INFO",
     "code_snippet": "if (key != null)"
-  },
-  {
-    "file": "Engine/LuaRunner.cs",
-    "line": 929,
-    "category": "Code Smell",
-    "title": "Deep Control Flow Nesting",
-    "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
-    "severity": "INFO",
-    "code_snippet": "foreach (var pair in headers.Pairs)"
   },
   {
     "file": "Engine/LuaRunner.cs",
     "line": 932,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
+    "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
+    "severity": "INFO",
+    "code_snippet": "foreach (var pair in headers.Pairs)"
+  },
+  {
+    "file": "Engine/LuaRunner.cs",
+    "line": 935,
+    "category": "Code Smell",
+    "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
     "severity": "INFO",
     "code_snippet": "if (key != null)"
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 934,
+    "line": 937,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4254,7 +4605,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1330,
+    "line": 1333,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4263,7 +4614,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1333,
+    "line": 1336,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'for' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4272,7 +4623,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1395,
+    "line": 1398,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4281,7 +4632,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1406,
+    "line": 1409,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4290,7 +4641,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1408,
+    "line": 1411,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4299,7 +4650,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1411,
+    "line": 1414,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4308,7 +4659,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1416,
+    "line": 1419,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'for' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4317,7 +4668,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1420,
+    "line": 1423,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4326,7 +4677,7 @@
   },
   {
     "file": "Engine/LuaRunner.cs",
-    "line": 1457,
+    "line": 1460,
     "category": "Code Smell",
     "title": "Deep Control Flow Nesting",
     "description": "Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.",
@@ -4763,6 +5114,17 @@
     "loc_rating_class": "rating-low"
   },
   {
+    "file": "Engine/LuaCamera.cs",
+    "type": "C#",
+    "loc": 1014,
+    "code_lines": 855,
+    "cc": 189,
+    "rating": "Moderate",
+    "rating_class": "rating-moderate",
+    "loc_rating": "High",
+    "loc_rating_class": "rating-high"
+  },
+  {
     "file": "Engine/LuaGui.cs",
     "type": "C#",
     "loc": 3078,
@@ -4787,8 +5149,8 @@
   {
     "file": "Engine/LuaRunner.cs",
     "type": "C#",
-    "loc": 1479,
-    "code_lines": 1260,
+    "loc": 1482,
+    "code_lines": 1261,
     "cc": 236,
     "rating": "High",
     "rating_class": "rating-high",
@@ -4809,8 +5171,8 @@
   {
     "file": "Engine/MatWrapper.cs",
     "type": "C#",
-    "loc": 71,
-    "code_lines": 61,
+    "loc": 76,
+    "code_lines": 65,
     "cc": 12,
     "rating": "Low",
     "rating_class": "rating-low",
@@ -4944,6 +5306,17 @@
     "loc": 26,
     "code_lines": 15,
     "cc": 1,
+    "rating": "Low",
+    "rating_class": "rating-low",
+    "loc_rating": "Low",
+    "loc_rating_class": "rating-low"
+  },
+  {
+    "file": "nodes/GUI/CameraTest.lua",
+    "type": "Lua",
+    "loc": 46,
+    "code_lines": 26,
+    "cc": 14,
     "rating": "Low",
     "rating_class": "rating-low",
     "loc_rating": "Low",
@@ -5391,23 +5764,23 @@
   }
 ];
         const stats = {
-  "total_files": 68,
-  "cs_files": 20,
-  "lua_files": 48,
-  "lines_of_code": 11807,
-  "code_lines": 9739,
-  "comment_lines": 863,
-  "blank_lines": 1205,
-  "total_cc": 2108,
-  "avg_cc": 31.0,
+  "total_files": 70,
+  "cs_files": 21,
+  "lua_files": 49,
+  "lines_of_code": 12875,
+  "code_lines": 10625,
+  "comment_lines": 877,
+  "blank_lines": 1373,
+  "total_cc": 2311,
+  "avg_cc": 33.0,
   "critical_issues": 0,
   "warning_issues": 0,
-  "info_issues": 415
+  "info_issues": 454
 };
         const scores = {
   "analysis_score": 90.0,
   "complexity_score": 98.9,
-  "scale_score": 94.5,
+  "scale_score": 94.3,
   "documentation_score": 85.0,
   "overall_score": 92.8,
   "overall_grade": "A"

@@ -1,0 +1,230 @@
+﻿#
+# Script for Camera Module Configuration
+#
+# (C)opyright 2016 EnvyLogic Co., Ltd.
+#
+#  ** Script Synctax **
+#  
+[Power On]
+set_pmu_init
+set_pmu_gnd 1
+set_pmu_pwr 0, 1.8, 0.5
+set_pmu_pwr 1, 2.8, 0.5
+set_pmu_pwr 4, 1.15, 0.5
+set_pmu_pwr 5, 1.22, 0.5
+set_pmu_pwr 6, 2.8, 0.5
+set_pmu_pwr 7, 1.8, 0.5
+set_pmu_pwr 2, 1.8, 0.5
+set_pmu_pwr 3, 2.8, 0.5
+set_pmu_pwr 8, 1.15, 0.8
+set_pmu_pwr 9, 1.23, 0.8
+set_pmu_pwr 10, 2.85, 0.8
+set_pmu_pwr 11, 1.80, 0.8
+
+set_pmu_mon 1, 0xfff
+set_pmu_sw 0 2
+set_pmu_sw 1 2
+set_pmu_sw 4 2
+set_pmu_sw 5 2
+set_pmu_sw 6 2
+set_pmu_sw 7 2
+
+set_pmu_sw 2 2
+set_pmu_sw 3 2
+set_pmu_sw 8 2
+set_pmu_sw 9 2
+set_pmu_sw 10 2
+set_pmu_sw 11 2
+
+set_pmu_end
+delay 100	
+
+
+[Power Off]
+set_pmu_init
+set_pmu_sw 0 0
+set_pmu_sw 1 0
+set_pmu_sw 2 0
+set_pmu_sw 3 0
+set_pmu_sw 4 0
+set_pmu_sw 5 0
+set_pmu_sw 6 0
+set_pmu_sw 7 0
+set_pmu_sw 8 0
+set_pmu_sw 9 0
+set_pmu_sw 10 0
+set_pmu_sw 11 0
+set_pmu_gnd 0
+//set_pmu_mon 0, 0
+set_pmu_end
+
+set_pmu_init
+set_pmu_sw 0 0
+set_pmu_sw 1 0
+set_pmu_sw 2 0
+set_pmu_sw 3 0
+set_pmu_sw 4 0
+set_pmu_sw 5 0
+set_pmu_sw 6 0
+set_pmu_sw 7 0
+set_pmu_sw 8 0
+set_pmu_sw 9 0
+set_pmu_sw 10 0
+set_pmu_sw 11 0
+set_pmu_gnd 0
+//set_pmu_mon 0, 0
+set_pmu_end
+
+
+[INIT 4000x3000]
+
+// open 4000x3000 YUV8
+open 3000, 8000, 16
+set_test_cam 0
+set_mipi_test_cam 0
+
+// MIPI & Frame 
+set_mipi_default 0x1e
+//set_mipi_input 4, 0
+//set_mipi_info 0, 0x1e, 0, 0, 0
+//set_mipi_dsi 0, 0, 0, 0
+
+// POWER on
+//set_cam_power 1
+// ISM Volt&Freq
+set_ism_default
+set_ism_volt 1.8
+//set_ism_freq 0, 24.0
+
+// ISM Reset
+delay 100
+set_ism_reset 1
+delay 10
+set_ism_reset 0
+delay 300
+
+// I2C prepare
+set_i2c_freq 200.0
+
+// Slave Address
+
+set_i2c 1 1 0x78 0xF0
+delay 1000
+
+# Set Resolution
+# 4000 x 3000
+set_i2c 1 1 0x78 0x54 46 0x00
+
+# Set Preview rate
+set_i2c 1 1 0x78 0x5A 60 0
+
+#preview start
+#set_i2c 1 1 0x78 0x6B 0x01
+#live view start
+set_i2c 1 1 0x78 0x65 0x01
+
+[INIT 2560x1920]
+
+// open 2560x1920 YUV8
+open 1920, 5120, 12
+set_test_cam 0
+set_mipi_test_cam 0
+
+// MIPI & Frame 
+set_mipi_default 0x1e
+//set_mipi_input 4, 0
+//set_mipi_info 0, 0x1e, 0, 0, 0
+//set_mipi_dsi 0, 0, 0, 0
+
+// POWER on
+//set_cam_power 1
+// ISM Volt&Freq
+set_ism_default
+//set_ism_volt 1.8
+//set_ism_freq 0, 24.0
+
+// ISM Reset
+delay 100
+set_ism_reset 1
+delay 5
+set_ism_reset 0
+delay 200
+
+// I2C prepare
+set_i2c_freq 200.0
+
+set_i2c 1 1 0x78 0xf0
+delay 500	
+
+set_i2c 1 1 0x78 0x54 32 0
+	
+set_i2c 1 1 0x78 0x5a 15 0
+	
+set_i2c 1 1 0x78 0x65 1
+
+[INIT 1920x1080]
+
+// open 1920x1080 YUV8
+open 1080, 3840, 30
+set_test_cam 0
+set_mipi_test_cam 0
+
+// MIPI & Frame 
+set_mipi_default 0x1e
+//set_mipi_input 4, 0
+//set_mipi_info 0, 0x1e, 0, 0, 0
+//set_mipi_dsi 0, 0, 0, 0
+
+// POWER on
+//set_cam_power 1
+// ISM Volt&Freq
+set_ism_default
+//set_ism_volt 1.8
+//set_ism_freq 0, 24.0
+
+// ISM Reset
+delay 100
+set_ism_reset 1
+delay 5
+set_ism_reset 0
+delay 200
+
+// I2C prepare
+set_i2c_freq 200.0
+
+set_i2c 1 1 0x78 0xF0				// Firmware 시작
+delay 500
+
+set_i2c 1 1 0x78 0xD1 0xFF 0xFF 0xFB 0xDF 0xFB 0xFF 0xFF 0xFF
+delay 100
+
+set_i2c 1 1 0x78 0x54 30 0			// preview 1920X1080
+set_i2c 1 1 0x78 0x5A 30 0			// Preview 용 YCO FRame Rate 30
+set_i2c 1 1 0x78 0x6B 1				// preview start
+
+[AUTO FOCUS]
+set_i2c 1 1 0x78 0x11 0x00
+set_i2c 1 1 0x78 0x23
+
+[I2C FREQ]
+set_i2c_freq 500.0
+// ISM Reset
+
+delay 200
+
+[I2C READ]
+set_i2c 1 0 0x78 0x00 0x00
+set_i2c 1 0 0x79
+get_i2c 1 4
+
+set_i2c 1 0 0x78 0x00 0x05
+set_i2c 1 0 0x79
+get_i2c 1 4
+
+set_i2c 1 0 0x78 0x00 0x0a
+set_i2c 1 0 0x79
+get_i2c 1 4
+
+
+
+
