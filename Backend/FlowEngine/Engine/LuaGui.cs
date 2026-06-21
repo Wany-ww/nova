@@ -33,6 +33,22 @@ namespace FlowEngine.Engine
         public string Legend { get; set; } = string.Empty;
         public Brush? CustomColor { get; set; }
         public string PlotType { get; set; } = "line";
+
+        // Advanced styling properties
+        public List<double> PlotXData { get; set; } = new List<double>();
+        public List<double> PlotYData { get; set; } = new List<double>();
+        public List<double> PlotZData { get; set; } = new List<double>();
+
+        public double LineThickness { get; set; } = 2.0;
+        public string LineStyle { get; set; } = "solid"; // "solid", "dashed", "dotted"
+
+        public Brush? MarkerColor { get; set; }
+        public double MarkerSize { get; set; } = 6.0;
+        public string MarkerStyle { get; set; } = "circle"; // "circle", "square", "triangle"
+
+        public Brush? BarColor { get; set; }
+        public double BarWidthValue { get; set; } = -1.0;
+        public string BarStyle { get; set; } = "solid"; // "solid", "gradient"
     }
 
     public class GuiDialog
@@ -607,6 +623,143 @@ namespace FlowEngine.Engine
                         }
                         break;
 
+                    case "title":
+                    case "title_font_size":
+                    case "title_color":
+                    case "title_background_color":
+                    case "title_visible":
+                        if (widget.Type == "plot2d" && widget.Element is Canvas c2dTitle)
+                        {
+                            if (!(c2dTitle.Tag is Plot2DState s2t)) { s2t = new Plot2DState(); c2dTitle.Tag = s2t; }
+                            var k = key.ToLower();
+                            if (k == "title") s2t.Title = value.CastToString() ?? string.Empty;
+                            else if (k == "title_font_size") s2t.TitleFontSize = value.Number;
+                            else if (k == "title_color") s2t.TitleColor = ParseColor(value);
+                            else if (k == "title_background_color") s2t.TitleBackground = ParseColor(value);
+                            else if (k == "title_visible") s2t.TitleVisible = value.CastToBool();
+                            RenderPlot2D(c2dTitle);
+                        }
+                        else if (widget.Type == "plot3d" && widget.Element is Canvas c3dTitle)
+                        {
+                            if (!(c3dTitle.Tag is Plot3DState s3t)) { s3t = new Plot3DState(); c3dTitle.Tag = s3t; }
+                            var k = key.ToLower();
+                            if (k == "title") s3t.Title = value.CastToString() ?? string.Empty;
+                            else if (k == "title_font_size") s3t.TitleFontSize = value.Number;
+                            else if (k == "title_color") s3t.TitleColor = ParseColor(value);
+                            else if (k == "title_background_color") s3t.TitleBackground = ParseColor(value);
+                            else if (k == "title_visible") s3t.TitleVisible = value.CastToBool();
+                            RenderPlot3D(c3dTitle);
+                        }
+                        break;
+
+                    case "grid_visible_x":
+                    case "grid_visible_y":
+                    case "grid_visible_z":
+                    case "grid_interval_x":
+                    case "grid_interval_y":
+                    case "grid_interval_z":
+                    case "grid_color_x":
+                    case "grid_color_y":
+                    case "grid_color_z":
+                    case "grid_thickness_x":
+                    case "grid_thickness_y":
+                    case "grid_thickness_z":
+                        if (widget.Type == "plot2d" && widget.Element is Canvas g2d)
+                        {
+                            if (!(g2d.Tag is Plot2DState s2g)) { s2g = new Plot2DState(); g2d.Tag = s2g; }
+                            var k = key.ToLower();
+                            if (k == "grid_visible_x") s2g.GridVisibleX = value.CastToBool();
+                            else if (k == "grid_visible_y") s2g.GridVisibleY = value.CastToBool();
+                            else if (k == "grid_interval_x") s2g.GridIntervalX = value.Number;
+                            else if (k == "grid_interval_y") s2g.GridIntervalY = value.Number;
+                            else if (k == "grid_color_x") s2g.GridColorX = ParseColor(value);
+                            else if (k == "grid_color_y") s2g.GridColorY = ParseColor(value);
+                            else if (k == "grid_thickness_x") s2g.GridThicknessX = value.Number;
+                            else if (k == "grid_thickness_y") s2g.GridThicknessY = value.Number;
+                            RenderPlot2D(g2d);
+                        }
+                        else if (widget.Type == "plot3d" && widget.Element is Canvas g3d)
+                        {
+                            if (!(g3d.Tag is Plot3DState s3g)) { s3g = new Plot3DState(); g3d.Tag = s3g; }
+                            var k = key.ToLower();
+                            if (k == "grid_visible_x") s3g.GridVisibleX = value.CastToBool();
+                            else if (k == "grid_visible_y") s3g.GridVisibleY = value.CastToBool();
+                            else if (k == "grid_visible_z") s3g.GridVisibleZ = value.CastToBool();
+                            else if (k == "grid_interval_x") s3g.GridIntervalX = value.Number;
+                            else if (k == "grid_interval_y") s3g.GridIntervalY = value.Number;
+                            else if (k == "grid_interval_z") s3g.GridIntervalZ = value.Number;
+                            else if (k == "grid_color_x") s3g.GridColorX = ParseColor(value);
+                            else if (k == "grid_color_y") s3g.GridColorY = ParseColor(value);
+                            else if (k == "grid_color_z") s3g.GridColorZ = ParseColor(value);
+                            else if (k == "grid_thickness_x") s3g.GridThicknessX = value.Number;
+                            else if (k == "grid_thickness_y") s3g.GridThicknessY = value.Number;
+                            else if (k == "grid_thickness_z") s3g.GridThicknessZ = value.Number;
+                            RenderPlot3D(g3d);
+                        }
+                        break;
+
+                    case "line_color":
+                    case "line_thickness":
+                    case "line_style":
+                    case "marker_color":
+                    case "marker_size":
+                    case "marker_style":
+                    case "bar_color":
+                    case "bar_width":
+                    case "bar_style":
+                        if (widget.Type == "plotline")
+                        {
+                            var k = key.ToLower();
+                            if (k == "line_color") widget.CustomColor = ParseColor(value);
+                            else if (k == "line_thickness") widget.LineThickness = value.Number;
+                            else if (k == "line_style") widget.LineStyle = value.CastToString() ?? "solid";
+                            else if (k == "marker_color") widget.MarkerColor = ParseColor(value);
+                            else if (k == "marker_size") widget.MarkerSize = value.Number;
+                            else if (k == "marker_style") widget.MarkerStyle = value.CastToString() ?? "circle";
+                            else if (k == "bar_color") widget.BarColor = ParseColor(value);
+                            else if (k == "bar_width") widget.BarWidthValue = value.Number;
+                            else if (k == "bar_style") widget.BarStyle = value.CastToString() ?? "solid";
+
+                            GuiWidget? parentWidget = null;
+                            lock (_lock)
+                            {
+                                _widgets.TryGetValue(widget.ParentName, out parentWidget);
+                            }
+                            if (parentWidget != null && parentWidget.Element is Canvas parentCanvas)
+                            {
+                                if (parentWidget.Type == "plot2d") RenderPlot2D(parentCanvas);
+                                else if (parentWidget.Type == "plot3d") RenderPlot3D(parentCanvas);
+                            }
+                        }
+                        break;
+
+                    case "data_x":
+                    case "data_y":
+                    case "data_z":
+                        if (widget.Type == "plotline" && value.Type == DataType.Table)
+                        {
+                            var tbl = value.Table;
+                            var pts = new List<double>();
+                            for (int i = 1; i <= tbl.Length; i++) pts.Add(tbl.Get(i).Number);
+
+                            var k = key.ToLower();
+                            if (k == "data_x") widget.PlotXData = pts;
+                            else if (k == "data_y") widget.PlotYData = pts;
+                            else if (k == "data_z") widget.PlotZData = pts;
+
+                            GuiWidget? parentWidget = null;
+                            lock (_lock)
+                            {
+                                _widgets.TryGetValue(widget.ParentName, out parentWidget);
+                            }
+                            if (parentWidget != null && parentWidget.Element is Canvas parentCanvas)
+                            {
+                                if (parentWidget.Type == "plot2d") RenderPlot2D(parentCanvas);
+                                else if (parentWidget.Type == "plot3d") RenderPlot3D(parentCanvas);
+                            }
+                        }
+                        break;
+
                     case "plot_type":
                         if (widget.Type == "plotline")
                         {
@@ -817,50 +970,76 @@ namespace FlowEngine.Engine
                         }
                         else if (widget.Type == "plotline" && value.Type == DataType.Table)
                         {
-                            GuiWidget? parentWidget = null;
+                            var tbl = value.Table;
+                            var valX = tbl.Get("x");
+                            var valY = tbl.Get("y");
+                            var valZ = tbl.Get("z");
+
+                            bool isStructured = valX.Type == DataType.Table || valY.Type == DataType.Table || valZ.Type == DataType.Table;
+
+                            if (isStructured)
+                            {
+                                if (valX.Type == DataType.Table)
+                                {
+                                    widget.PlotXData = new List<double>();
+                                    for (int i = 1; i <= valX.Table.Length; i++) widget.PlotXData.Add(valX.Table.Get(i).Number);
+                                }
+                                if (valY.Type == DataType.Table)
+                                {
+                                    widget.PlotYData = new List<double>();
+                                    for (int i = 1; i <= valY.Table.Length; i++) widget.PlotYData.Add(valY.Table.Get(i).Number);
+                                }
+                                if (valZ.Type == DataType.Table)
+                                {
+                                    widget.PlotZData = new List<double>();
+                                    for (int i = 1; i <= valZ.Table.Length; i++) widget.PlotZData.Add(valZ.Table.Get(i).Number);
+                                }
+                            }
+                            else
+                            {
+                                GuiWidget? parentWidget = null;
+                                lock (_lock)
+                                {
+                                    _widgets.TryGetValue(widget.ParentName, out parentWidget);
+                                }
+                                if (parentWidget != null)
+                                {
+                                    if (parentWidget.Type == "plot2d")
+                                    {
+                                        List<double> pts = new List<double>();
+                                        for (int i = 1; i <= tbl.Length; i++) pts.Add(tbl.Get(i).Number);
+                                        widget.Plot2DData = pts;
+                                    }
+                                    else if (parentWidget.Type == "plot3d")
+                                    {
+                                        List<List<double>> grid = new List<List<double>>();
+                                        for (int i = 1; i <= tbl.Length; i++)
+                                        {
+                                            var rowVal = tbl.Get(i);
+                                            if (rowVal.Type == DataType.Table)
+                                            {
+                                                var rowList = new List<double>();
+                                                for (int j = 1; j <= rowVal.Table.Length; j++)
+                                                {
+                                                    rowList.Add(rowVal.Table.Get(j).Number);
+                                                }
+                                                grid.Add(rowList);
+                                            }
+                                        }
+                                        widget.Plot3DData = grid;
+                                    }
+                                }
+                            }
+
+                            GuiWidget? pWidget = null;
                             lock (_lock)
                             {
-                                _widgets.TryGetValue(widget.ParentName, out parentWidget);
+                                _widgets.TryGetValue(widget.ParentName, out pWidget);
                             }
-                            if (parentWidget != null)
+                            if (pWidget != null && pWidget.Element is Canvas pCanvas)
                             {
-                                if (parentWidget.Type == "plot2d")
-                                {
-                                    var tbl = value.Table;
-                                    List<double> pts = new List<double>();
-                                    for (int i = 1; i <= tbl.Length; i++)
-                                    {
-                                        pts.Add(tbl.Get(i).Number);
-                                    }
-                                    widget.Plot2DData = pts;
-                                    if (parentWidget.Element is Canvas parentCanvas)
-                                    {
-                                        RenderPlot2D(parentCanvas);
-                                    }
-                                }
-                                else if (parentWidget.Type == "plot3d")
-                                {
-                                    var tbl = value.Table;
-                                    List<List<double>> grid = new List<List<double>>();
-                                    for (int i = 1; i <= tbl.Length; i++)
-                                    {
-                                        var rowVal = tbl.Get(i);
-                                        if (rowVal.Type == DataType.Table)
-                                        {
-                                            var rowList = new List<double>();
-                                            for (int j = 1; j <= rowVal.Table.Length; j++)
-                                            {
-                                                rowList.Add(rowVal.Table.Get(j).Number);
-                                            }
-                                            grid.Add(rowList);
-                                        }
-                                    }
-                                    widget.Plot3DData = grid;
-                                    if (parentWidget.Element is Canvas parentCanvas)
-                                    {
-                                        RenderPlot3D(parentCanvas);
-                                    }
-                                }
+                                if (pWidget.Type == "plot2d") RenderPlot2D(pCanvas);
+                                else if (pWidget.Type == "plot3d") RenderPlot3D(pCanvas);
                             }
                         }
                         else if (widget.Element is ProgressBar pb)
@@ -1255,28 +1434,84 @@ namespace FlowEngine.Engine
             if (double.IsNaN(width) || width <= 0) width = 200;
             if (double.IsNaN(height) || height <= 0) height = 150;
 
+            // Determine topMargin
+            double topMargin = 0;
+            if (plotState.TitleVisible && !string.IsNullOrEmpty(plotState.Title))
+            {
+                topMargin = plotState.TitleFontSize + 12.0;
+                var titleBorder = new Border
+                {
+                    Width = width,
+                    Height = topMargin,
+                    Background = plotState.TitleBackground ?? Brushes.Transparent,
+                    Child = new TextBlock
+                    {
+                        Text = plotState.Title,
+                        FontSize = plotState.TitleFontSize,
+                        Foreground = plotState.TitleColor ?? ThemeManager.TitleBarFgBrush,
+                        FontFamily = new FontFamily("Inter, Segoe UI"),
+                        FontWeight = FontWeights.Bold,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
+                };
+                Canvas.SetLeft(titleBorder, 0);
+                Canvas.SetTop(titleBorder, 0);
+                canvas.Children.Add(titleBorder);
+            }
+
+            double plotHeight = height - topMargin;
+            if (plotHeight <= 0) plotHeight = 1;
+
             var bg = new Border
             {
                 Width = width,
-                Height = height,
+                Height = plotHeight,
                 Background = new SolidColorBrush(Color.FromArgb(20, 255, 255, 255)),
                 BorderBrush = ThemeManager.BorderBrush,
                 BorderThickness = new Thickness(1)
             };
+            Canvas.SetLeft(bg, 0);
+            Canvas.SetTop(bg, topMargin);
             canvas.Children.Add(bg);
 
-            for (int i = 1; i < 4; i++)
+            // Draw grid lines
+            if (plotState.GridVisibleY && plotState.GridIntervalY > 0)
             {
-                var gridLine = new Line
+                int countY = (int)Math.Max(1, plotState.GridIntervalY);
+                for (int i = 1; i < countY; i++)
                 {
-                    X1 = 0,
-                    Y1 = height * i / 4.0,
-                    X2 = width,
-                    Y2 = height * i / 4.0,
-                    Stroke = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
-                    StrokeThickness = 0.5
-                };
-                canvas.Children.Add(gridLine);
+                    double y = topMargin + plotHeight * i / (double)countY;
+                    var gridLine = new Line
+                    {
+                        X1 = 0,
+                        Y1 = y,
+                        X2 = width,
+                        Y2 = y,
+                        Stroke = plotState.GridColorY ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                        StrokeThickness = plotState.GridThicknessY
+                    };
+                    canvas.Children.Add(gridLine);
+                }
+            }
+
+            if (plotState.GridVisibleX && plotState.GridIntervalX > 0)
+            {
+                int countX = (int)Math.Max(1, plotState.GridIntervalX);
+                for (int i = 1; i < countX; i++)
+                {
+                    double x = width * i / (double)countX;
+                    var gridLine = new Line
+                    {
+                        X1 = x,
+                        Y1 = topMargin,
+                        X2 = x,
+                        Y2 = topMargin + plotHeight,
+                        Stroke = plotState.GridColorX ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                        StrokeThickness = plotState.GridThicknessX
+                    };
+                    canvas.Children.Add(gridLine);
+                }
             }
 
             string plotName = string.Empty;
@@ -1293,109 +1528,186 @@ namespace FlowEngine.Engine
             }
 
             var lines = GetChildPlotLines(plotName);
-
-            List<List<double>> datasets = new List<List<double>>();
-            List<string> legends = new List<string>();
-            List<Brush> colors = new List<Brush>();
-            List<string> plotTypes = new List<string>();
+            var activeSeries = new List<SeriesPoints>();
 
             if (lines.Count > 0)
             {
                 for (int idx = 0; idx < lines.Count; idx++)
                 {
                     var lineWidget = lines[idx];
-                    datasets.Add(lineWidget.Plot2DData);
-                    legends.Add(GetDisplayName(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : lineWidget.Name));
-                    colors.Add(lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length]);
-                    plotTypes.Add(lineWidget.PlotType);
+                    string seriesName = GetDisplayName(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : lineWidget.Name);
+                    
+                    // Skip if disabled
+                    if (plotState.DisabledSeries.Contains(seriesName)) continue;
+
+                    List<double> yData = lineWidget.PlotYData.Count > 0 ? lineWidget.PlotYData : lineWidget.Plot2DData;
+                    List<double> xData = lineWidget.PlotXData.Count > 0 ? lineWidget.PlotXData : null!;
+                    
+                    if (yData.Count == 0) continue;
+                    if (xData == null)
+                    {
+                        xData = new List<double>();
+                        for (int i = 0; i < yData.Count; i++) xData.Add(i);
+                    }
+
+                    int count = Math.Min(xData.Count, yData.Count);
+                    var sPoints = new SeriesPoints
+                    {
+                        Brush = lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length],
+                        Type = lineWidget.PlotType,
+                        Legend = seriesName,
+                        Widget = lineWidget
+                    };
+                    for (int i = 0; i < count; i++)
+                    {
+                        sPoints.Points.Add(new Point(xData[i], yData[i]));
+                    }
+                    activeSeries.Add(sPoints);
                 }
             }
             else
             {
                 if (plotState.Data.Count > 0)
                 {
-                    datasets.Add(plotState.Data);
-                    legends.Add(GetDisplayName(plotState.Legend));
-                    colors.Add(ThemeManager.AccentBrush);
-                    plotTypes.Add("line");
+                    string seriesName = GetDisplayName(plotState.Legend);
+                    if (!plotState.DisabledSeries.Contains(seriesName))
+                    {
+                        var sPoints = new SeriesPoints
+                        {
+                            Brush = ThemeManager.AccentBrush,
+                            Type = "line",
+                            Legend = seriesName,
+                            Widget = null!
+                        };
+                        for (int i = 0; i < plotState.Data.Count; i++)
+                        {
+                            sPoints.Points.Add(new Point(i, plotState.Data[i]));
+                        }
+                        activeSeries.Add(sPoints);
+                    }
                 }
             }
 
-            if (datasets.Count == 0) return;
+            if (activeSeries.Count == 0) return;
 
-            double min = double.MaxValue;
-            double max = double.MinValue;
-            bool hasData = false;
-            for (int d = 0; d < datasets.Count; d++)
+            // Find min/max bounds
+            double minX = double.MaxValue;
+            double maxX = double.MinValue;
+            double minY = double.MaxValue;
+            double maxY = double.MinValue;
+            bool hasPoints = false;
+
+            foreach (var s in activeSeries)
             {
-                string seriesName = legends[d];
-                if (plotState.DisabledSeries.Contains(seriesName))
+                foreach (var pt in s.Points)
                 {
-                    continue;
-                }
-                var dataset = datasets[d];
-                if (dataset.Count == 0) continue;
-                hasData = true;
-                foreach (var val in dataset)
-                {
-                    if (val < min) min = val;
-                    if (val > max) max = val;
+                    hasPoints = true;
+                    if (pt.X < minX) minX = pt.X;
+                    if (pt.X > maxX) maxX = pt.X;
+                    if (pt.Y < minY) minY = pt.Y;
+                    if (pt.Y > maxY) maxY = pt.Y;
                 }
             }
-            if (!hasData)
+
+            if (!hasPoints)
             {
-                min = 0;
-                max = 1;
+                minX = 0; maxX = 1;
+                minY = 0; maxY = 1;
             }
-            double range = max - min;
-            if (range == 0) range = 1;
 
-            for (int d = 0; d < datasets.Count; d++)
+            double rangeX = maxX - minX;
+            if (rangeX == 0) rangeX = 1;
+            double rangeY = maxY - minY;
+            if (rangeY == 0) rangeY = 1;
+
+            // Render series
+            foreach (var s in activeSeries)
             {
-                string seriesName = legends[d];
-                if (plotState.DisabledSeries.Contains(seriesName))
-                {
-                    continue;
-                }
-                var dataset = datasets[d];
-                var brush = colors[d];
-                string type = plotTypes[d];
-
-                if (dataset.Count == 0) continue;
+                var brush = s.Brush;
+                var type = s.Type;
+                var widget = s.Widget;
 
                 if (type == "scatter")
                 {
-                    for (int i = 0; i < dataset.Count; i++)
-                    {
-                        double x = width * i / Math.Max(1, dataset.Count - 1);
-                        double y = height - (height * (dataset[i] - min) / range);
-                        
-                        var dot = new System.Windows.Shapes.Ellipse
+                    double markerSize = widget != null ? widget.MarkerSize : 6.0;
+                    string markerStyle = widget != null ? widget.MarkerStyle : "circle";
+                    Brush markerColor = (widget != null && widget.MarkerColor != null) ? widget.MarkerColor : brush;
+                    double r = markerSize / 2.0;
+
+                    for (int i = 0; i < s.Points.Count; i++)
+                     {
+                        double sx = width * (s.Points[i].X - minX) / rangeX;
+                        double sy = topMargin + plotHeight - (plotHeight * (s.Points[i].Y - minY) / rangeY);
+
+                        if (markerStyle == "square")
                         {
-                            Width = 6,
-                            Height = 6,
-                            Fill = brush,
-                            Margin = new Thickness(x - 3, y - 3, 0, 0)
-                        };
-                        canvas.Children.Add(dot);
+                            var sq = new Rectangle
+                            {
+                                Width = markerSize,
+                                Height = markerSize,
+                                Fill = markerColor,
+                                Margin = new Thickness(sx - r, sy - r, 0, 0)
+                            };
+                            canvas.Children.Add(sq);
+                        }
+                        else if (markerStyle == "triangle")
+                        {
+                            var tri = new Polygon
+                            {
+                                Points = new PointCollection
+                                {
+                                    new Point(sx, sy - r),
+                                    new Point(sx - r, sy + r),
+                                    new Point(sx + r, sy + r)
+                                },
+                                Fill = markerColor
+                            };
+                            canvas.Children.Add(tri);
+                        }
+                        else
+                        {
+                            var dot = new Ellipse
+                            {
+                                Width = markerSize,
+                                Height = markerSize,
+                                Fill = markerColor,
+                                Margin = new Thickness(sx - r, sy - r, 0, 0)
+                            };
+                            canvas.Children.Add(dot);
+                        }
                     }
                 }
                 else if (type == "bar")
                 {
-                    double barWidth = (width / Math.Max(1, dataset.Count)) * 0.6;
-                    for (int i = 0; i < dataset.Count; i++)
+                    double barWidth = (widget != null && widget.BarWidthValue > 0)
+                        ? widget.BarWidthValue
+                        : (width / Math.Max(1, s.Points.Count)) * 0.6;
+
+                    Brush fillBrush = (widget != null && widget.BarColor != null) ? widget.BarColor : brush;
+                    if (widget != null && widget.BarStyle == "gradient" && fillBrush is SolidColorBrush solidBrush)
                     {
-                        double x = width * i / Math.Max(1, dataset.Count - 1) - barWidth / 2.0;
-                        if (x < 0) x = 0;
-                        double valY = height - (height * (dataset[i] - min) / range);
-                        double barHeight = height - valY;
+                        var startColor = solidBrush.Color;
+                        var endColor = Color.FromArgb(20, startColor.R, startColor.G, startColor.B);
+                        var gradBrush = new LinearGradientBrush(startColor, endColor, new Point(0.5, 0), new Point(0.5, 1));
+                        gradBrush.Freeze();
+                        fillBrush = gradBrush;
+                    }
+
+                    for (int i = 0; i < s.Points.Count; i++)
+                    {
+                        double sx = width * (s.Points[i].X - minX) / rangeX;
+                        double sy = topMargin + plotHeight - (plotHeight * (s.Points[i].Y - minY) / rangeY);
+
+                        double x = sx - barWidth / 2.0;
+                        double valY = sy;
+                        double barHeight = (topMargin + plotHeight) - valY;
                         if (barHeight <= 0) barHeight = 1;
 
-                        var rect = new System.Windows.Shapes.Rectangle
+                        var rect = new Rectangle
                         {
                             Width = barWidth,
                             Height = barHeight,
-                            Fill = brush,
+                            Fill = fillBrush,
                             Opacity = 0.85
                         };
                         Canvas.SetLeft(rect, x);
@@ -1405,43 +1717,73 @@ namespace FlowEngine.Engine
                 }
                 else
                 {
+                    // line
+                    double thickness = widget != null ? widget.LineThickness : 2.0;
+                    string lineStyle = widget != null ? widget.LineStyle : "solid";
+
+                    DoubleCollection? dashArray = null;
+                    if (lineStyle == "dashed") dashArray = new DoubleCollection { 4, 4 };
+                    else if (lineStyle == "dotted") dashArray = new DoubleCollection { 1, 3 };
+
                     var polyline = new Polyline
                     {
                         Stroke = brush,
-                        StrokeThickness = 2
+                        StrokeThickness = thickness,
+                        StrokeDashArray = dashArray
                     };
 
-                    for (int i = 0; i < dataset.Count; i++)
+                    for (int i = 0; i < s.Points.Count; i++)
                     {
-                        double x = width * i / Math.Max(1, dataset.Count - 1);
-                        double y = height - (height * (dataset[i] - min) / range);
-                        polyline.Points.Add(new Point(x, y));
+                        double sx = width * (s.Points[i].X - minX) / rangeX;
+                        double sy = topMargin + plotHeight - (plotHeight * (s.Points[i].Y - minY) / rangeY);
+                        polyline.Points.Add(new Point(sx, sy));
                     }
 
                     canvas.Children.Add(polyline);
                 }
             }
 
-            bool hasAnyLegend = legends.Any(l => !string.IsNullOrEmpty(l));
+            // Render Legends
+            List<string> allLegends = new List<string>();
+            List<Brush> legendColors = new List<Brush>();
+            if (lines.Count > 0)
+            {
+                for (int idx = 0; idx < lines.Count; idx++)
+                {
+                    var lineWidget = lines[idx];
+                    allLegends.Add(GetDisplayName(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : lineWidget.Name));
+                    legendColors.Add(lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length]);
+                }
+            }
+            else
+            {
+                if (plotState.Data.Count > 0)
+                {
+                    allLegends.Add(GetDisplayName(plotState.Legend));
+                    legendColors.Add(ThemeManager.AccentBrush);
+                }
+            }
+
+            bool hasAnyLegend = allLegends.Any(l => !string.IsNullOrEmpty(l));
             if (hasAnyLegend)
             {
                 var legendPanel = new StackPanel { Orientation = Orientation.Vertical, Margin = new Thickness(0) };
 
-                for (int d = 0; d < datasets.Count; d++)
+                for (int d = 0; d < allLegends.Count; d++)
                 {
-                    string legText = legends[d];
+                    string legText = allLegends[d];
                     if (string.IsNullOrEmpty(legText)) continue;
 
                     bool isDisabled = plotState.DisabledSeries.Contains(legText);
                     var itemPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 1, 0, 1) };
-                    
+
                     var accentLine = new Line
                     {
                         X1 = 0,
                         Y1 = 0,
                         X2 = 12,
                         Y2 = 0,
-                        Stroke = colors[d],
+                        Stroke = legendColors[d],
                         StrokeThickness = 2,
                         VerticalAlignment = VerticalAlignment.Center,
                         Margin = new Thickness(0, 0, 6, 0),
@@ -1495,7 +1837,7 @@ namespace FlowEngine.Engine
                     Child = legendPanel
                 };
 
-                Canvas.SetTop(legendBorder, 6);
+                Canvas.SetTop(legendBorder, topMargin + 6);
                 Canvas.SetRight(legendBorder, 6);
                 canvas.Children.Add(legendBorder);
             }
@@ -1516,7 +1858,11 @@ namespace FlowEngine.Engine
             {
                 state = new Plot3DState();
                 canvas.Tag = state;
+            }
 
+            if (!state.EventsRegistered)
+            {
+                state.EventsRegistered = true;
                 canvas.MouseRightButtonDown += (s, e) =>
                 {
                     state.IsDragging = true;
@@ -1561,14 +1907,45 @@ namespace FlowEngine.Engine
                 };
             }
 
+            // Determine topMargin
+            double topMargin = 0;
+            if (state.TitleVisible && !string.IsNullOrEmpty(state.Title))
+            {
+                topMargin = state.TitleFontSize + 12.0;
+                var titleBorder = new Border
+                {
+                    Width = width,
+                    Height = topMargin,
+                    Background = state.TitleBackground ?? Brushes.Transparent,
+                    Child = new TextBlock
+                    {
+                        Text = state.Title,
+                        FontSize = state.TitleFontSize,
+                        Foreground = state.TitleColor ?? ThemeManager.TitleBarFgBrush,
+                        FontFamily = new FontFamily("Inter, Segoe UI"),
+                        FontWeight = FontWeights.Bold,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
+                };
+                Canvas.SetLeft(titleBorder, 0);
+                Canvas.SetTop(titleBorder, 0);
+                canvas.Children.Add(titleBorder);
+            }
+
+            double plotHeight = height - topMargin;
+            if (plotHeight <= 0) plotHeight = 1;
+
             var bg = new Border
             {
                 Width = width,
-                Height = height,
+                Height = plotHeight,
                 Background = new SolidColorBrush(Color.FromArgb(20, 255, 255, 255)),
                 BorderBrush = ThemeManager.BorderBrush,
                 BorderThickness = new Thickness(1)
             };
+            Canvas.SetLeft(bg, 0);
+            Canvas.SetTop(bg, topMargin);
             canvas.Children.Add(bg);
 
             string plotName = string.Empty;
@@ -1585,62 +1962,128 @@ namespace FlowEngine.Engine
             }
 
             var lines = GetChildPlotLines(plotName);
-
-            List<List<List<double>>> datasets = new List<List<List<double>>>();
-            List<string> legends = new List<string>();
-            List<Brush> colors = new List<Brush>();
+            var activeSeries3D = new List<SeriesPoints3D>();
 
             if (lines.Count > 0)
             {
                 for (int idx = 0; idx < lines.Count; idx++)
                 {
                     var lineWidget = lines[idx];
-                    datasets.Add(lineWidget.Plot3DData);
-                    legends.Add(GetDisplayName(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : lineWidget.Name));
-                    colors.Add(lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length]);
+                    string seriesName = GetDisplayName(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : lineWidget.Name);
+                    if (state.DisabledSeries.Contains(seriesName)) continue;
+
+                    var s3d = new SeriesPoints3D
+                    {
+                        Brush = lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length],
+                        Type = lineWidget.PlotType,
+                        Legend = seriesName,
+                        Widget = lineWidget
+                    };
+
+                    var xData = lineWidget.PlotXData;
+                    var yData = lineWidget.PlotYData;
+                    var zData = lineWidget.PlotZData;
+
+                    if (xData.Count > 0 || yData.Count > 0 || zData.Count > 0)
+                    {
+                        int count = Math.Max(xData.Count, Math.Max(yData.Count, zData.Count));
+                        for (int i = 0; i < count; i++)
+                        {
+                            double x = i < xData.Count ? xData[i] : (i < yData.Count ? yData[i] : 0);
+                            double y = i < yData.Count ? yData[i] : (i < xData.Count ? xData[i] : 0);
+                            double z = i < zData.Count ? zData[i] : 0;
+                            s3d.Points.Add(new Point3D(x, y, z));
+                        }
+                    }
+                    else if (lineWidget.Plot3DData.Count > 0 && lineWidget.Plot3DData[0].Count > 0)
+                    {
+                        s3d.GridData = lineWidget.Plot3DData;
+                    }
+
+                    if (s3d.Points.Count > 0 || s3d.GridData != null)
+                    {
+                        activeSeries3D.Add(s3d);
+                    }
                 }
             }
             else
             {
                 if (state.GridData.Count > 0 && state.GridData[0].Count > 0)
                 {
-                    datasets.Add(state.GridData);
-                    legends.Add(GetDisplayName(state.Legend));
-                    colors.Add(ThemeManager.AccentBrush);
-                }
-            }
-
-            if (datasets.Count == 0) return;
-
-            double minZ = double.MaxValue;
-            double maxZ = double.MinValue;
-            bool hasData = false;
-            for (int d = 0; d < datasets.Count; d++)
-            {
-                string seriesName = legends[d];
-                if (state.DisabledSeries.Contains(seriesName))
-                {
-                    continue;
-                }
-                var grid = datasets[d];
-                if (grid.Count == 0 || grid[0].Count == 0) continue;
-                hasData = true;
-                foreach (var row in grid)
-                {
-                    foreach (var val in row)
+                    string seriesName = GetDisplayName(state.Legend);
+                    if (!state.DisabledSeries.Contains(seriesName))
                     {
-                        if (val < minZ) minZ = val;
-                        if (val > maxZ) maxZ = val;
+                        var s3d = new SeriesPoints3D
+                        {
+                            Brush = ThemeManager.AccentBrush,
+                            Type = "line",
+                            Legend = seriesName,
+                            GridData = state.GridData,
+                            Widget = null!
+                        };
+                        activeSeries3D.Add(s3d);
                     }
                 }
             }
+
+            if (activeSeries3D.Count == 0) return;
+
+            // Global limits
+            double minX = double.MaxValue;
+            double maxX = double.MinValue;
+            double minY = double.MaxValue;
+            double maxY = double.MinValue;
+            double minZ = double.MaxValue;
+            double maxZ = double.MinValue;
+            bool hasData = false;
+
+            foreach (var s in activeSeries3D)
+            {
+                if (s.Points.Count > 0)
+                {
+                    hasData = true;
+                    foreach (var pt in s.Points)
+                    {
+                        if (pt.X < minX) minX = pt.X;
+                        if (pt.X > maxX) maxX = pt.X;
+                        if (pt.Y < minY) minY = pt.Y;
+                        if (pt.Y > maxY) maxY = pt.Y;
+                        if (pt.Z < minZ) minZ = pt.Z;
+                        if (pt.Z > maxZ) maxZ = pt.Z;
+                    }
+                }
+                else if (s.GridData != null)
+                {
+                    hasData = true;
+                    int rows = s.GridData.Count;
+                    int cols = s.GridData[0].Count;
+
+                    if (0 < minX) minX = 0;
+                    if (cols - 1 > maxX) maxX = cols - 1;
+                    if (0 < minY) minY = 0;
+                    if (rows - 1 > maxY) maxY = rows - 1;
+
+                    foreach (var row in s.GridData)
+                    {
+                        foreach (var val in row)
+                        {
+                            if (val < minZ) minZ = val;
+                            if (val > maxZ) maxZ = val;
+                        }
+                    }
+                }
+            }
+
             if (!hasData)
             {
-                minZ = 0;
-                maxZ = 1;
+                minX = 0; maxX = 1;
+                minY = 0; maxY = 1;
+                minZ = 0; maxZ = 1;
             }
-            double rangeZ = maxZ - minZ;
-            if (rangeZ == 0) rangeZ = 1;
+
+            double rangeX = maxX - minX; if (rangeX == 0) rangeX = 1;
+            double rangeY = maxY - minY; if (rangeY == 0) rangeY = 1;
+            double rangeZ = maxZ - minZ; if (rangeZ == 0) rangeZ = 1;
 
             double radX = state.RotateX * Math.PI / 180.0;
             double radY = state.RotateY * Math.PI / 180.0;
@@ -1649,97 +2092,267 @@ namespace FlowEngine.Engine
             double cosY = Math.Cos(radY);
             double sinY = Math.Sin(radY);
 
-            for (int d = 0; d < datasets.Count; d++)
+            Point ProjectCoord(double xVal, double yVal, double zVal)
             {
-                string seriesName = legends[d];
-                if (state.DisabledSeries.Contains(seriesName))
+                double x = (xVal - minX) / rangeX - 0.5;
+                double y = (yVal - minY) / rangeY - 0.5;
+                double z = (zVal - minZ) / rangeZ - 0.5;
+
+                double y1 = y * cosY - z * sinY;
+                double z1 = y * sinY + z * cosY;
+
+                double x2 = x * cosX - y1 * sinX;
+                double y2 = x * sinX + y1 * cosX;
+
+                double scale = width * 0.7 * state.Zoom;
+                double screenX = width / 2.0 + x2 * scale;
+                double centerY = topMargin + plotHeight / 2.0;
+                double screenY = centerY + y2 * scale - z1 * (scale * 0.5);
+
+                return new Point(screenX, screenY);
+            }
+
+            // Draw X grid lines
+            if (state.GridVisibleX && state.GridIntervalX > 0)
+            {
+                int countX = (int)Math.Max(1, state.GridIntervalX);
+                for (int i = 0; i <= countX; i++)
                 {
-                    continue;
-                }
-                var grid = datasets[d];
-                var strokeBrush = colors[d];
-
-                if (grid.Count == 0 || grid[0].Count == 0) continue;
-
-                int rows = grid.Count;
-                int cols = grid[0].Count;
-
-                Point Project(int r, int c, double val)
-                {
-                    double x = (double)c / Math.Max(1, cols - 1) - 0.5;
-                    double y = (double)r / Math.Max(1, rows - 1) - 0.5;
-                    double z = (val - minZ) / rangeZ - 0.5;
-
-                    double y1 = y * cosY - z * sinY;
-                    double z1 = y * sinY + z * cosY;
-
-                    double x2 = x * cosX - y1 * sinX;
-                    double y2 = x * sinX + y1 * cosX;
-
-                    double scale = width * 0.7 * state.Zoom;
-                    double screenX = width / 2.0 + x2 * scale;
-                    double screenY = height / 2.0 + y2 * scale - z1 * (scale * 0.5);
-
-                    return new Point(screenX, screenY);
-                }
-
-                for (int r = 0; r < rows; r++)
-                {
-                    for (int c = 0; c < cols - 1; c++)
+                    double xVal = minX + rangeX * i / (double)countX;
+                    var pt1 = ProjectCoord(xVal, minY, minZ);
+                    var pt2 = ProjectCoord(xVal, maxY, minZ);
+                    var gridLine = new Line
                     {
-                        var pt1 = Project(r, c, grid[r][c]);
-                        var pt2 = Project(r, c + 1, grid[r][c + 1]);
-                        var line = new Line
+                        X1 = pt1.X, Y1 = pt1.Y,
+                        X2 = pt2.X, Y2 = pt2.Y,
+                        Stroke = state.GridColorX ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                        StrokeThickness = state.GridThicknessX
+                    };
+                    canvas.Children.Add(gridLine);
+                }
+            }
+
+            // Draw Y grid lines
+            if (state.GridVisibleY && state.GridIntervalY > 0)
+            {
+                int countY = (int)Math.Max(1, state.GridIntervalY);
+                for (int i = 0; i <= countY; i++)
+                {
+                    double yVal = minY + rangeY * i / (double)countY;
+                    var pt1 = ProjectCoord(minX, yVal, minZ);
+                    var pt2 = ProjectCoord(maxX, yVal, minZ);
+                    var gridLine = new Line
+                    {
+                        X1 = pt1.X, Y1 = pt1.Y,
+                        X2 = pt2.X, Y2 = pt2.Y,
+                        Stroke = state.GridColorY ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                        StrokeThickness = state.GridThicknessY
+                    };
+                    canvas.Children.Add(gridLine);
+                }
+            }
+
+            // Draw Z grid cage lines
+            if (state.GridVisibleZ && state.GridIntervalZ > 0)
+            {
+                var corners = new[]
+                {
+                    new Point(minX, minY),
+                    new Point(maxX, minY),
+                    new Point(minX, maxY),
+                    new Point(maxX, maxY)
+                };
+
+                foreach (var corner in corners)
+                {
+                    var pt1 = ProjectCoord(corner.X, corner.Y, minZ);
+                    var pt2 = ProjectCoord(corner.X, corner.Y, maxZ);
+                    var gridLine = new Line
+                    {
+                        X1 = pt1.X, Y1 = pt1.Y,
+                        X2 = pt2.X, Y2 = pt2.Y,
+                        Stroke = state.GridColorZ ?? new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                        StrokeThickness = state.GridThicknessZ
+                    };
+                    canvas.Children.Add(gridLine);
+                }
+
+                int countZ = (int)Math.Max(1, state.GridIntervalZ);
+                for (int i = 1; i <= countZ; i++)
+                {
+                    double zVal = minZ + rangeZ * i / (double)countZ;
+                    var p1 = ProjectCoord(minX, minY, zVal);
+                    var p2 = ProjectCoord(maxX, minY, zVal);
+                    var p3 = ProjectCoord(maxX, maxY, zVal);
+                    var p4 = ProjectCoord(minX, maxY, zVal);
+
+                    var cageColor = state.GridColorZ ?? new SolidColorBrush(Color.FromArgb(30, 255, 255, 255));
+
+                    canvas.Children.Add(new Line { X1 = p1.X, Y1 = p1.Y, X2 = p2.X, Y2 = p2.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                    canvas.Children.Add(new Line { X1 = p2.X, Y1 = p2.Y, X2 = p3.X, Y2 = p3.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                    canvas.Children.Add(new Line { X1 = p3.X, Y1 = p3.Y, X2 = p4.X, Y2 = p4.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                    canvas.Children.Add(new Line { X1 = p4.X, Y1 = p4.Y, X2 = p1.X, Y2 = p1.Y, Stroke = cageColor, StrokeThickness = state.GridThicknessZ });
+                }
+            }
+
+            // Render series
+            foreach (var s in activeSeries3D)
+            {
+                if (s.Points.Count > 0)
+                {
+                    if (s.Type == "scatter")
+                    {
+                        double markerSize = s.Widget != null ? s.Widget.MarkerSize : 6.0;
+                        string markerStyle = s.Widget != null ? s.Widget.MarkerStyle : "circle";
+                        Brush markerColor = (s.Widget != null && s.Widget.MarkerColor != null) ? s.Widget.MarkerColor : s.Brush;
+                        double r = markerSize / 2.0;
+
+                        for (int i = 0; i < s.Points.Count; i++)
                         {
-                            X1 = pt1.X,
-                            Y1 = pt1.Y,
-                            X2 = pt2.X,
-                            Y2 = pt2.Y,
-                            Stroke = strokeBrush,
-                            StrokeThickness = 1
-                        };
-                        canvas.Children.Add(line);
+                            var pt = ProjectCoord(s.Points[i].X, s.Points[i].Y, s.Points[i].Z);
+                            if (markerStyle == "square")
+                            {
+                                var sq = new Rectangle
+                                {
+                                    Width = markerSize, Height = markerSize,
+                                    Fill = markerColor,
+                                    Margin = new Thickness(pt.X - r, pt.Y - r, 0, 0)
+                                };
+                                canvas.Children.Add(sq);
+                            }
+                            else if (markerStyle == "triangle")
+                            {
+                                var tri = new Polygon
+                                {
+                                    Points = new PointCollection
+                                    {
+                                        new Point(pt.X, pt.Y - r),
+                                        new Point(pt.X - r, pt.Y + r),
+                                        new Point(pt.X + r, pt.Y + r)
+                                    },
+                                    Fill = markerColor
+                                };
+                                canvas.Children.Add(tri);
+                            }
+                            else
+                            {
+                                var dot = new Ellipse
+                                {
+                                    Width = markerSize, Height = markerSize,
+                                    Fill = markerColor,
+                                    Margin = new Thickness(pt.X - r, pt.Y - r, 0, 0)
+                                };
+                                canvas.Children.Add(dot);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // line
+                        double thickness = s.Widget != null ? s.Widget.LineThickness : 1.0;
+                        string lineStyle = s.Widget != null ? s.Widget.LineStyle : "solid";
+
+                        DoubleCollection? dashArray = null;
+                        if (lineStyle == "dashed") dashArray = new DoubleCollection { 4, 4 };
+                        else if (lineStyle == "dotted") dashArray = new DoubleCollection { 1, 3 };
+
+                        for (int i = 0; i < s.Points.Count - 1; i++)
+                        {
+                            var pt1 = ProjectCoord(s.Points[i].X, s.Points[i].Y, s.Points[i].Z);
+                            var pt2 = ProjectCoord(s.Points[i+1].X, s.Points[i+1].Y, s.Points[i+1].Z);
+
+                            var line = new Line
+                            {
+                                X1 = pt1.X, Y1 = pt1.Y,
+                                X2 = pt2.X, Y2 = pt2.Y,
+                                Stroke = s.Brush,
+                                StrokeThickness = thickness,
+                                StrokeDashArray = dashArray
+                            };
+                            canvas.Children.Add(line);
+                        }
                     }
                 }
-
-                for (int c = 0; c < cols; c++)
+                else if (s.GridData != null)
                 {
-                    for (int r = 0; r < rows - 1; r++)
+                    int rows = s.GridData.Count;
+                    int cols = s.GridData[0].Count;
+
+                    for (int r = 0; r < rows; r++)
                     {
-                        var pt1 = Project(r, c, grid[r][c]);
-                        var pt2 = Project(r + 1, c, grid[r + 1][c]);
-                        var line = new Line
+                        for (int c = 0; c < cols - 1; c++)
                         {
-                            X1 = pt1.X,
-                            Y1 = pt1.Y,
-                            X2 = pt2.X,
-                            Y2 = pt2.Y,
-                            Stroke = strokeBrush,
-                            StrokeThickness = 1
-                        };
-                        canvas.Children.Add(line);
+                            var pt1 = ProjectCoord(c, r, s.GridData[r][c]);
+                            var pt2 = ProjectCoord(c + 1, r, s.GridData[r][c + 1]);
+                            var line = new Line
+                            {
+                                X1 = pt1.X, Y1 = pt1.Y,
+                                X2 = pt2.X, Y2 = pt2.Y,
+                                Stroke = s.Brush,
+                                StrokeThickness = 1
+                            };
+                            canvas.Children.Add(line);
+                        }
+                    }
+
+                    for (int c = 0; c < cols; c++)
+                    {
+                        for (int r = 0; r < rows - 1; r++)
+                        {
+                            var pt1 = ProjectCoord(c, r, s.GridData[r][c]);
+                            var pt2 = ProjectCoord(c, r + 1, s.GridData[r + 1][c]);
+                            var line = new Line
+                            {
+                                X1 = pt1.X, Y1 = pt1.Y,
+                                X2 = pt2.X, Y2 = pt2.Y,
+                                Stroke = s.Brush,
+                                StrokeThickness = 1
+                            };
+                            canvas.Children.Add(line);
+                        }
                     }
                 }
             }
 
-            bool hasAnyLegend = legends.Any(l => !string.IsNullOrEmpty(l));
+            // Render Legends
+            List<string> allLegends = new List<string>();
+            List<Brush> legendColors = new List<Brush>();
+            if (lines.Count > 0)
+            {
+                for (int idx = 0; idx < lines.Count; idx++)
+                {
+                    var lineWidget = lines[idx];
+                    allLegends.Add(GetDisplayName(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : lineWidget.Name));
+                    legendColors.Add(lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length]);
+                }
+            }
+            else
+            {
+                if (state.GridData.Count > 0 && state.GridData[0].Count > 0)
+                {
+                    allLegends.Add(GetDisplayName(state.Legend));
+                    legendColors.Add(ThemeManager.AccentBrush);
+                }
+            }
+
+            bool hasAnyLegend = allLegends.Any(l => !string.IsNullOrEmpty(l));
             if (hasAnyLegend)
             {
                 var legendPanel = new StackPanel { Orientation = Orientation.Vertical, Margin = new Thickness(0) };
 
-                for (int d = 0; d < datasets.Count; d++)
+                for (int d = 0; d < allLegends.Count; d++)
                 {
-                    string legText = legends[d];
+                    string legText = allLegends[d];
                     if (string.IsNullOrEmpty(legText)) continue;
 
                     bool isDisabled = state.DisabledSeries.Contains(legText);
                     var itemPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 1, 0, 1) };
-                    
+
                     var accentMarker = new Rectangle
                     {
                         Width = 8,
                         Height = 8,
-                        Fill = colors[d],
+                        Fill = legendColors[d],
                         VerticalAlignment = VerticalAlignment.Center,
                         Margin = new Thickness(0, 0, 6, 0),
                         Opacity = isDisabled ? 0.25 : 1.0
@@ -1792,7 +2405,7 @@ namespace FlowEngine.Engine
                     Child = legendPanel
                 };
 
-                Canvas.SetTop(legendBorder, 6);
+                Canvas.SetTop(legendBorder, topMargin + 6);
                 Canvas.SetRight(legendBorder, 6);
                 canvas.Children.Add(legendBorder);
             }
@@ -1884,6 +2497,23 @@ namespace FlowEngine.Engine
         public string Legend { get; set; } = string.Empty;
         public Brush? LegendTextColor { get; set; }
         public HashSet<string> DisabledSeries { get; } = new HashSet<string>();
+
+        // Custom Title properties
+        public string Title { get; set; } = string.Empty;
+        public double TitleFontSize { get; set; } = 12.0;
+        public Brush? TitleColor { get; set; }
+        public Brush? TitleBackground { get; set; }
+        public bool TitleVisible { get; set; } = true;
+
+        // Custom Grid properties per axis
+        public bool GridVisibleX { get; set; } = true;
+        public bool GridVisibleY { get; set; } = true;
+        public double GridIntervalX { get; set; } = 4.0;
+        public double GridIntervalY { get; set; } = 4.0;
+        public Brush? GridColorX { get; set; }
+        public Brush? GridColorY { get; set; }
+        public double GridThicknessX { get; set; } = 0.5;
+        public double GridThicknessY { get; set; } = 0.5;
     }
 
     public class Plot3DState
@@ -1897,5 +2527,56 @@ namespace FlowEngine.Engine
         public string Legend { get; set; } = string.Empty;
         public Brush? LegendTextColor { get; set; }
         public HashSet<string> DisabledSeries { get; } = new HashSet<string>();
+
+        // Restores dragging/zoom events register check
+        public bool EventsRegistered { get; set; } = false;
+
+        // Custom Title properties
+        public string Title { get; set; } = string.Empty;
+        public double TitleFontSize { get; set; } = 12.0;
+        public Brush? TitleColor { get; set; }
+        public Brush? TitleBackground { get; set; }
+        public bool TitleVisible { get; set; } = true;
+
+        // Custom Grid properties per axis
+        public bool GridVisibleX { get; set; } = true;
+        public bool GridVisibleY { get; set; } = true;
+        public bool GridVisibleZ { get; set; } = true;
+        public double GridIntervalX { get; set; } = 4.0;
+        public double GridIntervalY { get; set; } = 4.0;
+        public double GridIntervalZ { get; set; } = 4.0;
+        public Brush? GridColorX { get; set; }
+        public Brush? GridColorY { get; set; }
+        public Brush? GridColorZ { get; set; }
+        public double GridThicknessX { get; set; } = 0.5;
+        public double GridThicknessY { get; set; } = 0.5;
+        public double GridThicknessZ { get; set; } = 0.5;
+    }
+
+    public class SeriesPoints
+    {
+        public List<Point> Points { get; set; } = new List<Point>();
+        public Brush Brush { get; set; } = null!;
+        public string Type { get; set; } = "line";
+        public string Legend { get; set; } = string.Empty;
+        public GuiWidget Widget { get; set; } = null!;
+    }
+
+    public struct Point3D
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Z { get; set; }
+        public Point3D(double x, double y, double z) { X = x; Y = y; Z = z; }
+    }
+
+    public class SeriesPoints3D
+    {
+        public List<Point3D> Points { get; set; } = new List<Point3D>();
+        public List<List<double>> GridData { get; set; } = null!;
+        public Brush Brush { get; set; } = null!;
+        public string Type { get; set; } = "line";
+        public string Legend { get; set; } = string.Empty;
+        public GuiWidget Widget { get; set; } = null!;
     }
 }

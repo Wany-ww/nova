@@ -1,0 +1,473 @@
+Total issues: 236
+[1] INFO | AssemblyInfo.cs:5 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 12 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[2] INFO | AssemblyInfo.cs:8 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 12 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[3] INFO | ImageWindow.Docking.cs:22 | Code Smell | Magic Number
+    Desc: Magic number literal '160' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[4] INFO | ImageWindow.Docking.cs:24 | Code Smell | Magic Number
+    Desc: Magic number literal '53.33' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[5] INFO | ImageWindow.Docking.cs:25 | Code Smell | Magic Number
+    Desc: Magic number literal '53.33' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[6] INFO | ImageWindow.Docking.cs:98 | Code Smell | Magic Number
+    Desc: Magic number literal '120' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[7] INFO | ImageWindow.Docking.cs:100 | Code Smell | Magic Number
+    Desc: Magic number literal '40' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[8] INFO | ImageWindow.Docking.cs:101 | Code Smell | Magic Number
+    Desc: Magic number literal '40' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[9] INFO | ImageWindow.Docking.cs:210 | Code Smell | Magic Number
+    Desc: Magic number literal '120' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[10] INFO | ImageWindow.Docking.cs:212 | Code Smell | Magic Number
+    Desc: Magic number literal '40' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[11] INFO | ImageWindow.Docking.cs:213 | Code Smell | Magic Number
+    Desc: Magic number literal '40' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[12] INFO | ImageWindow.Docking.cs:320 | Code Smell | Magic Number
+    Desc: Magic number literal '160' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[13] INFO | ImageWindow.Docking.cs:322 | Code Smell | Magic Number
+    Desc: Magic number literal '53.33' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[14] INFO | ImageWindow.Docking.cs:323 | Code Smell | Magic Number
+    Desc: Magic number literal '53.33' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[15] INFO | ImageWindow.Docking.cs:44 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[16] INFO | ImageWindow.Docking.cs:47 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[17] INFO | ImageWindow.Docking.cs:116 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[18] INFO | ImageWindow.Docking.cs:229 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[19] INFO | ImageWindow.Docking.cs:234 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[20] INFO | ImageWindow.Docking.cs:236 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[21] INFO | ImageWindow.Docking.cs:246 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[22] INFO | ImageWindow.Docking.cs:248 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[23] INFO | ImageWindow.Docking.cs:252 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[24] INFO | ImageWindow.Docking.cs:270 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[25] INFO | ImageWindow.Docking.cs:275 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[26] INFO | ImageWindow.Docking.cs:277 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[27] INFO | ImageWindow.Docking.cs:287 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[28] INFO | ImageWindow.Docking.cs:289 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[29] INFO | ImageWindow.Docking.cs:293 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[30] INFO | ImageWindow.Docking.cs:339 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[31] INFO | ImageWindow.Docking.cs:342 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[32] INFO | ImageWindow.Docking.cs:358 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[33] INFO | ImageWindow.Docking.cs:360 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[34] INFO | ImageWindow.Docking.cs:370 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[35] INFO | ImageWindow.Docking.cs:372 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[36] INFO | ImageWindow.Docking.cs:376 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[37] INFO | ImageWindow.Docking.cs:426 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[38] INFO | ImageWindow.Docking.cs:438 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[39] INFO | ImageWindow.Docking.cs:443 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[40] INFO | ImageWindow.xaml.cs:64 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[41] INFO | ImageWindow.xaml.cs:66 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[42] INFO | ImageWindow.xaml.cs:70 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[43] INFO | MainWindow.Docking.cs:83 | Code Smell | Magic Number
+    Desc: Magic number literal '999' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[44] INFO | MainWindow.Docking.cs:90 | Code Smell | Magic Number
+    Desc: Magic number literal '999' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[45] INFO | MainWindow.Docking.cs:549 | Code Smell | Magic Number
+    Desc: Magic number literal '200' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[46] INFO | MainWindow.Docking.cs:690 | Code Smell | Magic Number
+    Desc: Magic number literal '200' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[47] INFO | MainWindow.Docking.cs:147 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[48] INFO | MainWindow.Docking.cs:151 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[49] INFO | MainWindow.Docking.cs:157 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[50] INFO | MainWindow.Docking.cs:159 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 9 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[51] INFO | MainWindow.Docking.cs:161 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 10 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[52] INFO | MainWindow.Docking.cs:165 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 10 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[53] INFO | MainWindow.Docking.cs:212 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[54] INFO | MainWindow.Docking.cs:214 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[55] INFO | MainWindow.Docking.cs:409 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[56] INFO | MainWindow.Docking.cs:428 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[57] INFO | MainWindow.Docking.cs:566 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[58] INFO | MainWindow.Docking.cs:574 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[59] INFO | MainWindow.Docking.cs:860 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[60] INFO | MainWindow.Docking.cs:862 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[61] INFO | MainWindow.Docking.cs:883 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[62] INFO | MainWindow.Docking.cs:885 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[63] INFO | MainWindow.DockingOverlay.cs:62 | Code Smell | Magic Number
+    Desc: Magic number literal '300' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[64] INFO | MainWindow.DockingOverlay.cs:68 | Code Smell | Magic Number
+    Desc: Magic number literal '300' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[65] INFO | MainWindow.DockingOverlay.cs:75 | Code Smell | Magic Number
+    Desc: Magic number literal '200' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[66] INFO | MainWindow.DockingOverlay.cs:81 | Code Smell | Magic Number
+    Desc: Magic number literal '200' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[67] INFO | MainWindow.DockingOverlay.cs:419 | Code Smell | Magic Number
+    Desc: Magic number literal '999' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[68] INFO | MainWindow.DockingOverlay.cs:426 | Code Smell | Magic Number
+    Desc: Magic number literal '999' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[69] INFO | MainWindow.Resources.cs:68 | Code Smell | Magic Number
+    Desc: Magic number literal '1024.0' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[70] INFO | MainWindow.Resources.cs:69 | Code Smell | Magic Number
+    Desc: Magic number literal '1024.0' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[71] INFO | MainWindow.Resources.cs:197 | Code Smell | Magic Number
+    Desc: Magic number literal '0.25' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[72] INFO | MainWindow.Resources.cs:198 | Code Smell | Magic Number
+    Desc: Magic number literal '4.0' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[73] INFO | MainWindow.Resources.cs:241 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[74] INFO | MainWindow.Resources.cs:265 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[75] INFO | MainWindow.xaml.cs:140 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[76] INFO | MainWindow.xaml.cs:163 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[77] INFO | MainWindow.xaml.cs:178 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[78] INFO | MainWindow.xaml.cs:192 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[79] INFO | MainWindow.xaml.cs:207 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[80] INFO | MainWindow.xaml.cs:221 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[81] INFO | MainWindow.xaml.cs:336 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[82] INFO | MainWindow.xaml.cs:390 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[83] INFO | Engine/FlowRunner.cs:279 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[84] INFO | Engine/FlowRunner.cs:281 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[85] INFO | Engine/FlowRunner.cs:343 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[86] INFO | Engine/FlowRunner.cs:405 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[87] INFO | Engine/FlowRunner.cs:409 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[88] INFO | Engine/FlowRunner.cs:417 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'switch' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[89] INFO | Engine/FlowRunner.cs:419 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[90] INFO | Engine/FlowRunner.cs:420 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[91] INFO | Engine/FlowRunner.cs:421 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[92] INFO | Engine/FlowRunner.cs:427 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[93] INFO | Engine/FlowRunner.cs:434 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'for' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[94] INFO | Engine/FlowRunner.cs:436 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[95] INFO | Engine/FlowRunner.cs:439 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[96] INFO | Engine/FlowRunner.cs:455 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[97] INFO | Engine/FlowRunner.cs:475 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[98] INFO | Engine/FlowRunner.cs:484 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[99] INFO | Engine/LuaGui.cs:800 | Code Smell | Magic Number
+    Desc: Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[100] INFO | Engine/LuaGui.cs:895 | Code Smell | Magic Number
+    Desc: Magic number literal '30' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[101] INFO | Engine/LuaGui.cs:973 | Code Smell | Magic Number
+    Desc: Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[102] INFO | Engine/LuaGui.cs:1016 | Code Smell | Magic Number
+    Desc: Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[103] INFO | Engine/LuaGui.cs:1083 | Code Smell | Magic Number
+    Desc: Magic number literal '0.5' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[104] INFO | Engine/LuaGui.cs:1084 | Code Smell | Magic Number
+    Desc: Magic number literal '0.5' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[105] INFO | Engine/LuaGui.cs:1129 | Code Smell | Magic Number
+    Desc: Magic number literal '0.5' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[106] INFO | Engine/LuaGui.cs:1130 | Code Smell | Magic Number
+    Desc: Magic number literal '0.5' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[107] INFO | Engine/LuaGui.cs:1131 | Code Smell | Magic Number
+    Desc: Magic number literal '0.5' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[108] INFO | Engine/LuaGui.cs:161 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[109] INFO | Engine/LuaGui.cs:163 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[110] INFO | Engine/LuaGui.cs:185 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[111] INFO | Engine/LuaGui.cs:187 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[112] INFO | Engine/LuaGui.cs:193 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[113] INFO | Engine/LuaGui.cs:195 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[114] INFO | Engine/LuaGui.cs:399 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[115] INFO | Engine/LuaGui.cs:407 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[116] INFO | Engine/LuaGui.cs:412 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[117] INFO | Engine/LuaGui.cs:420 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[118] INFO | Engine/LuaGui.cs:440 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[119] INFO | Engine/LuaGui.cs:445 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[120] INFO | Engine/LuaGui.cs:452 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[121] INFO | Engine/LuaGui.cs:459 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[122] INFO | Engine/LuaGui.cs:468 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[123] INFO | Engine/LuaGui.cs:477 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[124] INFO | Engine/LuaGui.cs:488 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[125] INFO | Engine/LuaGui.cs:490 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[126] INFO | Engine/LuaGui.cs:491 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[127] INFO | Engine/LuaGui.cs:498 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[128] INFO | Engine/LuaGui.cs:500 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[129] INFO | Engine/LuaGui.cs:501 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[130] INFO | Engine/LuaGui.cs:502 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[131] INFO | Engine/LuaGui.cs:523 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[132] INFO | Engine/LuaGui.cs:526 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[133] INFO | Engine/LuaGui.cs:527 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[134] INFO | Engine/LuaGui.cs:528 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[135] INFO | Engine/LuaGui.cs:533 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[136] INFO | Engine/LuaGui.cs:536 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[137] INFO | Engine/LuaGui.cs:545 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[138] INFO | Engine/LuaGui.cs:553 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[139] INFO | Engine/LuaGui.cs:557 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'for' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[140] INFO | Engine/LuaGui.cs:565 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[141] INFO | Engine/LuaGui.cs:569 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[142] INFO | Engine/LuaGui.cs:573 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[143] INFO | Engine/LuaGui.cs:576 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[144] INFO | Engine/LuaGui.cs:578 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[145] INFO | Engine/LuaGui.cs:582 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[146] INFO | Engine/LuaGui.cs:584 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[147] INFO | Engine/LuaGui.cs:588 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[148] INFO | Engine/LuaGui.cs:592 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'for' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[149] INFO | Engine/LuaGui.cs:607 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[150] INFO | Engine/LuaGui.cs:611 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'for' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[151] INFO | Engine/LuaGui.cs:617 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[152] INFO | Engine/LuaGui.cs:621 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'for' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[153] INFO | Engine/LuaGui.cs:624 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[154] INFO | Engine/LuaGui.cs:627 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'for' is nested 9 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[155] INFO | Engine/LuaGui.cs:636 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[156] INFO | Engine/LuaGui.cs:640 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[157] INFO | Engine/LuaGui.cs:643 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[158] INFO | Engine/LuaGui.cs:705 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[159] INFO | Engine/LuaGui.cs:780 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[160] INFO | Engine/LuaGui.cs:789 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[161] INFO | Engine/LuaGui.cs:794 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[162] INFO | Engine/LuaParser.cs:137 | Code Smell | Magic Number
+    Desc: Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[163] INFO | Engine/LuaParser.cs:93 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[164] INFO | Engine/LuaParser.cs:101 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[165] INFO | Engine/LuaParser.cs:116 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[166] INFO | Engine/LuaParser.cs:123 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[167] INFO | Engine/LuaRunner.cs:120 | Code Smell | Magic Number
+    Desc: Magic number literal '12' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[168] INFO | Engine/LuaRunner.cs:230 | Code Smell | Magic Number
+    Desc: Magic number literal '1000' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[169] INFO | Engine/LuaRunner.cs:231 | Code Smell | Magic Number
+    Desc: Magic number literal '50' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[170] INFO | Engine/LuaRunner.cs:241 | Code Smell | Magic Number
+    Desc: Magic number literal '50' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[171] INFO | Engine/LuaRunner.cs:750 | Code Smell | Magic Number
+    Desc: Magic number literal '1000000' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[172] INFO | Engine/LuaRunner.cs:1112 | Code Smell | Magic Number
+    Desc: Magic number literal '21' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[173] INFO | Engine/LuaRunner.cs:1146 | Code Smell | Magic Number
+    Desc: Magic number literal '21' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[174] INFO | Engine/LuaRunner.cs:1195 | Code Smell | Magic Number
+    Desc: Magic number literal '1024.0' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[175] INFO | Engine/LuaRunner.cs:1196 | Code Smell | Magic Number
+    Desc: Magic number literal '1024.0' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[176] INFO | Engine/LuaRunner.cs:1221 | Code Smell | Magic Number
+    Desc: Magic number literal '1024.0' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[177] INFO | Engine/LuaRunner.cs:1452 | Code Smell | Magic Number
+    Desc: Magic number literal '30' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[178] INFO | Engine/LuaRunner.cs:234 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[179] INFO | Engine/LuaRunner.cs:244 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[180] INFO | Engine/LuaRunner.cs:358 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[181] INFO | Engine/LuaRunner.cs:557 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'for' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[182] INFO | Engine/LuaRunner.cs:560 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[183] INFO | Engine/LuaRunner.cs:576 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[184] INFO | Engine/LuaRunner.cs:577 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'for' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[185] INFO | Engine/LuaRunner.cs:613 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[186] INFO | Engine/LuaRunner.cs:623 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[187] INFO | Engine/LuaRunner.cs:630 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[188] INFO | Engine/LuaRunner.cs:668 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[189] INFO | Engine/LuaRunner.cs:879 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[190] INFO | Engine/LuaRunner.cs:882 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[191] INFO | Engine/LuaRunner.cs:929 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[192] INFO | Engine/LuaRunner.cs:932 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[193] INFO | Engine/LuaRunner.cs:934 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[194] INFO | Engine/LuaRunner.cs:1330 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[195] INFO | Engine/LuaRunner.cs:1333 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'for' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[196] INFO | Engine/LuaRunner.cs:1395 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[197] INFO | Engine/LuaRunner.cs:1406 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[198] INFO | Engine/LuaRunner.cs:1408 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[199] INFO | Engine/LuaRunner.cs:1411 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 8 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[200] INFO | Engine/LuaRunner.cs:1416 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'for' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[201] INFO | Engine/LuaRunner.cs:1420 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[202] INFO | Engine/LuaRunner.cs:1457 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[203] INFO | Engine/LuaSocket.cs:282 | Code Smell | Magic Number
+    Desc: Magic number literal '1000' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[204] INFO | Engine/LuaSocket.cs:216 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[205] INFO | Engine/LuaSocket.cs:231 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[206] INFO | Engine/OpenCvLuaApi.cs:172 | Code Smell | Magic Number
+    Desc: Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[207] INFO | Engine/OpenCvLuaApi.cs:217 | Code Smell | Magic Number
+    Desc: Magic number literal '8' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[208] INFO | Engine/OpenCvLuaApi.cs:225 | Code Smell | Magic Number
+    Desc: Magic number literal '6' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[209] INFO | Engine/OpenCvLuaApi.cs:236 | Code Smell | Magic Number
+    Desc: Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[210] INFO | Engine/OpenCvLuaApi.cs:246 | Code Smell | Magic Number
+    Desc: Magic number literal '7' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[211] INFO | Engine/OpenCvLuaApi.cs:276 | Code Smell | Magic Number
+    Desc: Magic number literal '8' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[212] INFO | Engine/OpenCvLuaApi.cs:284 | Code Smell | Magic Number
+    Desc: Magic number literal '6' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[213] INFO | Engine/OpenCvLuaApi.cs:295 | Code Smell | Magic Number
+    Desc: Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[214] INFO | Engine/OpenCvLuaApi.cs:308 | Code Smell | Magic Number
+    Desc: Magic number literal '8' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[215] INFO | Engine/OpenCvLuaApi.cs:316 | Code Smell | Magic Number
+    Desc: Magic number literal '6' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[216] INFO | Engine/OpenCvLuaApi.cs:386 | Code Smell | Magic Number
+    Desc: Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[217] INFO | Engine/OpenCvLuaApi.cs:392 | Code Smell | Magic Number
+    Desc: Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[218] INFO | Engine/OpenCvLuaApi.cs:452 | Code Smell | Magic Number
+    Desc: Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[219] INFO | Engine/OpenCvLuaApi.cs:460 | Code Smell | Magic Number
+    Desc: Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[220] INFO | Engine/OpenCvLuaApi.cs:724 | Code Smell | Magic Number
+    Desc: Magic number literal '4' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[221] INFO | Engine/OpenCvLuaApi.cs:800 | Code Smell | Magic Number
+    Desc: Magic number literal '20' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[222] INFO | Engine/OpenCvLuaApi.cs:801 | Code Smell | Magic Number
+    Desc: Magic number literal '32' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[223] INFO | Engine/OpenCvLuaApi.cs:46 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[224] INFO | Engine/OpenCvLuaApi.cs:676 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'foreach' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[225] INFO | Engine/OpenCvLuaApi.cs:679 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[226] INFO | Engine/TrayNotification.cs:20 | Code Smell | Magic Number
+    Desc: Magic number literal '128' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[227] INFO | Engine/TrayNotification.cs:24 | Code Smell | Magic Number
+    Desc: Magic number literal '256' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[228] INFO | Engine/TrayNotification.cs:27 | Code Smell | Magic Number
+    Desc: Magic number literal '64' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[229] INFO | Engine/TrayNotification.cs:104 | Code Smell | Magic Number
+    Desc: Magic number literal '5000' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[230] INFO | Engine/TrayNotification.cs:157 | Code Smell | Magic Number
+    Desc: Magic number literal '32512' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[231] INFO | Engine/TrayNotification.cs:158 | Code Smell | Magic Number
+    Desc: Magic number literal '32512' used in calculation or comparison. Consider extracting to a named constant or config variable.
+[232] INFO | Engine/TrayNotification.cs:87 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[233] INFO | Engine/TrayNotification.cs:89 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[234] INFO | Engine/TrayNotification.cs:129 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 6 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[235] INFO | Engine/TrayNotification.cs:133 | Code Smell | Deep Control Flow Nesting
+    Desc: Control structure 'if' is nested 7 levels deep. Consider refactoring into smaller helper methods to improve readability.
+[236] INFO | nodes/Logging/Console/LogLevelsExample.lua:4 | Code Smell | Use of Standard Print in Node
+    Desc: Using standard 'print()' in Lua nodes is a code smell. Consider using the structured logging API (e.g. 'log.info()', 'log.warn()', 'log.error()') to specify clean message severity.

@@ -202,14 +202,34 @@ function show_gui(src : table)
     gui.config.set("plotGraph##pl", "plot2d", "pos", {10, 30})
     gui.config.set("plotGraph##pl", "plot2d", "size", {475, 160})
     gui.config.set("plotGraph##pl", "plot2d", "legend_text_color", {249, 226, 175, 255})
+    gui.config.set("plotGraph##pl", "plot2d", "title", "Engine Telemetry History")
+    gui.config.set("plotGraph##pl", "plot2d", "title_font_size", 11)
+    gui.config.set("plotGraph##pl", "plot2d", "title_color", {137, 180, 250, 255})
+    gui.config.set("plotGraph##pl", "plot2d", "grid_visible_x", true)
+    gui.config.set("plotGraph##pl", "plot2d", "grid_visible_y", true)
+    gui.config.set("plotGraph##pl", "plot2d", "grid_interval_x", 8)
+    gui.config.set("plotGraph##pl", "plot2d", "grid_interval_y", 5)
+    gui.config.set("plotGraph##pl", "plot2d", "grid_color_x", {70, 70, 95, 255})
+    gui.config.set("plotGraph##pl", "plot2d", "grid_color_y", {90, 70, 95, 255})
 
     gui.widget.create("Sensor A##ln", "plotline", "plotGraph##pl")
     gui.config.set("Sensor A##ln", "plotline", "foreground_color", {137, 180, 250, 255})
-    gui.config.set("Sensor A##ln", "plotline", "data", {10, 25, 45, 30, 60, 40, 75, 55, 90, 80})
+    gui.config.set("Sensor A##ln", "plotline", "line_thickness", 2.5)
+    gui.config.set("Sensor A##ln", "plotline", "marker_style", "circle")
+    gui.config.set("Sensor A##ln", "plotline", "marker_size", 6.0)
+    gui.config.set("Sensor A##ln", "plotline", "data", {
+        x = { 0.0, 1.2, 2.5, 3.8, 5.0, 6.2, 7.5, 8.8, 10.0, 11.2 },
+        y = { 10, 25, 45, 30, 60, 40, 75, 55, 90, 80 }
+    })
 
     gui.widget.create("Threshold##ln", "plotline", "plotGraph##pl")
-    gui.config.set("Threshold##ln", "plotline", "foreground_color", {245, 194, 231, 255})
-    gui.config.set("Threshold##ln", "plotline", "data", {15, 20, 35, 45, 50, 60, 65, 70, 75, 85})
+    gui.config.set("Threshold##ln", "plotline", "foreground_color", {243, 139, 168, 255})
+    gui.config.set("Threshold##ln", "plotline", "line_thickness", 1.5)
+    gui.config.set("Threshold##ln", "plotline", "line_style", "dashed")
+    gui.config.set("Threshold##ln", "plotline", "data", {
+        x = { 0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0 },
+        y = { 45, 45, 50, 50, 55, 55, 60 }
+    })
 
     -- Plot3D Control with Legend Config (and Camera rotation + scroll zoom)
     gui.widget.create("lblPlot3d##lb", "label", "visualPanel##pn")
@@ -221,6 +241,18 @@ function show_gui(src : table)
     gui.config.set("plot3dGraph##p3", "plot3d", "pos", {10, 230})
     gui.config.set("plot3dGraph##p3", "plot3d", "size", {475, 190})
     gui.config.set("plot3dGraph##p3", "plot3d", "legend_text_color", {249, 226, 175, 255})
+    gui.config.set("plot3dGraph##p3", "plot3d", "title", "Spatial Distribution Cage")
+    gui.config.set("plot3dGraph##p3", "plot3d", "title_font_size", 11)
+    gui.config.set("plot3dGraph##p3", "plot3d", "title_color", {166, 227, 161, 255})
+    gui.config.set("plot3dGraph##p3", "plot3d", "grid_visible_x", true)
+    gui.config.set("plot3dGraph##p3", "plot3d", "grid_visible_y", true)
+    gui.config.set("plot3dGraph##p3", "plot3d", "grid_visible_z", true)
+    gui.config.set("plot3dGraph##p3", "plot3d", "grid_interval_x", 4)
+    gui.config.set("plot3dGraph##p3", "plot3d", "grid_interval_y", 4)
+    gui.config.set("plot3dGraph##p3", "plot3d", "grid_interval_z", 4)
+    gui.config.set("plot3dGraph##p3", "plot3d", "grid_color_x", {70, 70, 95, 255})
+    gui.config.set("plot3dGraph##p3", "plot3d", "grid_color_y", {70, 70, 95, 255})
+    gui.config.set("plot3dGraph##p3", "plot3d", "grid_color_z", {166, 227, 161, 100})
     
     local peakGrid1 = {
         {10, 12, 15, 12, 10},
@@ -243,6 +275,17 @@ function show_gui(src : table)
     gui.widget.create("Channel Beta##ln", "plotline", "plot3dGraph##p3")
     gui.config.set("Channel Beta##ln", "plotline", "foreground_color", {166, 227, 161, 255})
     gui.config.set("Channel Beta##ln", "plotline", "data", peakGrid2)
+
+    -- 3D Path Plotline using 1D coordinates (x, y, z)
+    gui.widget.create("Robot Path##ln", "plotline", "plot3dGraph##p3")
+    gui.config.set("Robot Path##ln", "plotline", "foreground_color", {249, 226, 175, 255})
+    gui.config.set("Robot Path##ln", "plotline", "line_thickness", 3.0)
+    gui.config.set("Robot Path##ln", "plotline", "line_style", "dotted")
+    gui.config.set("Robot Path##ln", "plotline", "data", {
+        x = { 0.0, 1.0, 2.0, 3.0, 4.0 },
+        y = { 0.0, 1.0, 2.0, 1.0, 0.0 },
+        z = { 10.0, 30.0, 60.0, 40.0, 15.0 }
+    })
 
     -- =========================================================================
     -- 6. Horizontal Button Bar Panel (demonstrating horizontal arrangement!)
@@ -271,14 +314,23 @@ function show_gui(src : table)
     -- Setup event listeners for the horizontal layout buttons
     gui.config.set("btnUpdate##btn", "button", "onclick", function()
         gui.config.set("progStatus##pg", "progress", "data", 85)
-        local randomPts1 = {}
-        local randomPts2 = {}
+        local randomY1 = {}
+        local randomY2 = {}
         for i=1,10 do
-            table.insert(randomPts1, math.random(10, 90))
-            table.insert(randomPts2, math.random(15, 85))
+            table.insert(randomY1, math.random(10, 90))
         end
-        gui.config.set("Sensor A##ln", "plotline", "data", randomPts1)
-        gui.config.set("Threshold##ln", "plotline", "data", randomPts2)
+        for i=1,7 do
+            table.insert(randomY2, math.random(40, 60))
+        end
+
+        gui.config.set("Sensor A##ln", "plotline", "data", {
+            x = { 0.0, 1.2, 2.5, 3.8, 5.0, 6.2, 7.5, 8.8, 10.0, 11.2 },
+            y = randomY1
+        })
+        gui.config.set("Threshold##ln", "plotline", "data", {
+            x = { 0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0 },
+            y = randomY2
+        })
 
         local newGrid1 = {}
         local newGrid2 = {}
@@ -295,13 +347,23 @@ function show_gui(src : table)
         gui.config.set("Channel Alpha##ln", "plotline", "data", newGrid1)
         gui.config.set("Channel Beta##ln", "plotline", "data", newGrid2)
 
+        local randomZ = {}
+        for i=1,5 do
+            table.insert(randomZ, math.random(10, 80))
+        end
+        gui.config.set("Robot Path##ln", "plotline", "data", {
+            x = { 0.0, 1.0, 2.0, 3.0, 4.0 },
+            y = { 0.0, 1.0, 2.0, 1.0, 0.0 },
+            z = randomZ
+        })
+
         log.info("System configuration successfully applied.")
     end)
 
     gui.config.set("btnReset##btn", "button", "onclick", function()
         gui.config.set("progStatus##pg", "progress", "data", 0)
-        gui.config.set("Sensor A##ln", "plotline", "data", {0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
-        gui.config.set("Threshold##ln", "plotline", "data", {0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+        gui.config.set("Sensor A##ln", "plotline", "data", { x = {0}, y = {0} })
+        gui.config.set("Threshold##ln", "plotline", "data", { x = {0}, y = {0} })
 
         local zeroGrid = {
             {0, 0, 0, 0, 0},
@@ -312,6 +374,7 @@ function show_gui(src : table)
         }
         gui.config.set("Channel Alpha##ln", "plotline", "data", zeroGrid)
         gui.config.set("Channel Beta##ln", "plotline", "data", zeroGrid)
+        gui.config.set("Robot Path##ln", "plotline", "data", { x = {0}, y = {0}, z = {0} })
         log.warn("Statistics reset to baseline.")
     end)
 
