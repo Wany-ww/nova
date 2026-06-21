@@ -26,6 +26,12 @@ namespace FlowEngine.Engine
         public DynValue? OnChanged { get; set; }
         public DynValue? OnDoubleClick { get; set; }
         public bool IsHorizontal { get; set; } = false;
+
+        // Data series properties for plotline widgets
+        public List<double> Plot2DData { get; set; } = new List<double>();
+        public List<List<double>> Plot3DData { get; set; } = new List<List<double>>();
+        public string Legend { get; set; } = string.Empty;
+        public Brush? CustomColor { get; set; }
     }
 
     public class GuiDialog
@@ -79,6 +85,18 @@ namespace FlowEngine.Engine
         private static readonly Dictionary<string, ImageWindow> _activeGuiWindows = new Dictionary<string, ImageWindow>();
         private static readonly object _lock = new object();
 
+        private static readonly Brush[] SeriesColors = new Brush[]
+        {
+            ThemeManager.AccentBrush,
+            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#f5c2e7")), // Pink
+            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#a6e3a1")), // Green
+            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#fab387")), // Peach
+            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#b4befe")), // Lavender
+            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#f38ba8")), // Red
+            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#f9e2af")), // Yellow
+            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#94e2d5"))  // Teal
+        };
+
         public static Brush? TryGetDialogBackground(string name)
         {
             lock (_lock)
@@ -89,6 +107,22 @@ namespace FlowEngine.Engine
                 }
             }
             return null;
+        }
+
+        private static List<GuiWidget> GetChildPlotLines(string parentName)
+        {
+            var children = new List<GuiWidget>();
+            lock (_lock)
+            {
+                foreach (var widget in _widgets.Values)
+                {
+                    if (widget.ParentName == parentName && widget.Type == "plotline")
+                    {
+                        children.Add(widget);
+                    }
+                }
+            }
+            return children;
         }
 
         public static Script? CurrentScript { get; private set; }
@@ -270,9 +304,16 @@ namespace FlowEngine.Engine
                     {
                         parentCanvas = parentDialog.RootCanvas;
                     }
-                    else if (_widgets.TryGetValue(parent, out parentWidget) && parentWidget.Type == "panel")
+                    else if (_widgets.TryGetValue(parent, out parentWidget) && (parentWidget.Type == "panel" || parentWidget.Type == "plot2d" || parentWidget.Type == "plot3d"))
                     {
-                        parentCanvas = parentWidget.ContainerCanvas;
+                        if (parentWidget.Type == "panel")
+                        {
+                            parentCanvas = parentWidget.ContainerCanvas;
+                        }
+                        else
+                        {
+                            parentCanvas = parentWidget.Element as Canvas;
+                        }
                     }
 
                     if (parentCanvas == null) return;
@@ -346,6 +387,10 @@ namespace FlowEngine.Engine
                                 BorderThickness = new Thickness(1),
                                 BorderBrush = ThemeManager.BorderBrush
                             };
+                            break;
+
+                        case "plotline":
+                            element = new FrameworkElement();
                             break;
 
                         default:
@@ -481,7 +526,7 @@ namespace FlowEngine.Engine
                                 plotCanvas2d.Tag = state2d;
                             }
                             state2d.Legend = value.CastToString() ?? string.Empty;
-                            RenderPlot2D(plotCanvas2d, state2d.Data);
+                            RenderPlot2D(plotCanvas2d);
                         }
                         else if (widget.Type == "plot3d" && widget.Element is Canvas plotCanvas3d)
                         {
@@ -491,7 +536,21 @@ namespace FlowEngine.Engine
                                 plotCanvas3d.Tag = state3d;
                             }
                             state3d.Legend = value.CastToString() ?? string.Empty;
-                            RenderPlot3D(plotCanvas3d, state3d.GridData);
+                            RenderPlot3D(plotCanvas3d);
+                        }
+                        else if (widget.Type == "plotline")
+                        {
+                            widget.Legend = value.CastToString() ?? string.Empty;
+                            GuiWidget? parentWidget = null;
+                            lock (_lock)
+                            {
+                                _widgets.TryGetValue(widget.ParentName, out parentWidget);
+                            }
+                            if (parentWidget != null && parentWidget.Element is Canvas parentCanvas)
+                            {
+                                if (parentWidget.Type == "plot2d") RenderPlot2D(parentCanvas);
+                                else if (parentWidget.Type == "plot3d") RenderPlot3D(parentCanvas);
+                            }
                         }
                         break;
 
@@ -512,6 +571,20 @@ namespace FlowEngine.Engine
                         {
                             if (widget.Element is Control control) control.Foreground = fgBrush;
                             else if (widget.Element is TextBlock tb) tb.Foreground = fgBrush;
+                            else if (widget.Type == "plotline")
+                            {
+                                widget.CustomColor = fgBrush;
+                                GuiWidget? parentWidget = null;
+                                lock (_lock)
+                                {
+                                    _widgets.TryGetValue(widget.ParentName, out parentWidget);
+                                }
+                                if (parentWidget != null && parentWidget.Element is Canvas parentCanvas)
+                                {
+                                    if (parentWidget.Type == "plot2d") RenderPlot2D(parentCanvas);
+                                    else if (parentWidget.Type == "plot3d") RenderPlot3D(parentCanvas);
+                                }
+                            }
                         }
                         break;
 
@@ -641,7 +714,7 @@ namespace FlowEngine.Engine
                                 plotCanvas.Tag = state;
                             }
                             state.Data = pts;
-                            RenderPlot2D(plotCanvas, pts);
+                            RenderPlot2D(plotCanvas);
                         }
                         else if (widget.Element is Canvas plot3dCanvas && widget.Type == "plot3d" && value.Type == DataType.Table)
                         {
@@ -660,7 +733,61 @@ namespace FlowEngine.Engine
                                     grid.Add(rowList);
                                 }
                             }
-                            RenderPlot3D(plot3dCanvas, grid);
+                            if (!(plot3dCanvas.Tag is Plot3DState state))
+                            {
+                                state = new Plot3DState();
+                                plot3dCanvas.Tag = state;
+                            }
+                            state.GridData = grid;
+                            RenderPlot3D(plot3dCanvas);
+                        }
+                        else if (widget.Type == "plotline" && value.Type == DataType.Table)
+                        {
+                            GuiWidget? parentWidget = null;
+                            lock (_lock)
+                            {
+                                _widgets.TryGetValue(widget.ParentName, out parentWidget);
+                            }
+                            if (parentWidget != null)
+                            {
+                                if (parentWidget.Type == "plot2d")
+                                {
+                                    var tbl = value.Table;
+                                    List<double> pts = new List<double>();
+                                    for (int i = 1; i <= tbl.Length; i++)
+                                    {
+                                        pts.Add(tbl.Get(i).Number);
+                                    }
+                                    widget.Plot2DData = pts;
+                                    if (parentWidget.Element is Canvas parentCanvas)
+                                    {
+                                        RenderPlot2D(parentCanvas);
+                                    }
+                                }
+                                else if (parentWidget.Type == "plot3d")
+                                {
+                                    var tbl = value.Table;
+                                    List<List<double>> grid = new List<List<double>>();
+                                    for (int i = 1; i <= tbl.Length; i++)
+                                    {
+                                        var rowVal = tbl.Get(i);
+                                        if (rowVal.Type == DataType.Table)
+                                        {
+                                            var rowList = new List<double>();
+                                            for (int j = 1; j <= rowVal.Table.Length; j++)
+                                            {
+                                                rowList.Add(rowVal.Table.Get(j).Number);
+                                            }
+                                            grid.Add(rowList);
+                                        }
+                                    }
+                                    widget.Plot3DData = grid;
+                                    if (parentWidget.Element is Canvas parentCanvas)
+                                    {
+                                        RenderPlot3D(parentCanvas);
+                                    }
+                                }
+                            }
                         }
                         else if (widget.Element is ProgressBar pb)
                         {
@@ -1017,11 +1144,10 @@ namespace FlowEngine.Engine
             }
         }
 
-        private static void RenderPlot2D(Canvas canvas, List<double> data)
+        private static void RenderPlot2D(Canvas canvas)
         {
             canvas.ClipToBounds = true;
             canvas.Children.Clear();
-            if (data.Count == 0) return;
 
             double width = canvas.Width;
             double height = canvas.Height;
@@ -1038,11 +1164,6 @@ namespace FlowEngine.Engine
             };
             canvas.Children.Add(bg);
 
-            double min = data.Min();
-            double max = data.Max();
-            double range = max - min;
-            if (range == 0) range = 1;
-
             for (int i = 1; i < 4; i++)
             {
                 var gridLine = new Line
@@ -1057,47 +1178,119 @@ namespace FlowEngine.Engine
                 canvas.Children.Add(gridLine);
             }
 
-            var polyline = new Polyline
+            string plotName = string.Empty;
+            lock (_lock)
             {
-                Stroke = ThemeManager.AccentBrush,
-                StrokeThickness = 2
-            };
-
-            for (int i = 0; i < data.Count; i++)
-            {
-                double x = width * i / Math.Max(1, data.Count - 1);
-                double y = height - (height * (data[i] - min) / range);
-                polyline.Points.Add(new Point(x, y));
+                foreach (var pair in _widgets)
+                {
+                    if (pair.Value.Element == canvas)
+                    {
+                        plotName = pair.Key;
+                        break;
+                    }
+                }
             }
 
-            canvas.Children.Add(polyline);
+            var lines = GetChildPlotLines(plotName);
 
-            // Add legend if configured
-            if (canvas.Tag is Plot2DState state && !string.IsNullOrEmpty(state.Legend))
+            List<List<double>> datasets = new List<List<double>>();
+            List<string> legends = new List<string>();
+            List<Brush> colors = new List<Brush>();
+
+            if (lines.Count > 0)
             {
-                var legendPanel = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
-                
-                var accentLine = new Line
+                for (int idx = 0; idx < lines.Count; idx++)
                 {
-                    X1 = 0,
-                    Y1 = 0,
-                    X2 = 12,
-                    Y2 = 0,
-                    Stroke = ThemeManager.AccentBrush,
-                    StrokeThickness = 2,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(0, 0, 4, 0)
-                };
-                legendPanel.Children.Add(accentLine);
+                    var lineWidget = lines[idx];
+                    if (lineWidget.Plot2DData.Count > 0)
+                    {
+                        datasets.Add(lineWidget.Plot2DData);
+                        legends.Add(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : GetDisplayName(lineWidget.Name));
+                        colors.Add(lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length]);
+                    }
+                }
+            }
+            else
+            {
+                if (canvas.Tag is Plot2DState plotState && plotState.Data.Count > 0)
+                {
+                    datasets.Add(plotState.Data);
+                    legends.Add(plotState.Legend);
+                    colors.Add(ThemeManager.AccentBrush);
+                }
+            }
 
-                var legendText = new TextBlock
+            if (datasets.Count == 0) return;
+
+            double min = double.MaxValue;
+            double max = double.MinValue;
+            foreach (var dataset in datasets)
+            {
+                foreach (var val in dataset)
                 {
-                    Text = state.Legend,
-                    Foreground = ThemeManager.TitleBarFgBrush,
-                    FontSize = 9,
-                    VerticalAlignment = VerticalAlignment.Center
+                    if (val < min) min = val;
+                    if (val > max) max = val;
+                }
+            }
+            double range = max - min;
+            if (range == 0) range = 1;
+
+            for (int d = 0; d < datasets.Count; d++)
+            {
+                var dataset = datasets[d];
+                var brush = colors[d];
+
+                var polyline = new Polyline
+                {
+                    Stroke = brush,
+                    StrokeThickness = 2
                 };
-                legendPanel.Children.Add(legendText);
+
+                for (int i = 0; i < dataset.Count; i++)
+                {
+                    double x = width * i / Math.Max(1, dataset.Count - 1);
+                    double y = height - (height * (dataset[i] - min) / range);
+                    polyline.Points.Add(new Point(x, y));
+                }
+
+                canvas.Children.Add(polyline);
+            }
+
+            bool hasAnyLegend = legends.Any(l => !string.IsNullOrEmpty(l));
+            if (hasAnyLegend)
+            {
+                var legendPanel = new StackPanel { Orientation = Orientation.Vertical, Margin = new Thickness(0) };
+
+                for (int d = 0; d < datasets.Count; d++)
+                {
+                    string legText = legends[d];
+                    if (string.IsNullOrEmpty(legText)) continue;
+
+                    var itemPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 1, 0, 1) };
+                    
+                    var accentLine = new Line
+                    {
+                        X1 = 0,
+                        Y1 = 0,
+                        X2 = 12,
+                        Y2 = 0,
+                        Stroke = colors[d],
+                        StrokeThickness = 2,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(0, 0, 6, 0)
+                    };
+                    itemPanel.Children.Add(accentLine);
+
+                    var legendLabel = new TextBlock
+                    {
+                        Text = legText,
+                        Foreground = ThemeManager.TitleBarFgBrush,
+                        FontSize = 9,
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    itemPanel.Children.Add(legendLabel);
+                    legendPanel.Children.Add(itemPanel);
+                }
 
                 var legendBorder = new Border
                 {
@@ -1105,7 +1298,7 @@ namespace FlowEngine.Engine
                     BorderBrush = ThemeManager.BorderBrush,
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(3),
-                    Padding = new Thickness(6, 3, 6, 3),
+                    Padding = new Thickness(6, 4, 6, 4),
                     Child = legendPanel
                 };
 
@@ -1115,11 +1308,10 @@ namespace FlowEngine.Engine
             }
         }
 
-        private static void RenderPlot3D(Canvas canvas, List<List<double>> grid)
+        private static void RenderPlot3D(Canvas canvas)
         {
             canvas.ClipToBounds = true;
             canvas.Children.Clear();
-            if (grid.Count == 0 || grid[0].Count == 0) return;
 
             double width = canvas.Width;
             double height = canvas.Height;
@@ -1157,7 +1349,7 @@ namespace FlowEngine.Engine
                         state.RotateY -= dy * 0.5;
 
                         state.LastMousePos = pos;
-                        RenderPlot3D(canvas, state.GridData);
+                        RenderPlot3D(canvas);
                     }
                 };
 
@@ -1172,11 +1364,9 @@ namespace FlowEngine.Engine
                     if (state.Zoom > 10.0) state.Zoom = 10.0;
 
                     e.Handled = true;
-                    RenderPlot3D(canvas, state.GridData);
+                    RenderPlot3D(canvas);
                 };
             }
-
-            state.GridData = grid;
 
             var bg = new Border
             {
@@ -1188,21 +1378,65 @@ namespace FlowEngine.Engine
             };
             canvas.Children.Add(bg);
 
+            string plotName = string.Empty;
+            lock (_lock)
+            {
+                foreach (var pair in _widgets)
+                {
+                    if (pair.Value.Element == canvas)
+                    {
+                        plotName = pair.Key;
+                        break;
+                    }
+                }
+            }
+
+            var lines = GetChildPlotLines(plotName);
+
+            List<List<List<double>>> datasets = new List<List<List<double>>>();
+            List<string> legends = new List<string>();
+            List<Brush> colors = new List<Brush>();
+
+            if (lines.Count > 0)
+            {
+                for (int idx = 0; idx < lines.Count; idx++)
+                {
+                    var lineWidget = lines[idx];
+                    if (lineWidget.Plot3DData.Count > 0 && lineWidget.Plot3DData[0].Count > 0)
+                    {
+                        datasets.Add(lineWidget.Plot3DData);
+                        legends.Add(!string.IsNullOrEmpty(lineWidget.Legend) ? lineWidget.Legend : GetDisplayName(lineWidget.Name));
+                        colors.Add(lineWidget.CustomColor ?? SeriesColors[idx % SeriesColors.Length]);
+                    }
+                }
+            }
+            else
+            {
+                if (state.GridData.Count > 0 && state.GridData[0].Count > 0)
+                {
+                    datasets.Add(state.GridData);
+                    legends.Add(state.Legend);
+                    colors.Add(ThemeManager.AccentBrush);
+                }
+            }
+
+            if (datasets.Count == 0) return;
+
             double minZ = double.MaxValue;
             double maxZ = double.MinValue;
-            foreach (var row in grid)
+            foreach (var grid in datasets)
             {
-                foreach (var val in row)
+                foreach (var row in grid)
                 {
-                    if (val < minZ) minZ = val;
-                    if (val > maxZ) maxZ = val;
+                    foreach (var val in row)
+                    {
+                        if (val < minZ) minZ = val;
+                        if (val > maxZ) maxZ = val;
+                    }
                 }
             }
             double rangeZ = maxZ - minZ;
             if (rangeZ == 0) rangeZ = 1;
-
-            int rows = grid.Count;
-            int cols = grid[0].Count;
 
             double radX = state.RotateX * Math.PI / 180.0;
             double radY = state.RotateY * Math.PI / 180.0;
@@ -1211,86 +1445,103 @@ namespace FlowEngine.Engine
             double cosY = Math.Cos(radY);
             double sinY = Math.Sin(radY);
 
-            Point Project(int r, int c, double val)
+            for (int d = 0; d < datasets.Count; d++)
             {
-                double x = (double)c / Math.Max(1, cols - 1) - 0.5;
-                double y = (double)r / Math.Max(1, rows - 1) - 0.5;
-                double z = (val - minZ) / rangeZ - 0.5;
+                var grid = datasets[d];
+                var strokeBrush = colors[d];
+                int rows = grid.Count;
+                int cols = grid[0].Count;
 
-                double y1 = y * cosY - z * sinY;
-                double z1 = y * sinY + z * cosY;
-
-                double x2 = x * cosX - y1 * sinX;
-                double y2 = x * sinX + y1 * cosX;
-
-                double scale = width * 0.7 * state.Zoom;
-                double screenX = width / 2.0 + x2 * scale;
-                double screenY = height / 2.0 + y2 * scale - z1 * (scale * 0.5);
-
-                return new Point(screenX, screenY);
-            }
-
-            for (int r = 0; r < rows; r++)
-            {
-                for (int c = 0; c < cols - 1; c++)
+                Point Project(int r, int c, double val)
                 {
-                    var pt1 = Project(r, c, grid[r][c]);
-                    var pt2 = Project(r, c + 1, grid[r][c + 1]);
-                    var line = new Line
+                    double x = (double)c / Math.Max(1, cols - 1) - 0.5;
+                    double y = (double)r / Math.Max(1, rows - 1) - 0.5;
+                    double z = (val - minZ) / rangeZ - 0.5;
+
+                    double y1 = y * cosY - z * sinY;
+                    double z1 = y * sinY + z * cosY;
+
+                    double x2 = x * cosX - y1 * sinX;
+                    double y2 = x * sinX + y1 * cosX;
+
+                    double scale = width * 0.7 * state.Zoom;
+                    double screenX = width / 2.0 + x2 * scale;
+                    double screenY = height / 2.0 + y2 * scale - z1 * (scale * 0.5);
+
+                    return new Point(screenX, screenY);
+                }
+
+                for (int r = 0; r < rows; r++)
+                {
+                    for (int c = 0; c < cols - 1; c++)
                     {
-                        X1 = pt1.X,
-                        Y1 = pt1.Y,
-                        X2 = pt2.X,
-                        Y2 = pt2.Y,
-                        Stroke = ThemeManager.AccentBrush,
-                        StrokeThickness = 1
-                    };
-                    canvas.Children.Add(line);
+                        var pt1 = Project(r, c, grid[r][c]);
+                        var pt2 = Project(r, c + 1, grid[r][c + 1]);
+                        var line = new Line
+                        {
+                            X1 = pt1.X,
+                            Y1 = pt1.Y,
+                            X2 = pt2.X,
+                            Y2 = pt2.Y,
+                            Stroke = strokeBrush,
+                            StrokeThickness = 1
+                        };
+                        canvas.Children.Add(line);
+                    }
+                }
+
+                for (int c = 0; c < cols; c++)
+                {
+                    for (int r = 0; r < rows - 1; r++)
+                    {
+                        var pt1 = Project(r, c, grid[r][c]);
+                        var pt2 = Project(r + 1, c, grid[r + 1][c]);
+                        var line = new Line
+                        {
+                            X1 = pt1.X,
+                            Y1 = pt1.Y,
+                            X2 = pt2.X,
+                            Y2 = pt2.Y,
+                            Stroke = strokeBrush,
+                            StrokeThickness = 1
+                        };
+                        canvas.Children.Add(line);
+                    }
                 }
             }
 
-            for (int c = 0; c < cols; c++)
+            bool hasAnyLegend = legends.Any(l => !string.IsNullOrEmpty(l));
+            if (hasAnyLegend)
             {
-                for (int r = 0; r < rows - 1; r++)
+                var legendPanel = new StackPanel { Orientation = Orientation.Vertical, Margin = new Thickness(0) };
+
+                for (int d = 0; d < datasets.Count; d++)
                 {
-                    var pt1 = Project(r, c, grid[r][c]);
-                    var pt2 = Project(r + 1, c, grid[r + 1][c]);
-                    var line = new Line
+                    string legText = legends[d];
+                    if (string.IsNullOrEmpty(legText)) continue;
+
+                    var itemPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 1, 0, 1) };
+                    
+                    var accentMarker = new Rectangle
                     {
-                        X1 = pt1.X,
-                        Y1 = pt1.Y,
-                        X2 = pt2.X,
-                        Y2 = pt2.Y,
-                        Stroke = ThemeManager.AccentBrush,
-                        StrokeThickness = 1
+                        Width = 8,
+                        Height = 8,
+                        Fill = colors[d],
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(0, 0, 6, 0)
                     };
-                    canvas.Children.Add(line);
+                    itemPanel.Children.Add(accentMarker);
+
+                    var legendLabel = new TextBlock
+                    {
+                        Text = legText,
+                        Foreground = ThemeManager.TitleBarFgBrush,
+                        FontSize = 9,
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    itemPanel.Children.Add(legendLabel);
+                    legendPanel.Children.Add(itemPanel);
                 }
-            }
-
-            // Add legend if configured
-            if (canvas.Tag is Plot3DState statePlot3D && !string.IsNullOrEmpty(statePlot3D.Legend))
-            {
-                var legendPanel = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
-                
-                var accentMarker = new Rectangle
-                {
-                    Width = 8,
-                    Height = 8,
-                    Fill = ThemeManager.AccentBrush,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(0, 0, 4, 0)
-                };
-                legendPanel.Children.Add(accentMarker);
-
-                var legendText = new TextBlock
-                {
-                    Text = statePlot3D.Legend,
-                    Foreground = ThemeManager.TitleBarFgBrush,
-                    FontSize = 9,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                legendPanel.Children.Add(legendText);
 
                 var legendBorder = new Border
                 {
@@ -1298,7 +1549,7 @@ namespace FlowEngine.Engine
                     BorderBrush = ThemeManager.BorderBrush,
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(3),
-                    Padding = new Thickness(6, 3, 6, 3),
+                    Padding = new Thickness(6, 4, 6, 4),
                     Child = legendPanel
                 };
 

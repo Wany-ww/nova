@@ -129,32 +129,54 @@ function show_gui(src : table)
     -- Plot2D Control with Legend Config
     gui.widget.create("lblPlot2d##lb", "label", "visualPanel##pn")
     gui.config.set("lblPlot2d##lb", "label", "pos", {10, 10})
-    gui.config.set("lblPlot2d##lb", "label", "label", "Real-time Telemetry (2D Plot)")
+    gui.config.set("lblPlot2d##lb", "label", "label", "Real-time Telemetry (2D Plot - Multiple Series)")
 
     gui.widget.create("plotGraph##pl", "plot2d", "visualPanel##pn")
     gui.config.set("plotGraph##pl", "plot2d", "pos", {10, 30})
     gui.config.set("plotGraph##pl", "plot2d", "size", {475, 160})
-    gui.config.set("plotGraph##pl", "plot2d", "data", {10, 25, 45, 30, 60, 40, 75, 55, 90, 80})
-    gui.config.set("plotGraph##pl", "plot2d", "legend", "Telemetry (X-axis: Epochs, Y-axis: Value)")
+
+    gui.widget.create("lineTelemetry##ln", "plotline", "plotGraph##pl")
+    gui.config.set("lineTelemetry##ln", "plotline", "legend", "Sensor A (Active)")
+    gui.config.set("lineTelemetry##ln", "plotline", "foreground_color", {137, 180, 250, 255})
+    gui.config.set("lineTelemetry##ln", "plotline", "data", {10, 25, 45, 30, 60, 40, 75, 55, 90, 80})
+
+    gui.widget.create("linePrediction##ln", "plotline", "plotGraph##pl")
+    gui.config.set("linePrediction##ln", "plotline", "legend", "Threshold (Predicted)")
+    gui.config.set("linePrediction##ln", "plotline", "foreground_color", {245, 194, 231, 255})
+    gui.config.set("linePrediction##ln", "plotline", "data", {15, 20, 35, 45, 50, 60, 65, 70, 75, 85})
 
     -- Plot3D Control with Legend Config (and Camera rotation + scroll zoom)
     gui.widget.create("lblPlot3d##lb", "label", "visualPanel##pn")
     gui.config.set("lblPlot3d##lb", "label", "pos", {10, 210})
-    gui.config.set("lblPlot3d##lb", "label", "label", "Peak Distribution (3D Plot - Right-drag to Rotate, Wheel to Zoom)")
+    gui.config.set("lblPlot3d##lb", "label", "label", "Peak Distribution (3D Plot - Rotate/Zoom)")
 
     gui.widget.create("plot3dGraph##p3", "plot3d", "visualPanel##pn")
     gui.config.set("plot3dGraph##p3", "plot3d", "pos", {10, 230})
     gui.config.set("plot3dGraph##p3", "plot3d", "size", {475, 190})
     
-    local peakGrid = {
+    local peakGrid1 = {
         {10, 12, 15, 12, 10},
         {12, 20, 35, 20, 12},
         {15, 35, 80, 35, 15},
         {12, 20, 35, 20, 12},
         {10, 12, 15, 12, 10}
     }
-    gui.config.set("plot3dGraph##p3", "plot3d", "data", peakGrid)
-    gui.config.set("plot3dGraph##p3", "plot3d", "legend", "Peak Density (3D Wireframe)")
+    gui.widget.create("surface1##ln", "plotline", "plot3dGraph##p3")
+    gui.config.set("surface1##ln", "plotline", "legend", "Channel Alpha")
+    gui.config.set("surface1##ln", "plotline", "foreground_color", {137, 180, 250, 255})
+    gui.config.set("surface1##ln", "plotline", "data", peakGrid1)
+
+    local peakGrid2 = {
+        {20, 18, 15, 18, 20},
+        {18, 25, 30, 25, 18},
+        {15, 30, 50, 30, 15},
+        {18, 25, 30, 25, 18},
+        {20, 18, 15, 18, 20}
+    }
+    gui.widget.create("surface2##ln", "plotline", "plot3dGraph##p3")
+    gui.config.set("surface2##ln", "plotline", "legend", "Channel Beta")
+    gui.config.set("surface2##ln", "plotline", "foreground_color", {166, 227, 161, 255})
+    gui.config.set("surface2##ln", "plotline", "data", peakGrid2)
 
     -- =========================================================================
     -- 6. Horizontal Button Bar Panel (demonstrating horizontal arrangement!)
@@ -180,17 +202,47 @@ function show_gui(src : table)
     -- Setup event listeners for the horizontal layout buttons
     gui.config.set("btnUpdate##btn", "button", "onclick", function()
         gui.config.set("progStatus##pg", "progress", "data", 85)
-        local randomPts = {}
+        local randomPts1 = {}
+        local randomPts2 = {}
         for i=1,10 do
-            table.insert(randomPts, math.random(10, 90))
+            table.insert(randomPts1, math.random(10, 90))
+            table.insert(randomPts2, math.random(15, 85))
         end
-        gui.config.set("plotGraph##pl", "plot2d", "data", randomPts)
+        gui.config.set("lineTelemetry##ln", "plotline", "data", randomPts1)
+        gui.config.set("linePrediction##ln", "plotline", "data", randomPts2)
+
+        local newGrid1 = {}
+        local newGrid2 = {}
+        for r=1,5 do
+            local row1 = {}
+            local row2 = {}
+            for c=1,5 do
+                table.insert(row1, math.random(5, 75))
+                table.insert(row2, math.random(10, 60))
+            end
+            table.insert(newGrid1, row1)
+            table.insert(newGrid2, row2)
+        end
+        gui.config.set("surface1##ln", "plotline", "data", newGrid1)
+        gui.config.set("surface2##ln", "plotline", "data", newGrid2)
+
         log.info("System configuration successfully applied.")
     end)
 
     gui.config.set("btnReset##btn", "button", "onclick", function()
         gui.config.set("progStatus##pg", "progress", "data", 0)
-        gui.config.set("plotGraph##pl", "plot2d", "data", {0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+        gui.config.set("lineTelemetry##ln", "plotline", "data", {0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+        gui.config.set("linePrediction##ln", "plotline", "data", {0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+
+        local zeroGrid = {
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0}
+        }
+        gui.config.set("surface1##ln", "plotline", "data", zeroGrid)
+        gui.config.set("surface2##ln", "plotline", "data", zeroGrid)
         log.warn("Statistics reset to baseline.")
     end)
 
@@ -202,9 +254,11 @@ function show_gui(src : table)
     -- 7. Live Camera Feed Image View / Dummy image if no input
     -- =========================================================================
     local displayImg = src
+    local needRelease = false
     if not (displayImg and type(displayImg) == "userdata" and not displayImg:empty()) then
         -- Create a dummy matrix to showcase the image widget!
         displayImg = cv.Mat(120, 180, cv.CV_8UC3)
+        needRelease = true
         -- Draw a nice placeholder pattern on it
         cv.rectangle(displayImg, 5, 5, 175, 115, {137, 180, 250}, -1) -- filled background light blue
         cv.rectangle(displayImg, 10, 10, 170, 110, {30, 30, 46}, -1)  -- filled inner dark blue
@@ -220,4 +274,8 @@ function show_gui(src : table)
     gui.config.set("imgView##im", "image", "pos", {590, 485})
     gui.config.set("imgView##im", "image", "size", {120, 80})
     gui.config.set("imgView##im", "image", "data", displayImg)
+
+    if needRelease then
+        displayImg:release()
+    end
 end

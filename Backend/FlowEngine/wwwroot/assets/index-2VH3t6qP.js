@@ -203,28 +203,24 @@ gui.dialog.create(dlg)
 gui.dialog.show(dlg, true) -- Show dialog
 
 -- Hide dialog later
-gui.dialog.show(dlg, false)`},{name:`gui.widget.create`,category:`GUI`,signature:`gui.widget.create(name: string, type: string, parent: string)`,description:`Creates a dynamic visual widget under a parent dialog or panel. If the widget name exists, or the parent is invalid, this call is ignored. Suffix masking (\`##\` convention) hides the unique trailing identifier.
+gui.dialog.show(dlg, false)`},{name:`gui.widget.create`,category:`GUI`,signature:`gui.widget.create(name: string, type: string, parent: string)`,description:`Creates a dynamic visual widget under a parent dialog, panel, or plot. Suffix masking (\`##\` convention) hides the unique trailing identifier.
 
 ### Available Widget Types:
-- **panel**: A container box that can host child widgets.
-- **button**: An interactive button control.
-- **label**: Simple static text block.
-- **slider**: Horizontal slider bar with adjustable ranges.
-- **checkbox**: Standard binary tick checkbox.
-- **dropdown**: Selection box with a list of text options.
-- **textinput**: Single-line text input field.
-- **image**: Displays a static/dynamic matrix image.
-- **plot2d**: Renders a 2D line graph from a list of numbers.
-- **plot3d**: Renders a 3D wireframe mesh from a 2D grid matrix.
-- **progress**: Renders a progress completion bar (0-100).
-- **colorpicker**: Button opening a dark-themed RGB color picker window.`,inputs:[{name:`name`,type:`string`,desc:`Unique identifier name of the widget (e.g. 'btnStart##btn').`},{name:`type`,type:`string`,desc:`One of: 'panel', 'button', 'label', 'slider', 'checkbox', 'dropdown', 'textinput', 'image', 'plot2d', 'plot3d', 'progress', 'colorpicker'.`},{name:`parent`,type:`string`,desc:`Unique name of the parent dialog or parent panel widget.`}],outputs:[],example:`local dlg = "Monitor##dlg"
+- **panel**: A container box hosting other child widgets.
+- **button** / **label**: Interactive buttons and text labels.
+- **slider** / **progress**: Adjustable range bar and completion status.
+- **checkbox** / **dropdown** / **textinput**: Standard interactive forms.
+- **image**: Displays real-time matrix images (\`cv.Mat\`).
+- **plot2d** / **plot3d**: Graph canvases. Can host child \`plotline\` widgets.
+- **plotline**: A data series widget nested under \`plot2d\` or \`plot3d\`.
+- **colorpicker**: Button opening an RGB color selection window.`,inputs:[{name:`name`,type:`string`,desc:`Unique identifier name of the widget (e.g. 'btnStart##btn').`},{name:`type`,type:`string`,desc:`One of: 'panel', 'button', 'label', 'slider', 'checkbox', 'dropdown', 'textinput', 'image', 'plot2d', 'plot3d', 'progress', 'colorpicker', 'plotline'.`},{name:`parent`,type:`string`,desc:`Unique name of the parent dialog or parent panel widget.`}],outputs:[],example:`local dlg = "Monitor##dlg"
 gui.dialog.create(dlg)
 
 -- Create a panel child under the dialog
 gui.widget.create("myPanel##pn", "panel", dlg)
 
 -- Create a button child under the panel container
-gui.widget.create("btnRun##btn", "button", "myPanel##pn")`},{name:`gui.config.set`,category:`GUI`,signature:`gui.config.set(name: string, type: string, key: string, value: any)`,description:"Sets properties, styles, ranges, datasets, and callbacks for widgets/dialogs. If the widget/dialog does not exist, the call is ignored.\n\n### Configuration Keys:\n- **size** (`table`): Dimensions `{width, height}` in pixels. (e.g. `{300, 200}`). Applies to dialog or any widget.\n- **pos** (`table`): Coordinates `{x, y}` relative to parent. (e.g. `{10, 50}`).\n- **foreground_color** (`table`): Text or border color `{r, g, b, a}` (0-255).\n- **background_color** (`table`): Canvas/widget background color `{r, g, b, a}` (0-255).\n- **label** (`string`): Visual display text for buttons, labels, and checkboxes.\n- **horizontal** (`boolean`): Arrange panel children in a left-to-right flow.\n- **legend** (`string`): Overlay text at the top-right corner of 2D/3D plots.\n\n### Callback Functions:\n- **onclick**: Action triggered when clicked. Callback: `function()`\n- **onhover**: Action triggered when hovered. Callback: `function()`\n- **ondoubleclick**: Action triggered when double clicked. Callback: `function()`\n- **onchanged**: Action triggered on value change. Callbacks by control type:\n  - **slider**: `function(value: number)`\n  - **checkbox**: `function(checked: boolean)`\n  - **dropdown**: `function(selectedIndex: number)` (1-based index)\n  - **textinput**: `function(text: string)`\n  - **colorpicker**: `function(color: table)` (receives `{r, g, b, a}`)\n\n### Data Inputs (`data` key):\n- **slider / progress**: Numerical value.\n- **checkbox**: Boolean (`true`/`false`).\n- **dropdown**: Integer index (`1`-based choice index).\n- **textinput**: String text.\n- **colorpicker**: Color table `{r, g, b, a}`.\n- **image**: A `cv.Mat` object to display matrix frames in real-time.\n- **plot2d**: Array of numbers representing Y-values.\n- **plot3d**: 2D array of grid heights `{{z11, z12, ...}, {z21, z22, ...}}`.",inputs:[{name:`name`,type:`string`,desc:`The widget or dialog unique identifier name.`},{name:`type`,type:`string`,desc:`Type of the target (e.g. 'dialog', 'button', 'slider', 'colorpicker').`},{name:`key`,type:`string`,desc:`Property key to modify (e.g., 'size', 'pos', 'onclick', 'data', 'background_color').`},{name:`value`,type:`any`,desc:`Value matching key requirements (table, function, number, string, boolean, cv.Mat).`}],outputs:[],example:`-- 1. Create and customize a dialog with custom background
+gui.widget.create("btnRun##btn", "button", "myPanel##pn")`},{name:`gui.config.set`,category:`GUI`,signature:`gui.config.set(name: string, type: string, key: string, value: any)`,description:"Sets properties, datasets, and callbacks for widgets or dialogs.\n\n### Configuration Keys:\n- **size** (`table`): Dimensions `{width, height}` in pixels.\n- **pos** (`table`): Coordinates `{x, y}` relative to parent.\n- **foreground_color** (`table`): Color `{r, g, b, a}`. Customizes series color on `plotline`.\n- **background_color** (`table`): Background color `{r, g, b, a}`.\n- **label** (`string`): Display text for buttons, labels, checkboxes.\n- **horizontal** (`boolean`): Arranges panel children horizontally.\n- **legend** (`string`): Legend name for plots or specific `plotline` series.\n\n### Callback Functions:\n- **onclick** / **onhover** / **ondoubleclick**: Triggers on interaction.\n- **onchanged**: Triggers when value changes (for slider, checkbox, dropdown, textinput, colorpicker).\n\n### Data Inputs (`data` key):\n- **slider** / **progress**: Numerical value.\n- **checkbox**: Boolean (`true`/`false`).\n- **dropdown** / **textinput**: Selection index or text string.\n- **colorpicker**: Color table `{r, g, b, a}`.\n- **image**: A `cv.Mat` object to draw in real-time.\n- **plot2d** / **plotline** (under plot2d): Array of Y-values.\n- **plot3d** / **plotline** (under plot3d): 2D grid heights `{{z11, z12, ...}, ...}`.",inputs:[{name:`name`,type:`string`,desc:`The widget or dialog unique identifier name.`},{name:`type`,type:`string`,desc:`Type of the target (e.g. 'dialog', 'button', 'slider', 'colorpicker', 'plotline').`},{name:`key`,type:`string`,desc:`Property key to modify (e.g., 'size', 'pos', 'onclick', 'data', 'background_color').`},{name:`value`,type:`any`,desc:`Value matching key requirements (table, function, number, string, boolean, cv.Mat).`}],outputs:[],example:`-- 1. Create and customize a dialog with custom background
 local dlg = "MyDashboard##1"
 gui.dialog.create(dlg)
 gui.config.set(dlg, "dialog", "size", {500, 400})
